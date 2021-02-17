@@ -1,0 +1,250 @@
+openapi: 3.0.0
+info:
+  title: REST API DOC
+  description: |
+    REST API 문서
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:4000/api'
+
+paths:
+# === NewSale =========================================================
+  /newsale/create:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                contents_name: 
+                  type: string
+                  description: 컨텐츠에 표시될 텍스트, 검색될 때 사용
+                    
+                contents_type: 
+                  type: string
+                  enum:
+                    - preview video
+                    - 360 vr
+                    - live
+                    - market
+                  default:
+                    - preview video
+                  description: 영상, 360 vr, 주거, 상가
+
+                local_address: 
+                  type: string
+                  description: 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
+                thumnail_image:
+                  type: string
+                  description: 매물에 대한 대표 이미지 링크
+                preview_video_link:
+                  type: string
+                  description: 미리보기 영상 로컬링크
+                youtube_info_link:
+                  type: string
+                  description: 안내영상 링크(youtube link)
+                youtube_inner_link:
+                  type: string
+                  description: 내부영상 링크(youtube link)
+                vr_link_inner: 
+                  type: string
+                  description: 내부 vr 영상을 위한 링크(youtube link)
+                vr_link_outer: 
+                  type: string
+                  description: 외부 vr 영상을 위한 링크(youtube link)
+                vr_link_typeA: 
+                  type: string
+                  description: type A vr 링크
+                vr_link_typeB: 
+                  type: string
+                  description: type B vr 링크
+            
+                vr_image: 
+                  type: string
+                  description: >
+                    사진 슬라이드에 들어갈 이미지 로컬링크<br/>
+                    이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때)일 경우에는 어떻게 해야 함?<br/>
+                    위의 질문이 구현이 어렵다면 그냥 특정 개수로 태그를 달아서 하는 게 낫나?
+            
+                info_image: 
+                  type: string
+                  description: 안내자료에 들어갈 이미지 로컬링크
+            
+                # 설명 부분
+                newsale_info_type: 
+                  type: number
+                  description: 1. 타입
+                newsale_info_housenum: 
+                  type: number
+                  description: 2. 총 세대수
+                newsale_info_parknum: 
+                  type: number
+                  description: 3. 주차대수
+                newsale_info_width: 
+                  type: number
+                  description: 4. 평형대
+                newsale_info_price: 
+                  type: number
+                  description: 5. 가격
+                newsale_info_perprice: 
+                  type: number
+                  description: 6. 평당가격
+                newsale_info_roomnum: 
+                  type: number
+                  description: 7. 방 개수
+                newsale_info_bathroomnum: 
+                  type: number
+                  description: 7. 욕실
+                newsale_info_option:
+                  type: string
+                  description: 8. 옵션
+                newsale_info_floornum:
+                  type: number
+                  description: 9. 층수
+                newsale_info_etc: 
+                  type: string
+                  description: 10. 기타설명
+                
+                kakaomap_info_latitude:
+                  type: number
+                  
+                kakaomap_info_longtitude: 
+                  type: number
+                kakaomap_info_address: 
+                  type: string
+
+              required:
+                - contents_name
+                - contents_type
+                - local_address
+                - thumnail_image
+                - preview_video_link
+                - youtube_info_link
+                - youtube_inner_link
+                - vr_link_inner
+                - vr_link_outer
+                - vr_link_typeA
+                - vr_link_typeB
+                - vr_image
+                - info_image
+                - newsale_info_type
+                - newsale_info_housenum
+                - newsale_info_parknum
+                - newsale_info_width
+                - newsale_info_price
+                - newsale_info_perprice
+                - newsale_info_roomnum
+                - newsale_info_bathroomnum
+                - newsale_info_option
+                - newsale_info_floornum
+                - newsale_info_etc
+                - kakaomap_info_latitude
+                - kakaomap_info_longtitude
+                - kakaomap_info_address
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+  
+  /newsale/remove/:id:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+        
+
+      
+
+# === components =========================================================
+components:
+  securitySchemes: 
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    '200':
+      description: ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+            example:
+              status: 200
+
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              msg:
+                type: string
+            example:
+              status: 400
+              msg: 잘못된 요청
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              msg:
+                type: string
+            example:
+              status: 401
+              msg: 인증 오류
+
+    '403':
+      description: 권한 없음
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              msg:
+                type: string
+            example:
+              status: 403
+              msg: 권한 없음
+
+    '500':
+      description: 서버 에러
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              msg:
+                type: string
+            example:
+              status: 500
+              msg: 서버 에러

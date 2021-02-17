@@ -1,0 +1,546 @@
+openapi: 3.0.0
+info:
+  title: REST API DOC
+  description: |
+    REST API 문서
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:4000/api'
+
+paths:
+# === newSale ===================================================================
+  /newsale/create:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                contents_name:
+                  type: string
+                  description: 컨텐츠에 표시될 텍스트, 검색될 때 사용
+
+                contents_type:
+                  type: string
+                  enum:
+                    - preview video
+                    - 360 vr
+                    - live
+                    - market
+                  default: preview video
+                  description: 영상, 360 vr, 주거, 상가
+
+                local_address:
+                  type: string
+                  description: 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
+                thumnail_image:
+                  type: string
+                  description: 매물에 대한 대표 이미지 링크
+                preview_video_link:
+                  type: string
+                  description: 미리보기 영상 로컬링크
+                youtube_info_link:
+                  type: string
+                  description: 안내영상 링크(youtube link)
+                youtube_inner_link:
+                  type: string
+                  description: 내부영상 링크(youtube link)
+                vr_link_inner:
+                  type: string
+                  description: 내부 vr 영상을 위한 링크(youtube link)
+                vr_link_outer:
+                  type: string
+                  description: 외부 vr 영상을 위한 링크(youtube link)
+                vr_link_typeA:
+                  type: string
+                  description: type A vr 링크
+                vr_link_typeB:
+                  type: string
+                  description: type B vr 링크
+
+                vr_image:
+                  type: string
+                  description: >
+                    사진 슬라이드에 들어갈 이미지 로컬링크<br/>
+                    이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때)일 경우에는 어떻게 해야 함?<br/>
+                    위의 질문이 구현이 어렵다면 그냥 특정 개수로 태그를 달아서 하는 게 낫나?
+
+                info_image:
+                  type: string
+                  description: 안내자료에 들어갈 이미지 로컬링크
+
+                # 설명 부분
+                newsale_info_type:
+                  type: number
+                  description: 1. 타입
+                newsale_info_housenum:
+                  type: number
+                  description: 2. 총 세대수
+                newsale_info_parknum:
+                  type: number
+                  description: 3. 주차대수
+                newsale_info_width:
+                  type: number
+                  description: 4. 평형대
+                newsale_info_price:
+                  type: number
+                  description: 5. 가격
+                newsale_info_perprice:
+                  type: number
+                  description: 6. 평당가격
+                newsale_info_roomnum:
+                  type: number
+                  description: 7. 방 개수
+                newsale_info_bathroomnum:
+                  type: number
+                  description: 7. 욕실
+                newsale_info_option:
+                  type: string
+                  description: 8. 옵션
+                newsale_info_floornum:
+                  type: number
+                  description: 9. 층수
+                newsale_info_etc:
+                  type: string
+                  description: 10. 기타설명
+
+                kakaomap_info_latitude:
+                  type: number
+
+                kakaomap_info_longtitude:
+                  type: number
+                kakaomap_info_address:
+                  type: string
+
+              required:
+                - contents_name
+                - contents_type
+                - local_address
+                - thumnail_image
+                - preview_video_link
+                - youtube_info_link
+                - youtube_inner_link
+                - vr_link_inner
+                - vr_link_outer
+                - vr_link_typeA
+                - vr_link_typeB
+                - vr_image
+                - info_image
+                - newsale_info_type
+                - newsale_info_housenum
+                - newsale_info_parknum
+                - newsale_info_width
+                - newsale_info_price
+                - newsale_info_perprice
+                - newsale_info_roomnum
+                - newsale_info_bathroomnum
+                - newsale_info_option
+                - newsale_info_floornum
+                - newsale_info_etc
+                - kakaomap_info_latitude
+                - kakaomap_info_longtitude
+                - kakaomap_info_address
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+
+  /newsale/remove/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+# === interior ===========================================================
+  /interior/create:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Interior
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                contents_name:
+                  type: string
+                  description: 컨텐츠에 표시될 텍스트
+                contents_type:
+                  type: string
+                  enum:
+                    - preview video
+                    - 360 vr
+                    - live
+                    - market
+                  default: preview video
+                  description: 영상,360 vr, 주거, 상가
+                local_address:
+                  type: string
+                  description: 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
+                thumnail_image:
+                  type: string
+                  description: 대표 이미지 링크
+                preview_video_link:
+                  type: string
+                  description: 미리보기 영상 로컬링크
+                youtube_link:
+                  type: string
+                  description: 해당 컨텐츠의 유튭 영상
+                vr_link_old:
+                  type: string
+                  description: 시공 전 vr 영상을 위한 링크
+                vr_link_new:
+                  type: string
+                  description: 시공 후 vr 영상을 위한 링크
+                construct_time:
+                  type: string
+                  description: 인테리어/상세보기 부분 공사기간
+                construct_cost:
+                  type: string
+                  description: 인테리어/상세보기 부분 공사비용
+                construct_company:
+                  type: string
+                  description: 인테리어/상세보기 부분 공사업체
+                construct_info:
+                  type: string
+                  description: 엔테리어/상세보기 부분 공사내역
+                image_link:
+                  type: string
+                  description: 사진 슬라이드에 들어갈 이미지 로컬링크
+                interior_info_location:
+                  type: string
+                  description: 1. 위치
+                interior_info_width:
+                  type: number
+                  description: 2. 평수
+                interior_info_period:
+                  type: string
+                  description: 3. 공사기간
+                interior_info_price:
+                  type: number
+                  description: 4. 비용
+                interior_info_history:
+                  type: string
+                  description : 5. 시공내역
+                interior_info_etc:
+                  type: string
+                  description : 6. 기타설명
+
+                kakaomap_info_latitude:
+                  type: number
+                  description: 위도(double)
+                kakaomap_info_longtitude:
+                  type: number
+                  description: 경도
+                kakaomap_info_address:
+                  type: string
+                  description: 주소
+
+              required:
+                - contents_name
+                - contents_type
+                - local_address
+                - thumnail_image
+                - preview_video_link
+                - youtube_link
+                - vr_link_old
+                - vr_link_new
+                - construct_time
+                - construct_cost
+                - construct_company
+                - construct_info
+                - image_link
+                - interior_info_location
+                - interior_info_width
+                - interior_info_period
+                - interior_info_price
+                - interior_info_history
+                - interior_info_etc
+                - kakaomap_info_latitude
+                - kakaomap_info_longtitude
+                - kakaomap_info_address
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+# === consult ============================================================
+
+  /consult/create/{type}:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Consult
+      parameters:
+        - in: path
+          name: type
+          schema:
+            type: string
+            enum:
+              - franchise
+              - interior
+            default: interior
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                consult_name:
+                  type: string
+                  description: 상담의 이름
+                consult_req_email:
+                  type: string
+                  description: 상담 요청한 사람의 이메일
+                consult_req_name:
+                  type: string
+                  description: 상담 요청한 사람의 이름
+                consult_req_phone:
+                  type: string
+                  description: 상담 요청한 사람의 전화번호
+                consult_req_sector:
+                  type: string
+                  description: 상담 요청한 업종 </br></br>**franchise 는 있어야 함**</br>**interior는 없어야 함**</br>interior 에서 consult_req_sector 값을 넣어서 보내게 되면 Bad request 뜸
+
+              required:
+                - consult_name
+                - consult_req_email
+                - consult_req_name
+                - consult_req_phone
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+  /consult/createNewSale:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Consult
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                consult_name:
+                  type: string
+                  description: 상담의 이름
+                consult_req_email:
+                  type: string
+                  description: 상담 요청한 사람의 이메일
+                consult_req_name:
+                  type: string
+                  description: 상담 요청한 사람의 이름
+                consult_req_phone:
+                  type: string
+                  description: 상담 요청한 사람의 전화번호
+                consult_req_found:
+                  type: string
+                  description: 상담 요청한 찾는 물건(filter)
+              required:
+                - consult_name
+                - consult_req_email
+                - consult_req_name
+                - consult_req_phone
+                - consult_req_found
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+  /consult/show:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Consult
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum:
+              - interior
+              - franchise
+              - noFilter
+            default : noFilter
+          required: true
+          description: 1. 인테리어- interior</br>2. 프렌차이즈 - franchise</br>3. all - noFilter</br> noFilter 사용시 newSale 도 출력됨
+
+        - in: query
+          name: manager
+          schema:
+            type: string
+            default: noFilter
+          required: true
+          description: 상담에 대한 담당자
+
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+            default: asc
+          required: true
+          description: 이거는 아직 구현 안됨 구현된다면 초기값은 asc 가 맞음
+
+        - in: query
+          name: pagenum
+          schema:
+            type: integer
+            default: 0
+          required: true
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+  /consult/showNewSale:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Consult
+      parameters:
+        - in: query
+          name: realtyName
+          schema:
+            type: string
+            default: noFilter
+          required: true
+          description: 부동산 이름(filter)
+
+        - in: query
+          name: found
+          schema:
+            type: string
+            default: noFilter
+          required: true
+          description: 찾는 물건(filter)
+
+        - in: query
+          name: manager
+          schema:
+            type: string
+            default: noFilter
+          required: true
+          description: 담당자 이름(fliter)
+
+        - in: query
+          name: order
+          schema:
+            type: string
+            default: asc
+          description: 정렬 기준(현재는 기본값만 존재(asc))
+
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          required: true
+          description: 페이지네이션의 페이지 쪽 숫자
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+# === components =========================================================
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    '200':
+      description: ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+            example:
+              status: 200
+
+    '400':
+      description: bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              msg:
+                type: string
+            example:
+              status: 400
+              msg: 잘못된 요청
+    '401':
+      description: invalid token
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              msg:
+                type: string
+            example:
+              status: 401
+              msg: 인증 오류
+
+    '403':
+      description: 권한 없음
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              msg:
+                type: string
+            example:
+              status: 403
+              msg: 권한 없음
+
+    '500':
+      description: 서버 에러
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              msg:
+                type: string
+            example:
+              status: 500
+              msg: 서버 에러

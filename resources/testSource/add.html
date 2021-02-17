@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
+    </head>
+    <body>
+        <input type="text" id='company'> 부동산 중개소 이름
+        <input type="text" id='adress'> 부동산 중개소 주소
+        <input type="text" id='name'> 부동산 중개소 소장 이름
+        <input type="text" id='phone'> 부동산 중개소 소장 전화번호
+        <input type="button" onclick="addDataSend()"> 추가정보 전송
+
+        <script>
+            function addDataSend(){
+                axios.post('/api/user/add', {
+                    company:document.querySelector('#company').value,
+                    adress:document.querySelector('#adress').value,
+                    name:document.querySelector('#name').value,
+                    phone:document.querySelector('#phone').value,                    
+                }).then(res=>{
+                    const {realty_name, realty_adress, realty_owner_name, realty_owner_phone} = res.data;
+                
+                    if(status==200){
+                        // Cookies.set('token',)
+                        location.href='/'
+                    }
+                }).catch(err=>{
+                    alert('data 전송 실패')
+                })
+            }
+        </script>
+        <iframe src="test.mp4" frameborder="0"></iframe>
+    </body>
+</html>

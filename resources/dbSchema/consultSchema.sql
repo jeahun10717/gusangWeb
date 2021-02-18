@@ -17,12 +17,9 @@ create table consult (
     consult_req_found varchar(40), -- 상담 요청한 찾는 물건
     -- -----------------------------------------------------------------
 
-<<<<<<< HEAD
     consult_manager_name varchar(10), -- 상담요청에 대한 담당자 이름
 
     registAt datetime default now(),
     updateAt datetime
-=======
     consult_manager_name varchar(10) -- 상담요청에 대한 담당자 이름
->>>>>>> bd1f73d4256330cdd94a3223c4e6b546110af3dd
 )

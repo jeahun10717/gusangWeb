@@ -1,9 +1,6 @@
 # TODO List
 ## 1. 이번 주 내로 해결
 
-* 부동산 관련자들이 자신이 요청한 정보를 볼 수 있게 해야 함?
-* admin 페이지에서 상담요청한 목록 불러 올 때 부동산 사람들한테 보여줄 표에서 필터 걸기
-* 상담요청 DB 작성, CRUD 작성
 * **S3 코드 적용하기**
   > 1. s3 코드 관련해서 의문점 질문하고 해결하기
   > 2. s3 에 의한 newsale, interior, franchise 소스 수정
@@ -14,7 +11,7 @@
 * kakao oauth 과정에서 전화번호 가져오기
 * naver oauth 적용시키기
 * search 검색에 대한 거 다시 코딩해야 함
-    > search 에서 첫번째 필터는 검색어 2번째 필터는 조회수순으로 할 것
+    > search 에서 첫번째 우선순위 필터는 검색어 2번째 필터는 조회수순으로 할 것
 
 * consult api 에서 auth 설정해야 함. **`./api/consult/consult.ctrl.js` 39번째 줄**
     > 1. interior, franchise 상담요청은 auth == 0
@@ -24,10 +21,14 @@
 
 * consult pagination api 에서 검색 기능 추가해야 함.
 * 모든 api 의 auth 설정하기
-* 모든 api 의 pagination contents 갯수 2개로 해놨는데 이거 15개로 수정해야 함
-consult 부분은 30개
-* interior, newSale db schema 중에 평수 관련 double 로 수정
-* DB model 소스 간략화
+
+* 모든 api 의 pagination 에서 contents 변수 갯수 수정해야 함
+  > newSale, franchise, interior 는 15개
+  > consult 부분은 30개
+
+* DB schema 수정 : 모두 수정한 뒤 mysql 에서 alter 로 수정해야 함
+ > 1. interior, newSale db schema 중에 평수 관련 double 로 수정
+ > 2. 전화번호 관련 태그들 전부 varchar(13) 으로 통일해야 함
 
 * ~~모든 api route 에서 search 관련 api 들 조회수순, 날짜순이 필요?~~ => 조회수순만 할거임
 * ~~위도 경도 관련 알아보기~~
@@ -35,6 +36,11 @@ consult 부분은 30개
 * ~~최신순, 조회수순 up, down 도 설정해야 함(위의 `order=desc` 부분)~~
 * ~~`newsale.get('/show/:type/:pagenum')`
 -->`newsale.get('/show?type=views&pagenum=3&order=desc&local={지역코드}')` 로 바꾸기~~
+* ~~DB model 소스 간략화~~
+* ~~상담요청 DB 작성, CRUD 작성~~
+* ~~부동산 관련자들이 자신이 요청한 정보를 볼 수 있게 해야 함?~~
+* ~~admin 페이지에서 상담요청한 목록 불러 올 때 부동산 사람들한테 보여줄 표에서 필터 걸기~~
+
 
 ## 2. 비교적 이후 우선순위
 

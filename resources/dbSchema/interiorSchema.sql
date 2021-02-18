@@ -5,7 +5,7 @@ create table interior(
     local_address varchar(10), -- : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                -- 프론트에서 데이터 정해줘야 할 듯
     thumnail_image varchar(256),
-    -- auth ,  -- : 이 부분은 newSale 을 따로 뺐으니까 필요없을 듯함 
+    -- auth ,  -- : 이 부분은 newSale 을 따로 뺐으니까 필요없을 듯함
     preview_video_link varchar(256), -- 미리보기 영상 로컬링크
     youtube_link varchar(256), -- 해당 컨텐츠의 유튭 영상
     vr_link_old varchar(256), -- 시공 전 vr 영상을 위한 링크
@@ -22,7 +22,7 @@ create table interior(
 
     -- 견적관련
     interior_info_location varchar(256),  -- 1. 위치
-    interior_info_width int,              -- 2. 평수
+    interior_info_width double,              -- 2. 평수
     interior_info_period varchar(256),    -- 3. 공사기간
     interior_info_price int,              -- 4. 비용
     interior_info_history varchar(256),   -- 5. 시공내역

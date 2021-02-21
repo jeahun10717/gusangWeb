@@ -1,5 +1,4 @@
 const Joi = require('joi');
-const { params } = require('.');
 const { franchise } = require('../../databases');
 
 // 아래 함수에서 type 은 view 는 조회순, date 는 날짜순

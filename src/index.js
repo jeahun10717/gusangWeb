@@ -111,6 +111,7 @@ router.use('/api', api.routes());
 
 app.use(serve('./public'))
 app.use(bodyParser());
+app.use(require('koa-morgan')('dev'));
 app.use(error);
 app.use(token.jwtMiddleware);
 app.use(router.routes()).use(router.allowedMethods());

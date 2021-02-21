@@ -18,3 +18,9 @@ exports.isExist = async (login_type, login_id) => {
     const [result] = await db.query("select hex(uuid) uuid, isnull(name) isNew from users where login_type = ? and login_id = ?",[login_type, login_id]);
     return result; // 있으면 객체, 없으면 undefined
 }
+
+exports.getAuth = async (user_id) =>{
+  const [result] = await db.query(`select Auth from Users where uuid = ?`,Buffer.from(user_id,'hex'));
+  if(result) return result.Auth;
+  return result;
+}

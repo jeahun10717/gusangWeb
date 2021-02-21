@@ -1,0 +1,16 @@
+1. http://localhost:4000 에서 로그인버튼 클릭
+2. 콘솔에 찍혀 있는 access_token 으로 아래와 같은 method 보내기
+post : http://localhost:4000/api/users/exist
+	query : 
+	login_type : 2
+	access_token : 위에서 받아온 access_token
+3. 이후 추가 입력사항 받아서 아래와 같은 method 보내기
+post : http://localhost:4000/api/users/add
+	login_type: 2
+	access_token:FM3cVpXyFv1Xrdzg5iibzfnua6siaJf1K8IiUQo9dZsAAAF3v5YQ5A
+	realty_name:test
+	realty_adress:address
+	realty_owner_name:owner
+	realty_owner_phone:01012341234
+	phone:01077778888
+	name:jeahun

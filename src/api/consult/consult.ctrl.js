@@ -1,5 +1,4 @@
 const Joi = require('joi');
-const { params } = require('.');
 const { consult } = require('../../databases');
 
 // TODO: swagger 에서 enum 의 분기를 통해 interior 와 franchise 의 create 를

@@ -50,3 +50,5 @@ exports.jwtMiddleware = async (ctx, next)=>{
    }
    return next();
 };
+
+// console.log(get({UUID:'49183CC28CDD88F581A54DB7E59D87E5'}))

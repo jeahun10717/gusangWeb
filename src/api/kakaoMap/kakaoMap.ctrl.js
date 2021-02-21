@@ -13,8 +13,15 @@ exports.getAllCode = async (ctx) => {
 }
 
 exports.create = async (ctx) => {
-    const { local } = ctx.query
+    const { local } = ctx.request.body
     const localInfo = await kakaomap.kakaomap(local)
+    if(localInfo.documents.length === 0){
+      ctx.body = {
+        status: 200,
+        result: null
+      }
+      return;
+    }
     const query = {
         city : localInfo.documents[0].address.region_1depth_name,
         gu : localInfo.documents[0].address.region_2depth_name,
@@ -26,7 +33,13 @@ exports.create = async (ctx) => {
         code : Joi.number().required()
     }).validate(query)
 
-    await kakaomapModel.insert(params.value);
+    try{
+      await kakaomapModel.insert(params.value);
+
+    }catch(e){
+      if(e.errno === 1062) ctx.throw(400,'이미 있음');
+      else ctx.throw(400, e);
+    }
 
     ctx.body={
         status:200,

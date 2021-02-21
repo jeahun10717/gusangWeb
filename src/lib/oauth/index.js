@@ -8,7 +8,7 @@ function getAccessToken(code){
     // kakao톡은 formdata로만 전송이 가능.
     const header ={
        headers:{
-          "Content-Type":"application/x-www-form-urlencoded"   
+          "Content-Type":"application/x-www-form-urlencoded"
        }
     }
     const body = {
@@ -22,7 +22,7 @@ function getAccessToken(code){
        (resolve, reject)=>{
           axios.post(`https://kauth.kakao.com/oauth/token`, qs.stringify(body),header).then(  (res)=>{
              if(res.status == 200){
-                resolve(res.data);   
+                resolve(res.data);
              }
              reject(false);
           })
@@ -33,6 +33,17 @@ function getAccessToken(code){
        }
     );
  }
+exports.getAccessToken = getAccessToken;
+exports.kakaoData = async (access_token)=>{
+  const kakaoData = (await axios.post(`https://kapi.kakao.com/v2/user/me`, {}, {
+       headers: {
+           "Content-Type": "application/json",
+           "Authorization": "Bearer " + access_token
+       }
+  })).data;
+
+  return kakaoData;
+}
 
 exports.kakao = async ( code )=>{
    let data;

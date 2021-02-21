@@ -21,9 +21,13 @@ create table franchise(
     franchise_fax varchar(20),  -- 대표 팩스 번호
     franchise_detailsale varchar(256), -- 브랜드 창업 비용
                                        -- 도표에 들어가는 자료인데 구분자로 여래개 받아서 넣을 듯
-    -- 그래프용 월평균 매출
+    -- 그래프용 연별 매출
+    franchise_month_sales varchar(256),
     -- 그래프용 가맹점 증감추이
+    franchise_market_num varchar(256),
     -- 그래프용 가맹점 계약 현황
+    franchise_market_contract varchar(256),
+    
     -- ////////////////////////////////////////////////////////////////
 
     brand_introduce varchar(256), -- 브랜드 정보 / 브랜드 소개

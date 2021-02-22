@@ -227,10 +227,7 @@ exports.update = async (ctx) => {
     if(params.error) {
         ctx.throw(400);
     }
-    
-    newsale.update({
-        ...params.value,
-    });
+
 // TODO: update at 설정하기    
 
     const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
@@ -243,10 +240,14 @@ exports.update = async (ctx) => {
         vr_image: [ ...JSON.parse(Imgs.vr_image), ...vr_image], 
         info_image: [ ...JSON.parse(Imgs.info_image), ...info_image], 
     }, id);
-    
+    // TODO: update api 부분 이미지 업로드 부분만 따로 만들어 줘야 함
+    newsale.update({
+        ...params.value,
+    });
     // console.log("thumnail_image : "+thumnail_image);
     // console.log("vr_image : "+vr_image);
     // console.log("info_image : "+info_image);
+
 }
 
 exports.delImg = async (ctx)=>{
@@ -264,7 +265,10 @@ exports.delImg = async (ctx)=>{
 
     const idx = data.indexOf(key);
     if(idx == -1){
-        // TODO 없는 이미지
+        ctx.body = {
+            status: 400,
+            msg: "없는 이미지 입니다"
+        }
     }else{
         console.log({
             [field]: [...data.slice(0, idx), ...data.slice(idx+1, data.length)]

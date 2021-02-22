@@ -13,7 +13,7 @@ exports.getAllCode = async (ctx) => {
 }
 
 exports.create = async (ctx) => {
-    const { local } = ctx.request.body
+    const { local } = ctx.query
     const localInfo = await kakaomap.kakaomap(local)
     if(localInfo.documents.length === 0){
       ctx.body = {

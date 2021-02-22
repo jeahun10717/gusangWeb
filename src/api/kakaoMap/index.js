@@ -3,7 +3,7 @@ const kakaoMap = new Router();
 const kakaoMapCtrl = require('./kakaoMap.ctrl');
 const { auth } = require('../../lib')
 
-// kakaoMap.use(auth.level2);
+kakaoMap.use(auth.level2);
 
 kakaoMap
 .get('/getAllCode', kakaoMapCtrl.getAllCode) // 모든 지역코드 보여주기 : '/kakaoMap/getCode'

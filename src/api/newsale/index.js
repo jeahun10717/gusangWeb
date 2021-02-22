@@ -1,9 +1,13 @@
 const Router = require('koa-router');
 const newsale = new Router();
 const newSaleCtrl = require('./newSale.ctrl')
-const { auth } = require('../../lib');
+const { auth, S3 } = require('../../lib');
 
-// newsale.use(auth.login);
+const upload = S3.upload();
+// TODO: 다른 api 도 auth.login 수정해야 함
+
+newsale.use(auth.login);
+
 newsale.use(auth.level1)
 
 newsale
@@ -14,9 +18,23 @@ newsale
 
 newsale.use(auth.level2)
 
+// TODO mascount 수정
 newsale
-.post('/create', newSaleCtrl.create)
-.post('/update/:id/:type', newSaleCtrl.update)
+.post('/create'
+,upload.fields([
+    {name: "thumnail_image", maxCount: 1},
+    {name: "vr_image", maxCount: 2},
+    {name: "info_image", maxCount: 2}
+])
+,newSaleCtrl.create)
+.post('/update/:id',
+    upload.fields([
+    {name: "thumnail_image", maxCount: 1},
+    {name: "vr_image", maxCount: 2},
+    {name: "info_image", maxCount: 2}
+]), newSaleCtrl.update)
 .delete('/remove/:id', newSaleCtrl.delete)
+.delete('/delImg/:id', newSaleCtrl.delImg)
+// body : field, key
 
 module.exports = newsale;

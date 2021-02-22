@@ -8,6 +8,56 @@ servers:
   - url: 'http://localhost:4000/api'
 
 paths:
+# === User ======================================================================
+  /users/userInfo/update:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      description: >
+        user create 부분에서 추가 입력한 부분만 update 하는 api
+      parameters:
+        - in: query
+          name: id
+          schema: 
+            type: integer
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  description: 추가입력 때 입력한 전화번호
+                name:
+                  type: string
+                  description: 추가입력 때 입력한 이름
+                realty_name:
+                  type: string
+                  description: 추가입력 때 입력한 부동산 이름
+                realty_address:
+                  type: string
+                  description: 추가입력 때 입력한 부동산 주소
+                realty_owner_name:
+                  type: string
+                  description: 추가입력 대 입력한 부동산 대표 이름
+                realty_owner_phone:
+                  type: string
+                  description: 추가입력 때 입력한 부동산 대표 전화번호
+              required:
+                - name
+                - phone
+                - realty_name
+                - realty_address
+                - realty_owner_name
+                - realty_owner_phone
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+# ===============================================================================  
 # === newSale ===================================================================
   /newsale/create:
     post:
@@ -15,9 +65,12 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      description: >
+        신규매매 생성 api</br>
+        접근 권한 : auth 2, auth 3
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -40,6 +93,7 @@ paths:
                   description: 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                 thumnail_image:
                   type: string
+                  format: binary
                   description: 매물에 대한 대표 이미지 링크
                 preview_video_link:
                   type: string
@@ -64,14 +118,21 @@ paths:
                   description: type B vr 링크
 
                 vr_image:
-                  type: string
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  
                   description: >
                     사진 슬라이드에 들어갈 이미지 로컬링크<br/>
                     이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때)일 경우에는 어떻게 해야 함?<br/>
                     위의 질문이 구현이 어렵다면 그냥 특정 개수로 태그를 달아서 하는 게 낫나?
 
                 info_image:
-                  type: string
+                  type: array
+                  items:
+                    type: string
+                    format: binary
                   description: 안내자료에 들어갈 이미지 로컬링크
 
                 # 설명 부분
@@ -148,14 +209,16 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/200'
-
-
+  
   /newsale/remove/{id}:
     delete:
       security:
         - BearerAuth: []
       tags:
         - NewSale
+      description: >
+        컨텐츠를 삭제하는 api</br>
+
       parameters:
         - in: path
           name: id
@@ -166,12 +229,16 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 # === interior ===========================================================
+
   /interior/create:
     post:
       security:
         - BearerAuth: []
       tags:
         - Interior
+      description: >
+        인테리어 컨텐츠 생성</br>
+        접근권한 : auth 2, auth 3
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -287,6 +354,11 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      description: >
+        상담요청 api(interior, franchise)</br>
+        접근권한 : auth 0 (권한인증 필요 없음)</br>
+        type : franchise, interior
+
       parameters:
         - in: path
           name: type
@@ -335,6 +407,10 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      description: >
+        상담요청 api(newSale) </br>
+        접근권한 : auth 1
+
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -372,6 +448,9 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      description: >
+        들어온 상담 보여주는 api(interior, franchise)</br>
+        접근권한 : auth 2, auth 3
       parameters:
         - in: query
           name: type
@@ -421,6 +500,9 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      description: >
+        들어온 상담 보여주는 api</br>
+        접근권한 : auth 2, auth 3
       parameters:
         - in: query
           name: realtyName
@@ -464,6 +546,73 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/200'
+
+  /consult/setManager/{id}:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Consult
+      description: >
+        들어온 상담요청에서 매니저 지정해 주는 api</br>
+        접근권한 : auth 2
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /consult/remove/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Consult
+      description: >
+        들어온 상담요청 삭제
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+# === kakaoMap ===========================================================
+
+  /kakaoMap/getAllCode:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Consult
+      description: >
+        kakao api 사용하여 입력한 지역코드 전체 보여주는 api</br>
+        접근권한 : auth 2, auth 3
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /kakaoMap/insert:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Consult
+      description: >
+        kakaoApi 로 받아온 지역코드 입력 api</br>
+        접근권한 : auth 2, auth 3
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
 
 # === components =========================================================
 components:

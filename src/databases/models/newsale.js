@@ -71,3 +71,16 @@ exports.search = async(name1, name2, name3)=>{
 exports.viewsUp = async(id)=>{
     return await db.query('update newSale set view = view +1 where id = ?', id);
 }
+
+exports.getImgs = async (id)=>{
+    const [result] = await db.query(`select thumnail_image, vr_image, info_image from newSale where id = ?`,id);
+    return result;
+}
+exports.getImgsFromField = async(id, field)=>{
+    const [result] = await db.query(`select ${field} from newSale where id = ?`,id);
+    return result;
+}
+
+exports.insertImgs = async (query, id)=>{
+    await db.query(`update newSale set ? where id = ?`,[query, id]);
+}

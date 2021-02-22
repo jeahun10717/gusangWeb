@@ -1,5 +1,6 @@
 const Joi = require('joi');
-const { consult } = require('../../databases');
+const { consult, user } = require('../../databases');
+const { setADM } = require('../../databases/models/user');
 
 // TODO: swagger 에서 enum 의 분기를 통해 interior 와 franchise 의 create 를
 // 다르게 할 수 있는 지 알아보기
@@ -95,19 +96,22 @@ exports.createNewSale = async (ctx) => {
 }
 
 exports.setManager = async (ctx)=>{
-    const { id } = ctx.params;
+    const { id, manager } = ctx.query;
 
-    const params = Joi.object({
-        consult_manager_name : Joi.string().required()
-    }).validate(ctx.request.body)
+    const mngExist = await user.checkADM(2, manager)
 
-    if(params.error) {
-        ctx.throw(400);
-    }
-
-    consult.update(id, params.value);
-    ctx.body={
-        status: 200
+    if(mngExist.length === 0){  // 담당자가 존재하지 않으면 에러 뱉어냄
+        ctx.body = {
+            status: 400,
+            msg: `존재하지 않는 담당자 입니다.`
+        }
+    }else{  // 담당자가 존재하면 상담번호와 담당자 이름 넘겨주면 됨
+        await consult.update(id, {
+            consult_manager_name: manager
+            });
+        ctx.body = {
+            status: 200
+        }
     }
 }
 

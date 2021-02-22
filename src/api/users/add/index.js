@@ -12,7 +12,7 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
         phone: Joi.string().regex(/^[0-9]{10,13}$/).required(), // 회원전화번호
         name: Joi.string().required(),  // 회원 이름
         realty_name: Joi.string().required(),
-        realty_adress: Joi.string().required(),
+        realty_address: Joi.string().required(),
         realty_owner_name: Joi.string().required(),
         realty_owner_phone: Joi.string().regex(/^[0-9]{10,13}$/).required()
     }).validate(ctx.request.body);

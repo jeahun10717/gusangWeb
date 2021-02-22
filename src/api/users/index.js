@@ -1,10 +1,12 @@
 const Router = require('koa-router');
 const kakao = require('./kakao')
 const add = require('./add');
+const userInfo = require('./userInfo')
+
 const users = new Router();
 const Joi = require('joi');
 const { user : User } = require('../../databases');
-const { oauth,token } = require('../../lib');
+const { oauth,token,auth } = require('../../lib');
 
 users.get('/', (ctx, next)=>{
     ctx.body = 'this is users page'
@@ -37,7 +39,21 @@ users.post('/exist', async ctx=>{
     }
   }
 });
+
+// TODO: 아래 부분은 나중에 kakao id, naver id 로 user 여러개 넣을 수 있으면 완성시킬 것
+// users.use(auth.level1);
+
+// users.get('/getAllADM', async (ctx)=>{
+//   const result = await User.getAllADM();
+//   console.log(result);
+//   ctx.body = {
+//     status: 200,
+//     result
+//   }
+// })
+
 users.use('/kakao', kakao.routes());
 users.use('/add', add.routes());
+users.use('/userInfo', userInfo.routes());
 
 module.exports = users;

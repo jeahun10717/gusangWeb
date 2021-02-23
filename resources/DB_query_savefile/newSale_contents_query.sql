@@ -1,16 +1,16 @@
 -- 무조건 실행하는 구문 --------
 use gusang;
 select * from newSale;
+update newSale set vr_image = '["test/kT9BHnO0JioOVNyG1613998408079.jpg"]' where id = 1;
 -- ------------------------
 select views from newsale;
 -- test query -----------------------------------------------------------------------------------------------------
 update newSale set views = views +1 where id = 1;
-select * from newSale order by id desc limit ? offset ?;
 insert into newSale.views values (123);
-select * from newSale where contents_name like "%111%" || contents_name like "%aaa%" || contents_name like "%333%";
-select * from newSale where contents_name like "%111%" || contents_name like "%aaa%" || contents_name like "%333%";
 alter table newSale add thumnail_image varchar(256) null;
 -- ----------------------------------------------------------------------------------------------------------------
+update Users set Auth = 1 where id = 1;
+select * from Users;
 
 drop table newSale;
 create table newSale(
@@ -19,9 +19,9 @@ create table newSale(
     contents_type varchar(20), -- 영상,360 vr, 주거, 상가
     local_address varchar(10), -- : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                -- 프론트에서 데이터 정해줘야 할 듯
-	thumnail_image varchar(256), -- : 대표 이미지
+	thumnail_image text, -- : 대표 이미지
     -- auth ,  -- : 이 부분은 newSale 을 따로 뺐으니까 필요없을 듯함 
-    preview_video_link varchar(256), -- 미리보기 영상 로컬링크
+    preview_video_link text, -- 미리보기 영상 로컬링크
     youtube_info_link varchar(256), -- 안내영상 링크(youtube link)
     youtube_inner_link varchar(256), -- 내부영상 링크(youtube link)
     vr_link_inner varchar(256), -- 내부 vr 영상을 위한 링크(youtube link)

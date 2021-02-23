@@ -14,3 +14,5 @@ post : http://localhost:4000/api/users/add
 	realty_owner_phone:01012341234
 	phone:01077778888
 	name:jeahun
+
+위의 요청이 끝나면 body 에 access_token 이 생성되는데 이 코드는 이후 auth 에 사용될 BearerAuth 에 들어갈 my token 임

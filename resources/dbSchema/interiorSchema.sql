@@ -4,9 +4,9 @@ create table interior(
     contents_type varchar(20), -- 영상,360 vr, 주거, 상가
     local_address varchar(10), -- : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                -- 프론트에서 데이터 정해줘야 할 듯
-    thumnail_image varchar(256),
+    thumnail_image text,
     -- auth ,  -- : 이 부분은 newSale 을 따로 뺐으니까 필요없을 듯함
-    preview_video_link varchar(256), -- 미리보기 영상 로컬링크
+    preview_video_link text, -- 미리보기 영상 로컬링크
     youtube_link varchar(256), -- 해당 컨텐츠의 유튭 영상
     vr_link_old varchar(256), -- 시공 전 vr 영상을 위한 링크
     vr_link_new varchar(256), -- 시공 후 vr 영상을 위한 링크

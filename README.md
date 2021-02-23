@@ -8,9 +8,12 @@
   > ==> create, update 부분은 따로 빼서 정리해야 함
   > 3. DB image 관련 스키마 다시 정하기 --> text 1줄이 아니라 여러개로 정리
 
+* user table 에 대한 CRUD 작성
 * newSale api 권한 설정하기
 * kakao oauth 과정에서 전화번호 가져오기
 * naver oauth 적용시키기
+* user api 의 CRUD 작성해야 함
+* consult setManager api 담당자가 있는지 체크해야 함
 * search 검색에 대한 거 다시 코딩해야 함
   > search 에서 첫번째 우선순위 필터는 검색어 2번째 필터는 조회수순으로 할 것
 

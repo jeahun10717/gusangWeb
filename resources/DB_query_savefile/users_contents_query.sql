@@ -1,5 +1,12 @@
 use gusang;
 select * from users;
+drop table users;
+
+-- test query ---------------------------------------------------
+select name from users where Auth >= "2" && name = "jaeahun";
+alter table users change address realty_address varchar(256);
+-- --------------------------------------------------------------
+
 
 create table users(
 	id int unsigned auto_increment primary key ,
@@ -11,7 +18,7 @@ create table users(
     phone varchar(11),
     name varchar(10),
     realty_name varchar(10),
-    realty_adress varchar(256),
+    realty_address varchar(256),
     realty_owner_name varchar(10),
 	realty_owner_phone varchar(11),
     registAt datetime default now()

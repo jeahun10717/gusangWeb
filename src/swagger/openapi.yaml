@@ -20,7 +20,7 @@ paths:
       parameters:
         - in: query
           name: id
-          schema: 
+          schema:
             type: integer
       requestBody:
         content:
@@ -57,7 +57,6 @@ paths:
         '200':
           $ref: '#/components/responses/200'
 
-# ===============================================================================  
 # === newSale ===================================================================
   /newsale/create:
     post:
@@ -97,6 +96,7 @@ paths:
                   description: 매물에 대한 대표 이미지 링크
                 preview_video_link:
                   type: string
+                  format: binary
                   description: 미리보기 영상 로컬링크
                 youtube_info_link:
                   type: string
@@ -122,11 +122,9 @@ paths:
                   items:
                     type: string
                     format: binary
-                  
+
                   description: >
-                    사진 슬라이드에 들어갈 이미지 로컬링크<br/>
-                    이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때)일 경우에는 어떻게 해야 함?<br/>
-                    위의 질문이 구현이 어렵다면 그냥 특정 개수로 태그를 달아서 하는 게 낫나?
+                    사진 슬라이드에 들어갈 이미지 로컬링크
 
                 info_image:
                   type: array
@@ -208,8 +206,41 @@ paths:
                 - kakaomap_info_address
       responses:
         '200':
+            $ref: '#/components/responses/200'
+
+  /newsale/upImg:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      description: >
+        update 에서 로컬에 이미지 올리는 api</br>
+        update 에서 처리하는 것을 만들어 두는 거
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: 사진을 넣을 id
+        - in: query
+          name: key
+          schema:
+            type: string
+          description: 사진의 이름(링크)
+        - in: query
+          name: field
+          schema:
+            type: string
+            enum: 
+              - thumnail_image
+              - vr_image
+              - info_image
+
+      responses:
+        '200':
           $ref: '#/components/responses/200'
-  
+
   /newsale/remove/{id}:
     delete:
       security:

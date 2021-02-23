@@ -11,6 +11,7 @@ const s3 = new AWS.S3({
   region: AWS_S3_REGION,
 });
 
+//TODO:밑의 소스에서 extention 으로 확장자 처리하면 됨
 exports.getStorage = (bucket, folder)=>{
   return multerS3({
     s3: s3,

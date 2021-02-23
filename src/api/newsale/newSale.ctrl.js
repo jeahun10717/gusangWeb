@@ -87,7 +87,6 @@ exports.search = async (ctx) => {
 
     const result = await newsale.pageForSearch(searchName[0],searchName[1],searchName[2], p, 2);
 
-    //search pagenation 구현하기
     // const final = await newsale.pageForSearch(result, pagenum, 2)
     ctx.body = {
         status : 200,
@@ -97,7 +96,7 @@ exports.search = async (ctx) => {
     // console.log(ctx.body);
     // console.log(ctx.request.query);
     // console.log(ctx.query , ' : 쿼리 확인용');
-}
+} 
 
 exports.create = async (ctx) => {
     const params = Joi.object({
@@ -107,7 +106,7 @@ exports.create = async (ctx) => {
                                    // 프론트에서 데이터 정해줘야 할 듯
         // auth ,  // : 이 부분은 newSale 을 따로 뺐으니까 필요없을 듯함
         // thumnail_image : Joi.string().required(),
-        preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
+        // preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
         youtube_info_link : Joi.string().required(), // 안내영상 링크(youtube link)
         youtube_inner_link : Joi.string().required(), // 내부영상 링크(youtube link)
         vr_link_inner : Joi.string().required(), // 내부 vr 영상을 위한 링크(youtube link)
@@ -147,15 +146,17 @@ exports.create = async (ctx) => {
     let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
     let vr_image = ctx.files['vr_image'].map(i=>i.key);
     let info_image = ctx.files['info_image'].map(i=>i.key);
+    let preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
 
     thumnail_image = JSON.stringify(thumnail_image)
     vr_image = JSON.stringify(vr_image)
     info_image = JSON.stringify(info_image)
+    preview_video_link = JSON.stringify(preview_video_link)
     
-    console.log(vr_image+" : adfasdfasdfasdfad");
     await newsale.insert({
         ...params.value,
         thumnail_image: thumnail_image,
+        preview_video_link: preview_video_link,
         vr_image: vr_image,
         info_image: info_image,
         views:0
@@ -230,20 +231,25 @@ exports.update = async (ctx) => {
 
 // TODO: update at 설정하기    
 
-    const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
-    const vr_image = ctx.files['vr_image'].map(i=>i.key);
-    const info_image = ctx.files['info_image'].map(i=>i.key);
+    // const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+    // const vr_image = ctx.files['vr_image'].map(i=>i.key);
+    // const info_image = ctx.files['info_image'].map(i=>i.key);
 
-    const Imgs = await newsale.getImgs(id);
-    await newsale.insertImgs({
-        thumnail_image: [ ...JSON.parse(Imgs.thumnail_image),  ...thumnail_image],
-        vr_image: [ ...JSON.parse(Imgs.vr_image), ...vr_image], 
-        info_image: [ ...JSON.parse(Imgs.info_image), ...info_image], 
-    }, id);
+    // const Imgs = await newsale.getImgs(id);
+    // await newsale.insertImgs({
+    //     thumnail_image: [ ...JSON.parse(Imgs.thumnail_image),  ...thumnail_image],
+    //     vr_image: [ ...JSON.parse(Imgs.vr_image), ...vr_image], 
+    //     info_image: [ ...JSON.parse(Imgs.info_image), ...info_image], 
+    // }, id);
     // TODO: update api 부분 이미지 업로드 부분만 따로 만들어 줘야 함
     newsale.update({
         ...params.value,
+        updateAt: new Date()
     });
+
+    ctx.body = {
+        status: 200
+    }
     // console.log("thumnail_image : "+thumnail_image);
     // console.log("vr_image : "+vr_image);
     // console.log("info_image : "+info_image);
@@ -285,14 +291,32 @@ exports.delImg = async (ctx)=>{
         status: 200
     }
 }
+//key 와 field 로 추가하는 소스 필요함
+exports.upImg = async (ctx)=>{
+    const params = Joi.object({
+        field: Joi.string().required()
+    }).validate(ctx.request.body);
+    if(params.error) ctx.throw(400, '잘못된 요청');
+    
+    const {field} = params.value;
 
-// exports.upImg = async (ctx)=>{
-//     const params = Joi.object({
-//         field: Joi.string().required()
-//     }).validate(ctx.request.body);
-//     if(params.error) ctx.throw(400, '잘못된 요청');
-//     const {field} = 
-//     ctx.body = {
-//         status: 200
-//     }
-// }
+    let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+    let vr_image = ctx.files['vr_image'].map(i=>i.key);
+    let info_image = ctx.files['info_image'].map(i=>i.key);
+
+    thumnail_image = JSON.stringify(thumnail_image)
+    vr_image = JSON.stringify(vr_image)
+    info_image = JSON.stringify(info_image)
+    
+    await newsale.insert({
+        ...params.value,
+        thumnail_image: thumnail_image,
+        vr_image: vr_image,
+        info_image: info_image,
+        views:0
+    });
+
+    ctx.body ={
+        status: 200
+    }
+}

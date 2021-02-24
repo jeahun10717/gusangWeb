@@ -216,27 +216,52 @@ paths:
         - NewSale
       description: >
         update 에서 로컬에 이미지 올리는 api</br>
-        update 에서 처리하는 것을 만들어 두는 거
+        update 에서 처리하는 것을 만들어 두는 거</br>
+        접근권한 : auth 2, auth 3
       parameters:
         - in: query
           name: id
           schema:
             type: integer
-          description: 사진을 넣을 id
-        - in: query
-          name: key
-          schema:
-            type: string
-          description: 사진의 이름(링크)
+          description: 사진을 넣을 컨텐츠의 id
         - in: query
           name: field
           schema:
             type: string
             enum: 
               - thumnail_image
+              - preview_video_link
               - vr_image
               - info_image
+        - in: query
+          name: imgIdx
+          schema: 
+            type: integer
+          description: 업데이트할 사진의 index 
 
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                thumnail_image: 
+                  type: string
+                  format: binary
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                preview_video_link: 
+                  type: string
+                  format: binary
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                vr_image: 
+                  type: string
+                  format: binary
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것  
+                info_image: 
+                  type: string
+                  format: binary
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                  
       responses:
         '200':
           $ref: '#/components/responses/200'

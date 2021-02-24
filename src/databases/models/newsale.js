@@ -76,6 +76,7 @@ exports.getImgs = async (id)=>{
     const [result] = await db.query(`select thumnail_image, vr_image, info_image from newSale where id = ?`,id);
     return result;
 }
+
 exports.getImgsFromField = async(id, field)=>{
     const [result] = await db.query(`select ${field} from newSale where id = ?`,id);
     return result;

@@ -193,7 +193,7 @@ exports.update = async (ctx) => {
                                    // 프론트에서 데이터 정해줘야 할 듯
         // auth ,  // : 이 부분은 newSale 을 따로 뺐으니까 필요없을 듯함
         // thumnail_image : Joi.string().required(),
-        preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
+        // preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
         youtube_info_link : Joi.string().required(), // 안내영상 링크(youtube link)
         youtube_inner_link : Joi.string().required(), // 내부영상 링크(youtube link)
         vr_link_inner : Joi.string().required(), // 내부 vr 영상을 위한 링크(youtube link)
@@ -293,28 +293,25 @@ exports.delImg = async (ctx)=>{
 }
 //key 와 field 로 추가하는 소스 필요함
 exports.upImg = async (ctx)=>{
-    const params = Joi.object({
-        field: Joi.string().required()
-    }).validate(ctx.request.body);
-    if(params.error) ctx.throw(400, '잘못된 요청');
+    const { id, field, imgIdx } = ctx.query;
+    // console.log(typeof imgIdx);
     
-    const {field} = params.value;
+    const result = await newsale.getImgsFromField(id, field);
+    const data = JSON.parse(result[field])
+    // console.log(data);
 
-    let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
-    let vr_image = ctx.files['vr_image'].map(i=>i.key);
-    let info_image = ctx.files['info_image'].map(i=>i.key);
+    let imgInfo = ctx.files[`${field}`]
+    // console.log(imgInfo);
+    imgName = imgInfo[0].key;
+    // console.log(imgName);
 
-    thumnail_image = JSON.stringify(thumnail_image)
-    vr_image = JSON.stringify(vr_image)
-    info_image = JSON.stringify(info_image)
-    
-    await newsale.insert({
-        ...params.value,
-        thumnail_image: thumnail_image,
-        vr_image: vr_image,
-        info_image: info_image,
-        views:0
-    });
+    // console.log(data);
+    data.splice(imgIdx, 0,imgName);
+    // console.log(data);
+
+    await newsale.insertImgs({
+        [field]: JSON.stringify(data)
+    }, id)
 
     ctx.body ={
         status: 200

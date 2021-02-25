@@ -37,6 +37,11 @@ exports.pageByView = async(order, conType, page, contents) =>{
     }
 }
 
+exports.pagination = async(order, type, localCode, conType, page, contents) =>{
+    return await db.query(`select * from interior where contents_type = ? and local_address = ? order by ${type} ${order} limit ? offset ?`
+    ,[conType, localCode, contents, page * contents]);
+}
+
 exports.pageForSearch = async(name1, name2, name3, conType, page, contents) =>{
     return await db.query(`select
     *

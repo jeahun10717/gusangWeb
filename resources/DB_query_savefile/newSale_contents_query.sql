@@ -1,6 +1,6 @@
 -- 무조건 실행하는 구문 --------
 use gusang;
-select info_image from newSale;
+select * from newSale;
 update newSale set vr_image = '["test/kT9BHnO0JioOVNyG1613998408079.jpg"]' where id = 1;
 -- ------------------------
 select views from newsale;

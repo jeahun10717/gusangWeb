@@ -6,52 +6,17 @@ exports.pagenate = async (ctx) => {
     // show/:type/:id
     // 위의 api router 에서 type 은 최신순, 조회순
     // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
-    const { order, conType, type, pagenum } = ctx.query;
+    const { order, localCode, conType, type, pagenum } = ctx.query;
+    // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
+    // type : {views, id} --> id 는 최신순 정렬하는 거
+    // console.log(ctx.query);
+    // TODO: query 에서 원하는 값이 안들어오면 400 띄우는 소스 필요
+    // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
+    const result = await interior.pagination( order, type, localCode, conType, pagenum, 2);
 
-
-    //TODO pgaeByView 부분 나중에 2 를 15로 고치기
-    if(type === 'views'){ //조회수순
-        if(order === 'desc'){ // 내림차순(큰게 위로)
-            // pageByView(페이지개수, 페이지컨텐츠개수)
-            const result = await interior.pageByView( order, conType, pagenum, 2);
-            ctx.body = {
-                status : 200,
-                result
-            }
-        }else if(order === 'asc'){ // 오름차순(작은게 위로)
-            // pageByView(페이지개수, 페이지컨텐츠개수)
-            const result = await interior.pageByView( order, conType, pagenum, 2);
-            ctx.body = {
-                status : 200,
-                result
-            }
-        }else{
-            ctx.body = {
-                status : 400,
-                message : 'order 는 desc 나 asc 만 가능합니다.'
-            }
-        }
-    }else if(type === 'date'){ // 업로드 날짜(신규순)
-        if(order === 'desc'){
-            const result = await interior.pageByNew( order, conType, pagenum, 2);
-            ctx.body = {
-                status : 200,
-                result
-            }
-        }else if(order === 'asc'){
-            const result = await interior.pageByNew( order, conType, pagenum, 2);
-            ctx.body = {
-                status : 200,
-                result
-            }
-        }else{
-            ctx.body = {
-                status : 400,
-                message : 'order 는 order 나 asc 만 가능합니다.'
-            }
-        }
-    }else {
-        ctx.throw(400);
+    ctx.body = {
+        status : 200,
+        result
     }
 }
 

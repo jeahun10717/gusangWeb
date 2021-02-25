@@ -30,7 +30,6 @@ upload.fields([
 ]),
 newSaleCtrl.create)
 .post('/update/:id', newSaleCtrl.update)
-.delete('/remove/:id', newSaleCtrl.delete)
 .post('/upImg',
 upload.fields([
     {name: "thumnail_image", maxCount: 1},
@@ -41,5 +40,6 @@ upload.fields([
 newSaleCtrl.upImg
 )     // 1개씩 이미지 올리는 route ==> for update
 .delete('/delImg/:id', newSaleCtrl.delImg)
+.delete('/remove/:id', newSaleCtrl.delete)
 // body : field, key
 module.exports = newsale;

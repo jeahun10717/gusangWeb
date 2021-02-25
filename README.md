@@ -3,7 +3,6 @@
 ## 1. 이번 주 내로 해결
 
 * newSale, interior api 에서 contents_type 으로 필터링 해야 함.
-* franchise 부분에  
 
 * franchise 부분 DB 스키마 추가 작성해야 함
   > 1. 브랜드 소개 부분은 일단은 text 로 넣고 나중에 pdf 로 서빙할지 정하기

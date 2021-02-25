@@ -1,28 +1,27 @@
 # TODO List
+
 ## 1. 이번 주 내로 해결
 
-* **S3 코드 적용하기**
-  > 1. s3 코드 관련해서 의문점 질문하고 해결하기
-  > 2. s3 에 의한 newsale, interior, franchise 소스 수정
-  > ==> 위는 create 관련해서 이미지, 영상에 해당하는 db 스키마를 따로 처리해야 함.
-  > ==> create, update 부분은 따로 빼서 정리해야 함
-  > 3. DB image 관련 스키마 다시 정하기 --> text 1줄이 아니라 여러개로 정리
+* newSale, interior api 에서 contents_type 으로 필터링 해야 함.
+* franchise 부분에  
 
+* franchise 부분 DB 스키마 추가 작성해야 함
+  > 1. 브랜드 소개 부분은 일단은 text 로 넣고 나중에 pdf 로 서빙할지 정하기
+  > 2. 브랜드정보-대표메뉴 부분은 이미지만 --> 이미지 + 이미지이름 까지 할지 정하기
+  > 3. 브랜드정보-브랜드소개,브랜드 경쟁력 --> pdf 로 처리해야 할지 나중에 물어보기
+
+
+* S3 관련 작성
+  > 1. franchise, interior 에 소스 적용
+  > 2. upImg api 에서 에러처리 확인해야 함
+
+* swagger 정리하기
+* detail 호출하는 모든 api 에서 views 올려야 함(이거 관련 질문사항 있음)
 * user table 에 대한 CRUD 작성
-* newSale api 권한 설정하기
 * kakao oauth 과정에서 전화번호 가져오기
 * naver oauth 적용시키기
 * user api 의 CRUD 작성해야 함
 * consult setManager api 담당자가 있는지 체크해야 함
-* search 검색에 대한 거 다시 코딩해야 함
-  > search 에서 첫번째 우선순위 필터는 검색어 2번째 필터는 조회수순으로 할 것
-
-* consult api 에서 auth 설정해야 함. **`./api/consult/consult.ctrl.js` 39번째 줄**
-  > 1. interior, franchise 상담요청은 auth == 0
-  > 2. newSale 상담요청은 auth == 1 || 2 || 3
-  > 3. 상담 리스트 접근권한은 auth == 2 || 3
-  > 4. 상담 리스트 삭제권한은 auth == 2 || 3
-
 * consult pagination api 에서 검색 기능 추가해야 함.
 * 모든 api 의 auth 설정하기
 
@@ -30,36 +29,15 @@
   > newSale, franchise, interior 는 15개
   > consult 부분은 30개
 
-* DB schema 수정 : 모두 수정한 뒤 mysql 에서 alter 로 수정해야 함
- > 1. interior, newSale db schema 중에 평수 관련 double 로 수정
- > 2. 전화번호 관련 태그들 전부 varchar(13) 으로 통일해야 함
- > 3. users realty_name varchar(50) 으로 변경
- > 4. users realty_adress -> realty_address 로 수정
-
-* franchise 부분 DB 스키마 추가 작성해야 함
-
-* ~~모든 api route 에서 search 관련 api 들 조회수순, 날짜순이 필요?~~ => 조회수순만 할거임
-* ~~위도 경도 관련 알아보기~~
-* ~~localCode CRUD 작성해야 함~~
-* ~~최신순, 조회수순 up, down 도 설정해야 함(위의 `order=desc` 부분)~~
-* ~~`newsale.get('/show/:type/:pagenum')`
--->`newsale.get('/show?type=views&pagenum=3&order=desc&local={지역코드}')` 로 바꾸기~~
-* ~~DB model 소스 간략화~~
-* ~~상담요청 DB 작성, CRUD 작성~~
-* ~~부동산 관련자들이 자신이 요청한 정보를 볼 수 있게 해야 함?~~
-* ~~admin 페이지에서 상담요청한 목록 불러 올 때 부동산 사람들한테 보여줄 표에서 필터 걸기~~
-* ~~newSale 에서 회원가입 할 때 추가기입사항 안했을 때 어떻게 해야 함?~~
-
 
 ## 2. 비교적 이후 우선순위
 
 * 공정거래위원회 api 사용가능한지 확인
-* swagger 정리하기
 * DB 전화번호 관련한 스키마 `-` 빼고 수정하기
 * 저장소에 올릴 DB 스키마는 empty로 처리하기
 * select * where ~ 에서 * 부분 특정하기
-* ~~RDS, local DB 물어보기
-rds 는 가격이 비싼 대신 자동백업등을 지원해서 안전함. local DB 는 가격이 싼 대신 DB 가 날아가면 복구가 불가능함~~
+* 모든 페이지네이션 관련 api 들 contents 부분 15개, 30개로 수정
+* x
 
 ## 3. publishing 이후 수정해야 할 것
 
@@ -68,7 +46,6 @@ rds 는 가격이 비싼 대신 자동백업등을 지원해서 안전함. local
 
 * domain 구매
 * aws 서버 client 것으로 바꿀 것.
-* kosis(franchise api) client 것으로 바꿀 것.
 
 # Question List
 
@@ -76,7 +53,10 @@ rds 는 가격이 비싼 대신 자동백업등을 지원해서 안전함. local
 
 1. search api 에서 aaa bbb ccc 로 검색했을 때 aaa 가 먼저 정렬되도록 하려면 어떻게?
 2. 이미지, 동영상을 업로드 할 때 create 를 할 때 링크를 따로 넣어줘야 함?
-3. DB 에 대한 필터링 걸 때 노하우? if 문이 너무 많아져서 복잡해 보임.
+3. DB 에 대한 필터링 걸 때 노하우? if 문이 너무 많아져서 복잡해 보임
+4. views 를 올리는 기준은 detail api 인데 이 api가 get method 이다. 그런데 views 를 올리려면 update 가 있어야 한다. 즉 post 를 써야 하는데 이 문제는 어떻게 해결해야 함? 지금 생각나는 건 2가지
+--> 1. get() 으로 정보 가져오고 이후 바로 post 로 views update
+--> 2. 애초에 detail api 를 post 로 요청해서 views update 를 동시에 처리
 
 ## 2. to front-end engineer
 

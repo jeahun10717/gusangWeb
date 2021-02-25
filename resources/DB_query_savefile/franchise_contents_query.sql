@@ -1,11 +1,13 @@
 use gusang;
 select * from franchise;
-
+-- test query------------------------------------------------------------------------------
+drop table franchise;
+-- ----------------------------------------------------------------------------------------
 create table franchise(
     id int unsigned auto_increment primary key,
     franchise_name varchar(40), -- : 컨텐츠에 표시될 텍스트, 검색될 이름
     franchise_tag varchar(10), -- : 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
-    franchise_logo varchar(256), -- : franchise 로고
+    franchise_logo text, -- : franchise 로고
     
     -- 가맹정보 부분 //////////////////////////////////////////////////
     franchise_storenum int,     -- 매장 수
@@ -21,6 +23,7 @@ create table franchise(
     franchise_fax varchar(20),  -- 대표 팩스 번호
     franchise_detailsale varchar(256), -- 브랜드 창업 비용
                                        -- 도표에 들어가는 자료인데 구분자로 여래개 받아서 넣을 듯
+    -- 아래 3개의 정보들은 배열로 넣는데 2010~2021 순인데 년도가 수정되면 추가할 수 있음
     -- 그래프용 연별 매출
     franchise_month_sales varchar(256),
     -- 그래프용 가맹점 증감추이
@@ -30,10 +33,11 @@ create table franchise(
     
     -- ////////////////////////////////////////////////////////////////
 
-    brand_introduce varchar(256), -- 브랜드 정보 / 브랜드 소개
-    brand_menu varchar(256), -- 브랜드 정보 / 브랜드 대표메뉴
-    brand_competitiveness varchar(256), -- 브랜드 정보 / 브랜드 경쟁력
-    brand_video varchar(256), -- 브랜드 정보 / 브랜드 홍보영상
+    brand_introduce text, -- 브랜드 정보 / 브랜드 소개
+    brand_menu text, -- 브랜드 정보 / 브랜드 대표메뉴
+    brand_competitiveness text, -- 브랜드 정보 / 브랜드 경쟁력-->pdf 로 처리할거임
+    brand_video text, -- 브랜드 정보 / 브랜드 홍보영상
+    -- 위의 brand_video 는 영상파일인지 youtube 링크인지 구분해서 넣어줄 것
 
 
     registAt datetime default now(),

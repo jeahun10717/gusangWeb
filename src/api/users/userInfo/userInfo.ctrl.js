@@ -9,13 +9,14 @@ exports.show = async(ctx)=>{
     const { auth, page, order } = ctx.query;
 
     // TODO: contents 부분(show 함수의 매개변수 1 부분) 30개로 바꿔야 함
-    result = await user.show(auth, order, page, 1);
+    const result = await user.show(auth, order, page, 1);
 
     ctx.body = {
         status:200,
         result
     }
 }
+
 // TODO: user talbe 에 값 여러개 입력하고 밑의 소스 검증해야 함
 exports.search = async(ctx)=>{
     const { search, order, page } = ctx.query;

@@ -5,22 +5,22 @@ const { interior } = require('../../databases');
 exports.pagenate = async (ctx) => {
     // show/:type/:id
     // 위의 api router 에서 type 은 최신순, 조회순
-    const { order, type, pagenum } = ctx.query;
+    // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
+    const { order, conType, type, pagenum } = ctx.query;
 
-    // 페이지네이션을 위해서는 db 데이터의 개수를 알아야 함
-    // const rowNum = await interior.rowNum();
 
+    //TODO pgaeByView 부분 나중에 2 를 15로 고치기
     if(type === 'views'){ //조회수순
         if(order === 'desc'){ // 내림차순(큰게 위로)
             // pageByView(페이지개수, 페이지컨텐츠개수)
-            const result = await interior.pageByView( order, pagenum, 2);
+            const result = await interior.pageByView( order, conType, pagenum, 2);
             ctx.body = {
                 status : 200,
                 result
             }
         }else if(order === 'asc'){ // 오름차순(작은게 위로)
             // pageByView(페이지개수, 페이지컨텐츠개수)
-            const result = await interior.pageByView( order, pagenum, 2);
+            const result = await interior.pageByView( order, conType, pagenum, 2);
             ctx.body = {
                 status : 200,
                 result
@@ -33,13 +33,13 @@ exports.pagenate = async (ctx) => {
         }
     }else if(type === 'date'){ // 업로드 날짜(신규순)
         if(order === 'desc'){
-            const result = await interior.pageByNew( order, pagenum, 2);
+            const result = await interior.pageByNew( order, conType, pagenum, 2);
             ctx.body = {
                 status : 200,
                 result
             }
         }else if(order === 'asc'){
-            const result = await interior.pageByNew( order, pagenum, 2);
+            const result = await interior.pageByNew( order, conType, pagenum, 2);
             ctx.body = {
                 status : 200,
                 result
@@ -76,25 +76,22 @@ exports.detail = async (ctx) => {
 // type 은 검색할 db의 column 의 종류, input 은 검색어 종류
 exports.search = async (ctx) => {
     const params = Joi.object({
-        q: Joi.string().required(),
-        p: Joi.number().integer().required()
+        searchName: Joi.string().required(),
+        conType: Joi.string().required(),
+        page: Joi.number().integer().required()
     }).validate(ctx.query);
-    const { q, p } = params.value;
-    searchName = q.split(' ');
-    console.log(searchName);
-    const result = await interior.pageForSearch(searchName[0],searchName[1],searchName[2], p, 2);
+    const { searchName, page, conType } = params.value;
+    data = searchName.split(' ');
+    console.log(data);
+    const result = await interior.pageForSearch(data[0],data[1],data[2],conType,page, 2);
 
-    //search pagenation 구현하기
-    // const final = await newsale.pageForSearch(result, pagenum, 2)
+    // const final = await interior.pageForSearch(result, pagenum, 2)
     ctx.body = {
         status : 200,
         result
     }
-    // ctx.body = input
-    // console.log(ctx.body);
-    // console.log(ctx.request.query);
-    // console.log(ctx.query , ' : 쿼리 확인용');
-}
+} 
+
 exports.create = async (ctx) => {
     const params = Joi.object({
         contents_name : Joi.string().required(), // 컨텐츠에 표시될 텍스트

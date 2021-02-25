@@ -16,34 +16,34 @@ exports.update = async(id,query)=>{
 exports.delete = async(id)=>{
     return await db.query('delete from interior where id = ?', id);
 }
-// search 후 pagination
-exports.pageForSearch = async(name1, name2, name3, page, contents) =>{
-    return await db.query(`select
-    *
-    from interior
-    where contents_name like ? || contents_name like ? || contents_name like ?
-    order by views desc limit ? offset ?`
-    ,[`%${name1}%`, `%${name2}%`, `%${name3}%` ,contents, page * contents]);
-}
 // 최신순으로 정렬
-exports.pageByNew = async(order, page, contents) =>{
+exports.pageByNew = async(order, conType, page, contents) =>{
     if(order === 'desc'){
-        return await db.query(`select * from interior order by id desc limit ? offset ?`
-        ,[contents, page * contents]);
+        return await db.query(`select * from interior where contents_type = ? order by id desc limit ? offset ?`
+        ,[conType ,contents, page * contents]);
     }else if(order === 'asc'){
-        return await db.query(`select * from interior order by id asc limit ? offset ?`
-        ,[contents, page * contents]);
+        return await db.query(`select * from interior where contents_type = ? order by id asc limit ? offset ?`
+        ,[conType, contents, page * contents]);
     }
 }
 // 조회수순으로 정렬
-exports.pageByView = async(order ,page, contents) =>{
+exports.pageByView = async(order, conType, page, contents) =>{
     if(order === 'desc'){
-        return await db.query(`select * from interior order by views desc limit ? offset ?`
-        ,[contents, page * contents]);
+        return await db.query(`select * from interior where contents_type = ? order by views desc limit ? offset ?`
+        ,[conType ,contents, page * contents]);
     }else if(order === 'asc'){
-        return await db.query(`select * from interior order by views asc limit ? offset ?`
-        ,[contents, page * contents]);
+        return await db.query(`select * from interior where contents_type = ? order by views asc limit ? offset ?`
+        ,[conType, contents, page * contents]);
     }
+}
+
+exports.pageForSearch = async(name1, name2, name3, conType, page, contents) =>{
+    return await db.query(`select
+    *
+    from interior
+    where contents_type = ? and (contents_name like ? || contents_name like ? || contents_name like ?)
+    order by views desc limit ? offset ?`
+    ,[conType, `%${name1}%`, `%${name2}%`, `%${name3}%`, contents, page * contents]);
 }
 
 //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력

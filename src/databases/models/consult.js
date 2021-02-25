@@ -191,7 +191,6 @@ exports.filteredPaginateNewSale = async(realtyName, found, manager, order, page,
 }
 
 // isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
-// TODO: * consult isExist 부분에서 user 테이블에 Auth 가 3, 2 인지 확인하는 부분 추가 해야 함
 exports.isExist = async(id)=>{
     const [result] = await db.query('select count(*) cnt from consult where id = ?', id);
     return result.cnt;

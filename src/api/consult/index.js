@@ -10,7 +10,6 @@ consult.use(auth.level1);
 
 consult
 .post('/createNewSale', consultCtrl.createNewSale) // 상담 생성(newSale)
-// TODO: 권한인증 미들웨어 필요
 
 consult.use(auth.level2);
 

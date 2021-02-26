@@ -17,25 +17,12 @@ exports.delete = async(id)=>{
     return await db.query('delete from franchise where id = ?', id);
 }
 
-exports.pageByNew = async(order, page, contents) =>{
-    if(order === 'desc'){
-        return await db.query(`select * from franchise order by id desc limit ? offset ?`
-        ,[contents, page * contents]);
-    }else if(order === 'asc'){
-        return await db.query(`select * from franchise order by id asc limit ? offset ?`
-        ,[contents, page * contents]);
-    }
+// order 는 desc, asc / type 은 views, id
+exports.pagination = async(order, type, localCode, conType, page, contents) =>{
+    return await db.query(`select * from franchise where franchise_tag = ? and local_address = ? order by ${type} ${order} limit ? offset ?`
+    ,[conType, localCode, contents, page * contents]);
 }
-// 조회수순으로 정렬
-exports.pageByView = async(order ,page, contents) =>{
-    if(order === 'desc'){
-        return await db.query(`select * from franchise order by views desc limit ? offset ?`
-        ,[contents, page * contents]);
-    }else if(order === 'asc'){
-        return await db.query(`select * from franchise order by views asc limit ? offset ?`
-        ,[contents, page * contents]);
-    }
-}
+
 // search 후 pagination
 exports.pageForSearch = async(name1, name2, name3, page, contents) =>{
     return await db.query(`select

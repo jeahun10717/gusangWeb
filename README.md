@@ -9,6 +9,7 @@
   > 2. 브랜드정보-대표메뉴 부분은 이미지만 --> 이미지 + 이미지이름 까지 할지 정하기
   > 3. 브랜드정보-브랜드소개,브랜드 경쟁력 --> pdf 로 처리해야 할지 나중에 물어보기
 
+* user table 에 대한 CRUD 작성
 
 * S3 관련 작성
   > 1. franchise, interior 에 소스 적용
@@ -16,10 +17,8 @@
 
 * swagger 정리하기
 * detail 호출하는 모든 api 에서 views 올려야 함(이거 관련 질문사항 있음)
-* user table 에 대한 CRUD 작성
 * kakao oauth 과정에서 전화번호 가져오기
 * naver oauth 적용시키기
-* user api 의 CRUD 작성해야 함
 * consult setManager api 담당자가 있는지 체크해야 함
 * consult pagination api 에서 검색 기능 추가해야 함.
 * 모든 api 의 auth 설정하기

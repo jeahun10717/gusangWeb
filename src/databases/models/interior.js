@@ -16,27 +16,8 @@ exports.update = async(id,query)=>{
 exports.delete = async(id)=>{
     return await db.query('delete from interior where id = ?', id);
 }
-// 최신순으로 정렬
-exports.pageByNew = async(order, conType, page, contents) =>{
-    if(order === 'desc'){
-        return await db.query(`select * from interior where contents_type = ? order by id desc limit ? offset ?`
-        ,[conType ,contents, page * contents]);
-    }else if(order === 'asc'){
-        return await db.query(`select * from interior where contents_type = ? order by id asc limit ? offset ?`
-        ,[conType, contents, page * contents]);
-    }
-}
-// 조회수순으로 정렬
-exports.pageByView = async(order, conType, page, contents) =>{
-    if(order === 'desc'){
-        return await db.query(`select * from interior where contents_type = ? order by views desc limit ? offset ?`
-        ,[conType ,contents, page * contents]);
-    }else if(order === 'asc'){
-        return await db.query(`select * from interior where contents_type = ? order by views asc limit ? offset ?`
-        ,[conType, contents, page * contents]);
-    }
-}
 
+// interior.get('/show') 의 함수로 쓰일 거
 exports.pagination = async(order, type, localCode, conType, page, contents) =>{
     return await db.query(`select * from interior where contents_type = ? and local_address = ? order by ${type} ${order} limit ? offset ?`
     ,[conType, localCode, contents, page * contents]);

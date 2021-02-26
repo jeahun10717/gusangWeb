@@ -3,13 +3,21 @@ const { S3 } = require('../../lib');
 const { newsale } = require('../../databases');
 
 exports.pagenate = async (ctx) => {
-    // show/:type/:id
-    // 위의 api router 에서 type 은 최신순, 조회순
+    const params = Joi.object({
+        order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
+        localCode: Joi.string().required(), // TODO: 문자 개수 로컬코드 갯수로 검증해야 함
+        conType: Joi.string().regex(/\bpreview video\b|\b360 vr\b|\blive\b|\bmarket\b/).required(),
+        type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
+        pagenum: Joi.number().integer()
+    }).validate(ctx.query)
+    console.log(params.error);
+    if(params.error){
+        ctx.throw(400)
+    }
     // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
     const { order, localCode, conType, type, pagenum } = ctx.query;
     // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
     // type : {views, id} --> id 는 최신순 정렬하는 거
-    // console.log(ctx.query);
     // TODO: query 에서 원하는 값이 안들어오면 400 띄우는 소스 필요
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
     const result = await newsale.pagination( order, type, localCode, conType, pagenum, 2);
@@ -55,7 +63,7 @@ exports.search = async (ctx) => {
         status : 200,
         result
     }
-} 
+}
 
 exports.create = async (ctx) => {
     const params = Joi.object({
@@ -111,7 +119,7 @@ exports.create = async (ctx) => {
     vr_image = JSON.stringify(vr_image)
     info_image = JSON.stringify(info_image)
     preview_video_link = JSON.stringify(preview_video_link)
-    
+
     await newsale.insert({
         ...params.value,
         thumnail_image: thumnail_image,
@@ -128,7 +136,7 @@ exports.create = async (ctx) => {
 
 exports.delete = async(ctx) => {
     const { id } = ctx.params;
-    // TODO: 나중에 시간 나면 s3 지우는 코드 작성해야 함
+    // TODO: 나중에 시간 나면 s3 에서 사진 지우는 코드 작성해야 함
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
     if(newsale.isExist(id)){
         await newsale.delete(id)
@@ -144,7 +152,7 @@ exports.update = async (ctx) => {
     if(await interior.isExist(id)===0){
         ctx.throw(400)
     }
-    
+
     const params = Joi.object({
         contents_name : Joi.string().required(), // 컨텐츠에 표시될 텍스트, 검색될 때 사용
         contents_type : Joi.string().required(),  // 영상, 360 vr, 주거, 상가
@@ -188,7 +196,7 @@ exports.update = async (ctx) => {
         ctx.throw(400);
     }
 
-// TODO: update at 설정하기    
+// TODO: update at 설정하기
 
     // const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
     // const vr_image = ctx.files['vr_image'].map(i=>i.key);
@@ -197,8 +205,8 @@ exports.update = async (ctx) => {
     // const Imgs = await newsale.getImgs(id);
     // await newsale.insertImgs({
     //     thumnail_image: [ ...JSON.parse(Imgs.thumnail_image),  ...thumnail_image],
-    //     vr_image: [ ...JSON.parse(Imgs.vr_image), ...vr_image], 
-    //     info_image: [ ...JSON.parse(Imgs.info_image), ...info_image], 
+    //     vr_image: [ ...JSON.parse(Imgs.vr_image), ...vr_image],
+    //     info_image: [ ...JSON.parse(Imgs.info_image), ...info_image],
     // }, id);
     // TODO: update api 부분 이미지 업로드 부분만 따로 만들어 줘야 함
     newsale.update({
@@ -254,7 +262,7 @@ exports.delImg = async (ctx)=>{
 exports.upImg = async (ctx)=>{
     const { id, field, imgIdx } = ctx.query;
     // console.log(typeof imgIdx);
-    
+
     const result = await newsale.getImgsFromField(id, field);
     const data = JSON.parse(result[field])
     // console.log(data);

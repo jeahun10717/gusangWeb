@@ -3,10 +3,21 @@ const { interior } = require('../../databases');
 
 // 아래 함수에서 type 은 view 는 조회순, date 는 날짜순
 exports.pagenate = async (ctx) => {
+    const params = Joi.object({
+        order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
+        localCode: Joi.string().required(), // TODO: 문자 개수 로컬코드 갯수로 검증해야 함
+        conType: Joi.string().regex(/\bpreview video\b|\b360 vr\b|\blive\b|\bmarket\b/).required(),
+        type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
+        pagenum: Joi.number().integer()
+    }).validate(ctx.query)
+    console.log(params.error);
+    if(params.error){
+        ctx.throw(400)
+    }
     // show/:type/:id
     // 위의 api router 에서 type 은 최신순, 조회순
     // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
-    const { order, localCode, conType, type, pagenum } = ctx.query;
+    const { order, localCode, conType, type, pagenum } = params.value;
     // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
     // type : {views, id} --> id 는 최신순 정렬하는 거
     // console.log(ctx.query);

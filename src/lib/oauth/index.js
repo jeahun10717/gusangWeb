@@ -62,3 +62,20 @@ exports.kakao = async ( code )=>{
 
    return kakaoData;
 }
+
+exports.naverData = async (access_token)=>{
+   try{
+      const result = await axios.get('https://openapi.naver.com/v1/nid/me', {
+        headers:{
+          Authorization: `Bearer ${access_token}`
+        }
+      });
+  
+      return result.data.response;
+    }catch(e){
+       console.log(e.data);
+      const err = new Error('잘못된 요청-네이버 로그인 실패');
+      err.status = 400;
+      throw err
+    }
+}

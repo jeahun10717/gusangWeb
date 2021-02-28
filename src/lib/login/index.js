@@ -10,10 +10,11 @@ exports.regist = async (query)=>{
     if(userData){   //가입이 되어 있을 경우(userData 가 존재할 때)-->isExist 가 객체로 존재할 때 <1>
         // 토큰 생성 및 토큰 return
         // dead code
-        return {
-            isNew: userData.isNew,
-            token: token.get({UUID: userData.uuid})
-        };
+        // return {
+        //     isNew: userData.isNew,
+        //     token: token.get({UUID: userData.uuid})
+        throw new Error('이미 있는 회원입니다.');
+        // };
     }else{
         // 가입이 안되있을 경우.
         // uuid 생성
@@ -22,7 +23,8 @@ exports.regist = async (query)=>{
         // db insert
         const data = {
             ...query,
-            uuid : Buffer.from(UUID, 'hex')
+            uuid : Buffer.from(UUID, 'hex'),
+            auth: 1
         }
 
         await user.insert(data);

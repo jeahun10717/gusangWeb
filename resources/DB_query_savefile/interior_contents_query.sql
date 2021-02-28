@@ -2,6 +2,7 @@ use gusang;
 select * from interior;
 -- test query------------------------------------------------------------------------------
 drop table interior;
+alter table interior modify interior_info_etc text;
 -- ----------------------------------------------------------------------------------------
 create table interior(
     id int unsigned auto_increment primary key,
@@ -31,9 +32,9 @@ create table interior(
     interior_info_period varchar(256),    -- 3. 공사기간
     interior_info_price int,              -- 4. 비용
     interior_info_history varchar(256),   -- 5. 시공내역
-    interior_info_etc varchar(256),       -- 6. 기타설명
+    interior_info_etc text,       -- 6. 기타설명
     --
-
+    
     -- 카카오 맵을 위한 위도 경도 주소
     kakaomap_info_latitude double,      -- 위도
     kakaomap_info_longtitude double,    -- 경도
@@ -42,5 +43,5 @@ create table interior(
 
     registAt datetime default now(),
     updateAt datetime,
-    views int -- 조회수
+    views int default 0-- 조회수
 )

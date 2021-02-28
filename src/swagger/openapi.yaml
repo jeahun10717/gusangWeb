@@ -9,19 +9,64 @@ servers:
 
 paths:
 # === User ======================================================================
+  /users/userinfo/show:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: 유저 목록
+      parameters:
+        - in: query
+          name: auth
+          schema:
+            type: string
+            enum:
+              - noFilter
+              - admin
+              - common
+          description: noFilter (default)
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: 0부터 시작 한단다
+          required: true
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: ['desc', 'asc']
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: 200
+                  result:
+                    user_id: 유저 ID
+                    Auth: 권한
+                    phone: 폰 번호
+                    name: 2름
+                    realty_name: 부동산 이름
+                    realty_address: 부동산 주소
+                    realty_owner_name: 부동산 대표 이름
+                    realty_owner_phone: 부동산 대표 전화번호
+                    registAt: 등록일
+
   /users/userInfo/update:
     post:
       security:
         - BearerAuth: []
       tags:
         - User
+      summary: 유저 수정
       description: >
         user create 부분에서 추가 입력한 부분만 update 하는 api
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: integer
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -30,7 +75,7 @@ paths:
               properties:
                 phone:
                   type: string
-                  description: 추가입력 때 입력한 전화번호
+                  description: 추가입력 때 입력한 전화번호 ('-' 넣으면 안됨)
                 name:
                   type: string
                   description: 추가입력 때 입력한 이름
@@ -45,7 +90,7 @@ paths:
                   description: 추가입력 대 입력한 부동산 대표 이름
                 realty_owner_phone:
                   type: string
-                  description: 추가입력 때 입력한 부동산 대표 전화번호
+                  description: 추가입력 때 입력한 부동산 대표 전화번호 ('-' 넣으면 안됨)
               required:
                 - name
                 - phone
@@ -56,6 +101,33 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/200'
+
+  /users/userInfo/delete/{user_id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: 유저 삭제 [관리자 전용]
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: 400
+                  code: 0
+                  msg: 아이디가 없음
 
 # === newSale ===================================================================
   /newsale/create:
@@ -208,6 +280,295 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 
+  /newsale/detail/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      description: 매물에 대한 세부 정보 가져오는 api
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: 가져올 매물의 id
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /newsale/search:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      description: 검색어를 통한 매물 가져옴(페이지네이션 함)
+      parameters:
+        - in: query
+          name: searchName
+          schema:
+            type: string
+          description: 입력받는 검색어
+          required: true
+        - in: query
+          name: conType
+          schema:
+            type: string
+            enum:
+              - preview video
+              - 360 vr
+              - live
+              - markete
+          description: 컨텐츠 타입(총 4개)
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: 페이지 번호(첫번째 페이지가 0)
+          required: true
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /newsale/show:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      description: 15개씩 컨텐츠 요약해서 보여주는 api(영상 미리보기 부분)
+      parameters:
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+        - in: query
+          name: localCode
+          schema:
+            type: string
+            enum:
+              - 2644000000
+              - 2641000000
+              - 2629000000
+              - 2617000000
+              - 2626000000
+              - 2623000000
+              - 2632000000
+              - 2653000000
+              - 2638000000
+              - 2614000000
+              - 2650000000
+              - 2647000000
+              - 2620000000
+              - 2611000000
+              - 2635000000
+              - 2671000000
+          description: 강서구, 금정구, 남구, 동구, 동래구, 부산진구, 북구, 사상구, 사하구, 서구, 수영구, 연제구, 영도구, 중구, 해운대구 순서임</br>
+            위의 사항을 요청할 떄 front 에서는 지역코드를 노출시키는 게 아니라 지역코드에 해당하는 지역(구) 명을 노출시켜야 함
+          required: true
+        - in: query
+          name: conType
+          schema:
+            type: string
+            enum:
+              - preview video
+              - 360 vr
+              - live
+              - market
+          description: 4개 중에 1개 선택
+          required: true
+
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum:
+              - views
+              - id
+          description: type 은 order 의 기준. views 는 조회수순, id 는 최신순
+          required: true
+
+        - in: query
+          name: pagenum
+          schema:
+            type: integer
+          description: pagination 을 위한 페이지 번호
+          required: true
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /newsale/update/{id}:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      description: update 를 하는 api 인데 클라이언트가 직접 데이터를 제공하는 부분은 따로 처리했음</br>
+        텍스만 update 하는 api 임
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                contents_name:
+                  type: string
+                  description:  컨텐츠에 표시될 텍스트, 검색될 때 사용
+                contents_type:
+                  type: string
+                  enum:
+                    - preview video
+                    - 360 vr
+                    - live
+                    - marketrs
+                  description:  영상, 360 vr, 주거, 상가
+                local_address:
+                  type: string
+                  description:  지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
+                youtube_info_link:
+                  type: string
+                  description:  안내영상 링크(youtube link)
+                youtube_inner_link:
+                  type: string
+                  description:  내부영상 링크(youtube link)
+                vr_link_inner:
+                  type: string
+                  description:  내부 vr 영상을 위한 링크(youtube link)
+                vr_link_outer:
+                  type: string
+                  description:  외부 vr 영상을 위한 링크(youtube link)
+                vr_link_typeA:
+                  type: string
+                  description:  type A vr 링크
+                vr_link_typeB:
+                  type: string
+                  description:  type B vr 링크
+
+                newsale_info_type:
+                  type: integer
+                  description:  1. 타입
+                newsale_info_housenum:
+                  type: integer
+                  description:  2. 총 세대수
+                newsale_info_parknum:
+                  type: integer
+                  description:  3. 주차 대수
+                newsale_info_width:
+                  type: integer
+                  description:  4. 평형대
+                newsale_info_price:
+                  type: integer
+                  description:  5. 가격
+                newsale_info_perprice:
+                  type: integer
+                  description:  6. 평당가격
+                newsale_info_roomnum:
+                  type: integer
+                  description:  7. 방 개수
+                newsale_info_bathroomnum:
+                  type: integer
+                  description:  7. 욕실
+                newsale_info_option:
+                  type: string
+                  description:  8. 옵션
+                newsale_info_floornum:
+                  type: integer
+                  description:  9. 층수
+                newsale_info_etc:
+                  type: string
+                  description:  10. 기타설명
+                kakaomap_info_latitude:
+                  type: string
+                  description:  kakaoMap 에서 가져오는 위도
+                kakaomap_info_longtitude:
+                  type: string
+                  description:  kakaoMap 에서 가져오는 경도
+                kakaomap_info_address:
+                  type: string
+                  description:  kakaoMap 에서 가져오는 주소
+              required:
+                - contents_name
+                - contents_type
+                - local_address
+                - youtube_info_link
+                - youtube_inner_link
+                - vr_link_inner
+                - vr_link_outer
+                - vr_link_typeA
+                - vr_link_typeB
+                - newsale_info_type
+                - newsale_info_housenum
+                - newsale_info_parknum
+                - newsale_info_width
+                - newsale_info_price
+                - newsale_info_perprice
+                - newsale_info_roomnum
+                - newsale_info_bathroomnum
+                - newsale_info_option
+                - newsale_info_floornum
+                - newsale_info_etc
+                - kakaomap_info_latitude
+                - kakaomap_info_longtitude
+                - kakaomap_info_address
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /delImg/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - NewSale
+      description: >
+        클라이언트가 S3 에 올린 데이터를 지우고 싶을 때 사용하는 api </br>
+        update 에서 로컬에 이미지 업데이트 할 때 먼저 지우기 위한 api
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: 지우고 싶은 사진이 존재하는 매물의 id
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                field:
+                  type: string
+                  enum:
+                    - thumnail_image
+                    - preview_video_link
+                    - vr_image
+                    - info_image
+                  description: 이미지를 지우기 위한 DB 의 칼럼 이름
+                key:
+                  type: string
+                  description: S3 에서 데이터를 찾기 위한 key
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+
   /newsale/upImg:
     post:
       security:
@@ -217,6 +578,7 @@ paths:
       description: >
         update 에서 로컬에 이미지 올리는 api</br>
         update 에서 처리하는 것을 만들어 두는 거</br>
+        **주의 사항 : 반드시 delImg api 를 먼저 요청하고 해당 idx 로 이 api 요청 할 것!**</br>
         접근권한 : auth 2, auth 3
       parameters:
         - in: query
@@ -228,16 +590,16 @@ paths:
           name: field
           schema:
             type: string
-            enum: 
+            enum:
               - thumnail_image
               - preview_video_link
               - vr_image
               - info_image
         - in: query
           name: imgIdx
-          schema: 
+          schema:
             type: integer
-          description: 업데이트할 사진의 index 
+          description: 업데이트할 사진의 index
 
       requestBody:
         content:
@@ -245,23 +607,23 @@ paths:
             schema:
               type: object
               properties:
-                thumnail_image: 
+                thumnail_image:
                   type: string
                   format: binary
                   description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
-                preview_video_link: 
+                preview_video_link:
                   type: string
                   format: binary
                   description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
-                vr_image: 
-                  type: string
-                  format: binary
-                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것  
-                info_image: 
+                vr_image:
                   type: string
                   format: binary
                   description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
-                  
+                info_image:
+                  type: string
+                  format: binary
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -285,6 +647,134 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 # === interior ===========================================================
+  /interior/detail/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Interior
+      description: 매물에 대한 세부 정보 가져오는 api
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: 가져올 매물의 id
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /interior/search:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Interior
+      description: 검색어를 통한 매물 가져옴(페이지네이션 함)
+      parameters:
+        - in: query
+          name: searchName
+          schema:
+            type: string
+          description: 입력받는 검색어
+          required: true
+        - in: query
+          name: conType
+          schema:
+            type: string
+            enum:
+              - preview video
+              - 360 vr
+              - live
+              - markete
+          description: 컨텐츠 타입(총 4개)
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: 페이지 번호(첫번째 페이지가 0)
+          required: true
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /interior/show:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Interior
+      description: 15개씩 컨텐츠 요약해서 보여주는 api(영상 미리보기 부분)
+      parameters:
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+        - in: query
+          name: localCode
+          schema:
+            type: string
+            enum:
+              - 2644000000
+              - 2641000000
+              - 2629000000
+              - 2617000000
+              - 2626000000
+              - 2623000000
+              - 2632000000
+              - 2653000000
+              - 2638000000
+              - 2614000000
+              - 2650000000
+              - 2647000000
+              - 2620000000
+              - 2611000000
+              - 2635000000
+              - 2671000000
+          description: 강서구, 금정구, 남구, 동구, 동래구, 부산진구, 북구, 사상구, 사하구, 서구, 수영구, 연제구, 영도구, 중구, 해운대구 순서임</br>
+            위의 사항을 요청할 떄 front 에서는 지역코드를 노출시키는 게 아니라 지역코드에 해당하는 지역(구) 명을 노출시켜야 함
+          required: true
+        - in: query
+          name: conType
+          schema:
+            type: string
+            enum:
+              - preview video
+              - 360 vr
+              - live
+              - market
+          description: 4개 중에 1개 선택
+          required: true
+
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum:
+              - views
+              - id
+          description: type 은 order 의 기준. views 는 조회수순, id 는 최신순
+          required: true
+
+        - in: query
+          name: pagenum
+          schema:
+            type: integer
+          description: pagination 을 위한 페이지 번호
+          required: true
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+
+
 
   /interior/create:
     post:
@@ -297,7 +787,7 @@ paths:
         접근권한 : auth 2, auth 3
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -316,12 +806,17 @@ paths:
                 local_address:
                   type: string
                   description: 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
+
                 thumnail_image:
                   type: string
+                  format: binary
                   description: 대표 이미지 링크
+
                 preview_video_link:
                   type: string
+                  format: binary
                   description: 미리보기 영상 로컬링크
+
                 youtube_link:
                   type: string
                   description: 해당 컨텐츠의 유튭 영상
@@ -343,9 +838,12 @@ paths:
                 construct_info:
                   type: string
                   description: 엔테리어/상세보기 부분 공사내역
+
                 image_link:
                   type: string
+                  format: binary
                   description: 사진 슬라이드에 들어갈 이미지 로컬링크
+
                 interior_info_location:
                   type: string
                   description: 1. 위치

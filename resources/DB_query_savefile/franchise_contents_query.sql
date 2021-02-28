@@ -2,6 +2,17 @@ use gusang;
 select * from franchise;
 -- test query------------------------------------------------------------------------------
 drop table franchise;
+select 
+	case
+	when franchise_name like "%bbb%" then locate('bbb',franchise_name)+100
+	when franchise_name like "%aaa%" then locate('aaa', franchise_name)+200
+	when franchise_name like "%xxx%" then locate('xxx', franchise_name)+300
+	end as zorder, franchise_name, franchise_address, franchise_tag
+from franchise
+where franchise_tag = "korean"
+order by 
+	zorder
+    limit 2 offset 0;
 -- ----------------------------------------------------------------------------------------
 create table franchise(
     id int unsigned auto_increment primary key,
@@ -43,4 +54,4 @@ create table franchise(
     registAt datetime default now(),
     updateAt datetime,
     views int -- 조회수
-)
+);

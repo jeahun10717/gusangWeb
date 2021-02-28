@@ -32,8 +32,17 @@ exports.pagenate = async (ctx) => {
 }
 
 exports.detail = async (ctx) => {
-    const { id } = ctx.params;
+    const params = Joi.object({
+        id: Joi.number().integer().required()
+    }).validate(ctx.params)
 
+    if(params.error){
+        ctx.throw(400);
+    }
+
+    const { id } = params.value;
+
+    await interior.upViews(id)
     // Promise 함수인데 await 안붙히면 Promise 리턴해서 무조건 true 값이 됨. VSS
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
     if(await interior.isExist(id)){
@@ -56,12 +65,17 @@ exports.search = async (ctx) => {
         conType: Joi.string().required(),
         page: Joi.number().integer().required()
     }).validate(ctx.query);
+
+    if(params.error){
+        ctx.throw(400);
+    }
+
     const { searchName, page, conType } = params.value;
+
     data = searchName.split(' ');
-    console.log(data);
+
     const result = await interior.pageForSearch(data[0],data[1],data[2],conType,page, 2);
 
-    // const final = await interior.pageForSearch(result, pagenum, 2)
     ctx.body = {
         status : 200,
         result
@@ -74,9 +88,9 @@ exports.create = async (ctx) => {
         contents_type : Joi.string().required(), // 영상,360 vr, 주거, 상가
         local_address : Joi.string().required(), // : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                    // 프론트에서 데이터 정해줘야 할 듯
-        thumnail_image : Joi.string().required(),
+        // thumnail_image : Joi.string().required(),
 
-        preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
+        // preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
         youtube_link : Joi.string().required(), // 해당 컨텐츠의 유튭 영상
         vr_link_old : Joi.string().required(), // 시공 전 vr 영상을 위한 링크
         vr_link_new : Joi.string().required(), // 시공 후 vr 영상을 위한 링크
@@ -86,7 +100,7 @@ exports.create = async (ctx) => {
         construct_company : Joi.string().required(), // 인테리어/상세보기 부분 공사업체
         construct_info : Joi.string().required(), // 인테리어/상세보기 부분 공사내역
 
-        image_link : Joi.string().required(), // 사진 슬라이드에 들어갈 이미지 로컬링크
+        // image_link : Joi.string().required(), // 사진 슬라이드에 들어갈 이미지 로컬링크
         // 이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때일 경우에는 어떻게 해야 함?
         // 위의 질문이 구현이 어렵다면 그냥 특정 개수로 태그를 달아서 하는 게 낫나?
 
@@ -105,10 +119,21 @@ exports.create = async (ctx) => {
         kakaomap_info_address : Joi.string().required(), // 주소
     }).validate(ctx.request.body)
 
-    if(params.error) {
-        ctx.throw(400);
-    }
-    interior.insert(params.value);
+    let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+    let preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
+    let image_link = ctx.files['image_link'].map(i=>i.key);
+
+    thumnail_image = JSON.stringify(thumnail_image)
+    preview_video_link = JSON.stringify(preview_video_link)
+    image_link = JSON.stringify(image_link)
+
+    await newsale.insert({
+        ...params.value,
+        thumnail_image,
+        preview_video_link,
+        image_link,
+        views:0
+    });
 
     ctx.body ={
         status: 200

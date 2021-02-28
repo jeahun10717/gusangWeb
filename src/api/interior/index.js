@@ -1,10 +1,7 @@
 const Router = require('koa-router');
 const interior = new Router();
 const interiorCtrl = require('./interior.ctrl.js');
-const { auth } = require('../../lib');
-
-
-interior.use(auth.level1)
+const { auth, S3 } = require('../../lib');
 
 interior
 .get('/')
@@ -13,7 +10,8 @@ interior
 .get('/show', interiorCtrl.pagenate)   // 15개씩 보여주는 페이지를 위한 페이지네이션 포함 라우트
 // type:{date, veiws}, order:{desc, asc}, pagenum:{int num}
 
-interior.use(auth.level2)
+interior.use(auth.login);
+interior.use(auth.level2);
 
 interior
 .post('/create', interiorCtrl.create)

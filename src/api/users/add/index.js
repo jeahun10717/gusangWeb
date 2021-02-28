@@ -18,24 +18,30 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
     }).validate(ctx.request.body);
 
     if(params.error) ctx.throw(400, 'bed request');
-
+    
     const { access_token, login_type, ...rest } = params.value;
-
+    
     let login_id;
 
     if(login_type === 2){   // kakao login
       const kakaoData = await oauth.kakaoData(access_token);
       login_id = `kakao:${kakaoData.id}`;
     }
-    //  else if(login_type === 1){  // naver login
-    //
-    // }
+    else if(login_type === 1){  // naver login
+      const naverData = await oauth.naverData(access_token);
+      console.log(naverData);
+      login_id = `naver:${naverData.id}`; 
+    }
 
-    const userToken = await login.regist({
-      login_type,
-      login_id,
-      ...rest
-    });
+    try{
+      const userToken = await login.regist({
+        login_type,
+        login_id,
+        ...rest
+      });
+    }catch(e){
+      throw(400,e);
+    }
     // console.log(params);
     // console.log(params.value);
     // console.log(ctx.request.user);

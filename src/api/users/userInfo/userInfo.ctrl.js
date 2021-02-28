@@ -2,11 +2,19 @@ const Joi = require('joi');
 const { user } = require('../../../databases');
 
 exports.show = async(ctx)=>{
+    console.log(ctx.query);
+    const params = Joi.object({
+        auth: Joi.string().valid('noFilter','admin','common').default('noFilter'),
+        page: Joi.number().integer().required(),
+        order: Joi.string().valid('desc','asc').required()
+    }).validate(ctx.query);
+    if(params.error) ctx.throw(400,'잘못된 요청');
+
     // auth == noFilter : 전체 회원 보여줌
     // auth == admin : auth == 2 || auth == 3
     // auth == common : auth == 0 || auth == 1
     // order 오름차순 내림차순
-    const { auth, page, order } = ctx.query;
+    const { auth, page, order } = params.value;
 
     // TODO: contents 부분(show 함수의 매개변수 1 부분) 30개로 바꿔야 함
     const result = await user.show(auth, order, page, 1);
@@ -31,10 +39,9 @@ exports.search = async(ctx)=>{
 }
 
 exports.update = async(ctx)=>{
-    const { id } = ctx.query;
-    if(await user.isExistFromID===0){ // 해당 id 가 존재하면 실행
-        ctx.throw(400);
-    }
+    const { UUID } = ctx.request.user;
+    const user_id = Buffer.from(UUID, 'hex');
+
     const params = Joi.object({
         phone: Joi.string().regex(/^[0-9]{10,13}$/).required(), // 회원전화번호
         name: Joi.string().required(),  // 회원 이름
@@ -44,10 +51,26 @@ exports.update = async(ctx)=>{
         realty_owner_phone: Joi.string().regex(/^[0-9]{10,13}$/).required()
     }).validate(ctx.request.body);
     if(params.error) ctx.throw(400, 'bed request');
-
-    await user.update(id, params.value);
-
+    
+    const result = await user.update(user_id, params.value);
+    if(result.affectedRows === 0) ctx.throw(400, "id 가 존재하지 않음");
+    
     ctx.body = {
         status:200,
     }
+}
+
+exports.delete = async (ctx)=>{
+    const params = Joi.object({
+        id: Joi.string().custom(v=>Buffer.from(v,'hex')).required()
+    }).validate(ctx.params);
+    // TODO params.error
+    const { id } = params.value;
+
+    const result = await user.delete(id);
+    if(result.affectedRows === 0) ctx.throw(400, "id 가 존재하지 않음");
+    
+        ctx.body = {
+            status: 200,
+        }
 }

@@ -41,6 +41,7 @@ users.post('/exist', async ctx=>{
 });
 
 users.use('/kakao', kakao.routes());
+users.use('/naver', require('./naver').routes())
 users.use('/add', add.routes());
 users.use('/userInfo', userInfo.routes());
 

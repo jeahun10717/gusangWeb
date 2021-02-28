@@ -18,18 +18,24 @@ exports.delete = async(id)=>{
 }
 
 // order 는 desc, asc / type 은 views, id
-exports.pagination = async(order, type, localCode, conType, page, contents) =>{
-    return await db.query(`select * from franchise where franchise_tag = ? and local_address = ? order by ${type} ${order} limit ? offset ?`
-    ,[conType, localCode, contents, page * contents]);
+exports.pagination = async(order, type, tag, page, contents) =>{
+    return await db.query(`select * from franchise 
+    where franchise_tag = ? 
+    order by ${type} ${order} limit ? offset ?`
+    ,[tag, contents, page * contents]);
 }
 
 // search 후 pagination
 exports.pageForSearch = async(name1, name2, name3, page, contents) =>{
-    return await db.query(`select
-    *
+    return await db.query(`select *
     from franchise
-    where franchise_name like ? || franchise_name like ? || franchise_name like ?
-    order by views desc limit ? offset ?`
+    order by
+    case
+        when franchise_name like ? then locate(? , franchise_name)+100
+        when franchise_name like ? then locate(? , franchise_name)+200
+        when franchise_name like ? then locate(? , franchise_name)+300
+        end
+        asc limit ? offset ?`
     ,[`%${name1}%`, `%${name2}%`, `%${name3}%` ,contents, page * contents]);
 }
 //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
@@ -46,12 +52,3 @@ exports.rowNum = async()=>{
 //     return await db.query(`select * from franchise where contents_name like \'%${name1}%\' || contents_name like \'%${name2}%\' || contents_name like \'%${name3}%\'`
 //     , [name1, name2, name3]);
 // }
-
-exports.search = async(name1, name2, name3)=>{
-
-    indata1=`%${name1}%`;
-    indata2=`%${name2}%`;
-    indata3=`%${name3}%`;
-    return await db.query(`select * from franchise where contents_name like ? || contents_name like ? || contents_name like ?`
-    , [indata1, indata2, indata3]);
-}

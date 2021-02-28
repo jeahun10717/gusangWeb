@@ -1,59 +1,32 @@
 const Joi = require('joi');
 const { franchise } = require('../../databases');
+const tagArr = ["cafe","bakery","dessert","chicken","pizza",
+"korean","chinese","japanese","special","snack",
+"fastfood","pub","convStore","sale","laundry",
+"pcRoom","game","studyCafe","education","life"]
 
 // 아래 함수에서 type 은 view 는 조회순, date 는 날짜순
 exports.pagenate = async (ctx) => {
-    // show/:type/:id
-    // 위의 api router 에서 type 은 최신순, 조회순
-    const { order, type, pagenum } = ctx.query;
+    const params = Joi.object({
+        order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
+        tag: Joi.string().valid(...tagArr).required(),
+        type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
+        pagenum: Joi.number().integer().required()
+    }).validate(ctx.query);
+    console.log(params);
+    if(params.error){
+        ctx.throw(400)
+    }
+    // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
+    const { order, tag, type, pagenum } = ctx.query;
+    // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
+    // type : {views, id} --> id 는 최신순 정렬하는 거
+    // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
+    const result = await franchise.pagination( order, type, tag, pagenum, 2);
 
-    // 페이지네이션을 위해서는 db 데이터의 개수를 알아야 함
-    // const rowNum = await franchise.rowNum();
-
-    // console.log(rowNum);
-    // NaN 오류 발생 함. id 에
-    if(type === 'views'){ //조회수순
-        if(order === 'desc'){ // 내림차순(큰게 위로)
-            // pageByView(페이지개수, 페이지컨텐츠개수)
-            const result = await franchise.pageByView( order, pagenum, 2);
-            ctx.body = {
-                status : 200,
-                result
-            }
-        }else if(order === 'asc'){ // 오름차순(작은게 위로)
-            // pageByView(페이지개수, 페이지컨텐츠개수)
-            const result = await franchise.pageByView( order, pagenum, 2);
-            ctx.body = {
-                status : 200,
-                result
-            }
-        }else{
-            ctx.body = {
-                status : 400,
-                message : 'order 는 desc 나 asc 만 가능합니다.'
-            }
-        }
-    }else if(type === 'date'){ // 업로드 날짜(신규순)
-        if(order === 'desc'){
-            const result = await franchise.pageByNew( order, pagenum, 2);
-            ctx.body = {
-                status : 200,
-                result
-            }
-        }else if(order === 'asc'){
-            const result = await franchise.pageByNew( order, pagenum, 2);
-            ctx.body = {
-                status : 200,
-                result
-            }
-        }else{
-            ctx.body = {
-                status : 400,
-                message : 'order 는 order 나 asc 만 가능합니다.'
-            }
-        }
-    }else {
-        ctx.throw(400);
+    ctx.body = {
+        status : 200,
+        result
     }
 }
 
@@ -78,13 +51,13 @@ exports.detail = async (ctx) => {
 // type 은 검색할 db의 column 의 종류, input 은 검색어 종류
 exports.search = async (ctx) => {
     const params = Joi.object({
-        q: Joi.string().required(),
-        p: Joi.number().integer().required()
+        searchName: Joi.string().required(),
+        page: Joi.number().integer().required()
     }).validate(ctx.query);
-    const { q, p } = params.value;
-    searchName = q.split(' ');
-    console.log(searchName);
-    const result = await franchise.pageForSearch(searchName[0],searchName[1],searchName[2], p, 2);
+    const { searchName, page } = params.value;
+    splitData = searchName.split(' ');
+
+    const result = await franchise.pageForSearch(splitData[0],splitData[1],splitData[2], page, 2);
 
     //search pagenation 구현하기
     // const final = await newsale.pageForSearch(result, pagenum, 2)

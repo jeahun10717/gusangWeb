@@ -8,8 +8,8 @@ exports.pagenate = async (ctx) => {
         localCode: Joi.string().required(), // TODO: 문자 개수 로컬코드 갯수로 검증해야 함
         conType: Joi.string().regex(/\bpreview video\b|\b360 vr\b|\blive\b|\bmarket\b/).required(),
         type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
-        pagenum: Joi.number().integer()
-    }).validate(ctx.query)
+        pagenum: Joi.number().integer().required()
+    }).validate(ctx.query);
     console.log(params.error);
     if(params.error){
         ctx.throw(400)
@@ -18,7 +18,6 @@ exports.pagenate = async (ctx) => {
     const { order, localCode, conType, type, pagenum } = ctx.query;
     // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
     // type : {views, id} --> id 는 최신순 정렬하는 거
-    // TODO: query 에서 원하는 값이 안들어오면 400 띄우는 소스 필요
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
     const result = await newsale.pagination( order, type, localCode, conType, pagenum, 2);
 
@@ -29,7 +28,20 @@ exports.pagenate = async (ctx) => {
 }
 
 exports.detail = async (ctx) => {
-    const { id } = ctx.params;
+    const params = Joi.object({
+        id: Joi.number().integer().required()
+    }).validate(ctx.params);
+
+    if(params.error){
+        ctx.body = {
+            status: 400,
+            msg: "잘못된 요청"
+        }
+    }
+
+    const { id } = params.value;
+
+    await newsale.upViews(id);
 
     // Promise 함수인데 await 안붙히면 Promise 리턴해서 무조건 true 값이 됨. VSS
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
@@ -53,10 +65,15 @@ exports.search = async (ctx) => {
         conType: Joi.string().required(),
         page: Joi.number().integer().required()
     }).validate(ctx.query);
+
+    if(params.error){
+      ctx.throw(400)
+    }
+
     const { searchName, page, conType } = params.value;
     // searchName : 검색어 | page : {페이지 num} | conType : {preview video, 360 vr, live, market}
-    data = searchName.split(' ');
-    console.log(data);
+    const data = searchName.split(' ');
+
     const result = await newsale.pageForSearch(data[0],data[1],data[2],conType,page, 2);
 
     ctx.body = {
@@ -132,6 +149,7 @@ exports.create = async (ctx) => {
     ctx.body ={
         status: 200
     }
+
 }
 
 exports.delete = async(ctx) => {
@@ -149,7 +167,7 @@ exports.delete = async(ctx) => {
 }
 exports.update = async (ctx) => {
     const { id } = ctx.params;
-    if(await interior.isExist(id)===0){
+    if(await newsale.isExist(id)===0){
         ctx.throw(400)
     }
 
@@ -208,8 +226,7 @@ exports.update = async (ctx) => {
     //     vr_image: [ ...JSON.parse(Imgs.vr_image), ...vr_image],
     //     info_image: [ ...JSON.parse(Imgs.info_image), ...info_image],
     // }, id);
-    // TODO: update api 부분 이미지 업로드 부분만 따로 만들어 줘야 함
-    newsale.update({
+    await newsale.update(id, {
         ...params.value,
         updateAt: new Date()
     });
@@ -224,9 +241,10 @@ exports.update = async (ctx) => {
 }
 
 exports.delImg = async (ctx)=>{
+    // TODO: id 가 존재하는 값인지 검증해야 함-->생각해보고 굳이 필요없겠다고 생각들면 안할것
     const { id } = ctx.params;
     const params = Joi.object({
-        field: Joi.string().valid("thumnail_image","vr_image","info_image").required(),
+        field: Joi.string().valid("thumnail_image","preview_video_link","vr_image","info_image").required(),
         key: Joi.string().required()
     }).validate(ctx.request.body);
     if(params.error) ctx.throw(400, '잘못된 요청');

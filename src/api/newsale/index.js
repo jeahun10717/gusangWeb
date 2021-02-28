@@ -10,7 +10,7 @@ newsale.use(auth.login); // 로그인 확인
 newsale.use(auth.level1); // 권한 확인
 
 newsale
-.get('/detail', newSaleCtrl.detail) // 한개의 정보전체를 뿌려주는 라우트
+.get('/detail/:id', newSaleCtrl.detail) // 한개의 정보전체를 뿌려주는 라우트
 .get('/search', newSaleCtrl.search) // 검색 정렬을 위한 라우트 + 페이지네이션
 .get('/show', newSaleCtrl.pagenate)   // 15개씩 보여주는 페이지를 위한 페이지네이션 포함 라우트
 // /api/newsale/show?type=''&order=''&pagenum=''

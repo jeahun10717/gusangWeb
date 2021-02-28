@@ -1,0 +1,12 @@
+
+1. http://localhost:4000/naver 에 접속 후 로그인 버튼 클릭
+2. 위의 과정이 끝나면 http://localhost:4000/api/users/naver#~ 의 ~ 부분에 access_token 이 생기는데 이를 naverOauth 쿠키에 저장했음
+3. 이후 naverOauth 에 저장된 토큰값을 POST /api/users/add 의 request-body 의 access_token 에 넣으면 body 에 bearer-token 검증을 위한 token 값이 생김
+4. 위의 POST: /api/users/add 의 나머지 값을 채워서 insert 하면 됨
+
+<**중요!!!!**>
+
+위의 과정은 테스트 소스를 위함이고 DOMAIN 이 확정이 나고 클라이언트 사이트에서 url 이 확정이 나면 아래의 사항들을 수정해야 한다.
+
+1. naver client id 받아서 .env 에 저장해야 함.
+2. naver development 설정2개(redirect URL, base URL 수정해야 됨)

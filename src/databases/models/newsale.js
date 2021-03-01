@@ -46,21 +46,12 @@ exports.rowNum = async()=>{
     return await db.query('select count(*) cnt from newSale');
 }
 
-exports.search = async(name1, name2, name3)=>{
-
-    indata1=`%${name1}%`;
-    indata2=`%${name2}%`;
-    indata3=`%${name3}%`;
-    return await db.query(`select * from newSale where contents_name like ? || contents_name like ? || contents_name like ? order by views desc`
-    , [indata1, indata2, indata3]);
-}
-
 exports.viewsUp = async(id)=>{
     return await db.query('update newSale set view = view +1 where id = ?', id);
 }
 
 exports.getImgs = async (id)=>{
-    const [result] = await db.query(`select thumnail_image, vr_image, info_image from newSale where id = ?`,id);
+    const [result] = await db.query(`select thumnail_image, preview_video_link, vr_image, info_image from newSale where id = ?`,id);
     return result;
 }
 

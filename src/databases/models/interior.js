@@ -48,6 +48,21 @@ exports.rowNum = async()=>{
     return await db.query('select count(*) cnt from interior');
 }
 
+/////  이미지 컨트롤을 위한 DB query  ////////////////////////////////////////////////////////////////////////////
+exports.getImgs = async (id)=>{
+    const [result] = await db.query(`select thumnail_image, vr_image, info_image from interior where id = ?`,id);
+    return result;
+}
+
+exports.getImgsFromField = async(id, field)=>{
+    const [result] = await db.query(`select ${field} from interior where id = ?`,id);
+    return result;
+}
+
+exports.insertImgs = async (query, id)=>{
+    await db.query(`update interior set ? where id = ?`,[query, id]);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 exports.upViews = async(id)=>{
     await db.query(`update interior set views=views+1 where id = ?`, id)
 }

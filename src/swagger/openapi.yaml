@@ -530,7 +530,7 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 
-  /delImg/{id}:
+  /newsale/delImg/{id}:
     delete:
       security:
         - BearerAuth: []
@@ -563,6 +563,9 @@ paths:
                 key:
                   type: string
                   description: S3 에서 데이터를 찾기 위한 key
+              required: 
+                - field
+                - key
 
       responses:
         '200':
@@ -586,6 +589,7 @@ paths:
           schema:
             type: integer
           description: 사진을 넣을 컨텐츠의 id
+          required: true
         - in: query
           name: field
           schema:
@@ -595,11 +599,14 @@ paths:
               - preview_video_link
               - vr_image
               - info_image
+          description: 수정할 사진의 스키마 칼럼의 이름
+          required: true
         - in: query
           name: imgIdx
           schema:
             type: integer
           description: 업데이트할 사진의 index
+          required: true
 
       requestBody:
         content:
@@ -773,9 +780,6 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 
-
-
-
   /interior/create:
     post:
       security:
@@ -840,9 +844,11 @@ paths:
                   description: 엔테리어/상세보기 부분 공사내역
 
                 image_link:
-                  type: string
-                  format: binary
-                  description: 사진 슬라이드에 들어갈 이미지 로컬링크
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 사진 슬라이드에 들어갈 이미지 로컬링크(1개 이상 가능함)
 
                 interior_info_location:
                   type: string
@@ -899,6 +905,235 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/200'
+
+  /interior/update/{id}:
+    post:
+      security:
+        - BearerAuth: []
+      tags: 
+        - Interior
+      description: 인테리어 매물정보 수정(외부에서 가져오는 이미지를 제외한 사용자가 올리는 자료는 api 분리 해 놓음)
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                contents_name:
+                  type: string
+                  description: 컨텐츠에 표시될 텍스트
+                contents_type:
+                  type: string
+                  enum:
+                    - preview video
+                    - 360 vr
+                    - live
+                    - market
+                  default: preview video
+                  description: 영상,360 vr, 주거, 상가
+                local_address:
+                  type: string
+                  description: 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
+                youtube_link:
+                  type: string
+                  description: 해당 컨텐츠의 유튭 영상
+                vr_link_old:
+                  type: string
+                  description: 시공 전 vr 영상을 위한 링크
+                vr_link_new:
+                  type: string
+                  description: 시공 후 vr 영상을 위한 링크
+
+                construct_time:
+                  type: string
+                  description: 인테리어/상세보기 부분 공사기간
+                construct_cost:
+                  type: string
+                  description: 인테리어/상세보기 부분 공사비용
+                construct_company:
+                  type: string
+                  description: 인테리어/상세보기 부분 공사업체
+                construct_info:
+                  type: string
+                  description: 엔테리어/상세보기 부분 공사내역
+
+                interior_info_location:
+                  type: string
+                  description: 1. 위치
+                interior_info_width:
+                  type: number
+                  description: 2. 평수
+                interior_info_period:
+                  type: string
+                  description: 3. 공사기간
+                interior_info_price:
+                  type: number
+                  description: 4. 비용
+                interior_info_history:
+                  type: string
+                  description : 5. 시공내역
+                interior_info_etc:
+                  type: string
+                  description : 6. 기타설명
+
+                kakaomap_info_latitude:
+                  type: number
+                  description: 위도(double)
+                kakaomap_info_longtitude:
+                  type: number
+                  description: 경도
+                kakaomap_info_address:
+                  type: string
+                  description: 주소
+
+              required:
+                - contents_name
+                - contents_type
+                - local_address
+                - youtube_link
+                - vr_link_old
+                - vr_link_new
+                - construct_time
+                - construct_cost
+                - construct_company
+                - construct_info
+                - interior_info_location
+                - interior_info_width
+                - interior_info_period
+                - interior_info_price
+                - interior_info_history
+                - interior_info_etc
+                - kakaomap_info_latitude
+                - kakaomap_info_longtitude
+                - kakaomap_info_address
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+  
+  /interior/upImg:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Interior
+      description: >
+        update 에서 로컬에 이미지 올리는 api</br>
+        update 에서 처리하는 것을 만들어 두는 거</br>
+        **주의 사항 : 반드시 delImg api 를 먼저 요청하고 해당 idx 로 이 api 요청 할 것!**</br>
+        접근권한 : auth 2, auth 3
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: 사진을 넣을 컨텐츠의 id
+          required: true
+        - in: query
+          name: field
+          schema:
+            type: string
+            enum:
+              - thumnail_image
+              - preview_video_link
+              - image_link
+          description: 수정할 사진의 스키마 칼럼의 이름
+          required: true
+        - in: query
+          name: imgIdx
+          schema:
+            type: integer
+          description: 업데이트할 사진의 index
+          required: true
+
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                thumnail_image:
+                  type: string
+                  format: binary
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                preview_video_link:
+                  type: string
+                  format: binary
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                image_link:
+                  type: string
+                  format: binary
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+    
+  /interior/delImg/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Interior
+      description: >
+        클라이언트가 S3 에 올린 데이터를 지우고 싶을 때 사용하는 api </br>
+        update 에서 로컬에 이미지 업데이트 할 때 먼저 지우기 위한 api
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: 지우고 싶은 사진이 존재하는 매물의 id
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                field:
+                  type: string
+                  enum:
+                    - thumnail_image
+                    - preview_video_link
+                    - image_link
+                  description: 이미지를 지우기 위한 DB 의 칼럼 이름
+                key:
+                  type: string
+                  description: S3 에서 데이터를 찾기 위한 key
+              required: 
+                - field
+                - key
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+  /interior/remove/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Interior
+      description: >
+        컨텐츠를 삭제하는 api</br>
+
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+
 
 # === consult ============================================================
 
@@ -1145,7 +1380,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Consult
+        - KakaoMap
       description: >
         kakao api 사용하여 입력한 지역코드 전체 보여주는 api</br>
         접근권한 : auth 2, auth 3
@@ -1159,7 +1394,7 @@ paths:
       security:
         - BearerAuth: []
       tags:
-        - Consult
+        - KakaoMap
       description: >
         kakaoApi 로 받아온 지역코드 입력 api</br>
         접근권한 : auth 2, auth 3

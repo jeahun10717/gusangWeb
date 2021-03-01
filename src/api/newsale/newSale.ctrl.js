@@ -165,6 +165,7 @@ exports.delete = async(ctx) => {
         ctx.throw(400)
     }
 }
+
 exports.update = async (ctx) => {
     const { id } = ctx.params;
     if(await newsale.isExist(id)===0){

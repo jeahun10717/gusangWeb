@@ -25,12 +25,19 @@ users.post('/exist', async ctx=>{
   if(login_type === 2){
     const kakaoData = await oauth.kakaoData(access_token);
     login_id = `kakao:${kakaoData.id}`;
+  }else if(login_type === 1){
+    const naverData = await oauth.naverData(access_token);
+    login_id = `naver:${naverData.id}`;
   }
   const isExist = await User.isExist(login_type, login_id);
+
   let myToken;
+
   if(isExist){
     myToken = token.get({UUID: isExist.uuid});
   }
+
+  console.log(myToken);
   ctx.body = {
     status: 200,
     data: {

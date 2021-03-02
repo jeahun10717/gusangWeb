@@ -13,7 +13,6 @@ exports.regist = async (query)=>{
         // return {
         //     isNew: userData.isNew,
         //     token: token.get({UUID: userData.uuid})
-        throw new Error('이미 있는 회원입니다.');
         // };
     }else{
         // 가입이 안되있을 경우.

@@ -33,15 +33,16 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
       login_id = `naver:${naverData.id}`; 
     }
 
-    try{
+    // try{ // TODO: 이 부분에 왜 try-catch 로 했는지 확인하고 나중에 수정하기
       const userToken = await login.regist({
         login_type,
         login_id,
         ...rest
-      });
-    }catch(e){
-      throw(400,e);
-    }
+      })
+    //   });
+    // }catch(e){
+    //   throw(400,e);
+    // }
     // console.log(params);
     // console.log(params.value);
     // console.log(ctx.request.user);

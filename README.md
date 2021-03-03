@@ -2,6 +2,8 @@
 
 ## 1. 이번 주 내로 해결
 
+* /api/users/userInfo/setADM 부분 UUID 로 하는 거 설명필요 ㅜㅜ
+
 * franchise 부분 DB 스키마 추가 작성해야 함
 
 * user table 에 대한 CRUD 작성

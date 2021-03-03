@@ -73,3 +73,9 @@ exports.getAuth = async (user_id) =>{
 exports.delete = async(id)=>{
   return await db.query('delete from users where uuid = ?', id);
 }
+
+// user 테이블에 마스터 권한을 가진 user 가 존재하는 지 판단하는 소스
+exports.chkMstAdmExist = async() => {
+  const [result] = await db.query('select count(*) cnt from users where Auth = 3');
+  return result.cnt;
+}

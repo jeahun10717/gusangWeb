@@ -1133,7 +1133,18 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 
+# === franchise ==========================================================
 
+  # /franchise/create:
+  #   post:
+  #     security:
+  #       - BearerAuth : []
+  #     tags: 
+  #       - Franchise
+  #     description: 프랜차이즈 매물 생성 api</br>접근권한 auth 2, auth 3
+
+
+      
 
 # === consult ============================================================
 

@@ -27,6 +27,16 @@ exports.show = async(ctx)=>{
 
 // TODO: user talbe 에 값 여러개 입력하고 밑의 소스 검증해야 함
 exports.search = async(ctx)=>{
+    const params = Joi.object({
+        search: Joi.string().required(),
+        order: Joi.string().required(),
+        page: Joi.number().integer().required()
+    }).validate(ctx.query);
+
+    if(params.error){
+        ctx.throw(400, "잘못된 요청입니다.")
+    }
+
     const { search, order, page } = ctx.query;
     const name = search.split(' ');
     //TODO: 여기서 1 부분 30 으로 바꾸기
@@ -74,3 +84,27 @@ exports.delete = async (ctx)=>{
             status: 200,
         }
 }
+
+/* TODO: 최고관리자는 복수로 가능. 최고관리자 관련해서 front 에서 alert 띄워줘야 함
+auth 3 이 auth 1 한테 auth 2 부여할 때 : front 재확인 필요 없음
+auth 3 이 auth 2 한테 auth 1 부여할 때 : front 재확인 필요 없음
+auth 3 이 auth 2 한테 auth 3 부여할 때 : front 재확인 필요
+auth 3 이 auth 3 한테 auth 2 부여할 때 : front 재확인 필요 + DB 에서 검증이 필요
+*/
+// TODO: 밑의 소스 다시 auth 3 관련한 부분 다시 짜야 할 듯
+
+exports.setADM = async (ctx)=>{
+    const { UUID } = ctx.request.user;
+    const user_id = Buffer.from(UUID, 'hex');
+
+    const params = Joi.object({
+        adm: Joi.number().integer().required()
+    }).validate(ctx.query);
+
+    if(params.error){
+        ctx.throw(400, "없는 관리자 number 입니다.");
+    }
+
+    await user.setADM(user_id, adm);
+}
+

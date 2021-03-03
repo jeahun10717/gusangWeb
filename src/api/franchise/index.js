@@ -3,7 +3,7 @@ const franchise = new Router();
 const franchiseCtrl = require('./franchise.ctrl.js');
 const { auth } = require('../../lib');
 
-franchise.use(auth.level1);
+// franchise.use(auth.level1);
 
 franchise
 .get('/')
@@ -12,7 +12,7 @@ franchise
 .get('/show', franchiseCtrl.pagenate)   // 15개씩 보여주는 페이지를 위한 페이지네이션 포함 라우트
 // search/ ? type={views, date} & order={desc, asc} & pagenum = {int num}
 
-franchise.use(auth.level2);
+// franchise.use(auth.level2);
 
 franchise
 .post('/create', franchiseCtrl.create)

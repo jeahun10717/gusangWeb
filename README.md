@@ -2,12 +2,7 @@
 
 ## 1. 이번 주 내로 해결
 
-* newSale, interior api 에서 contents_type 으로 필터링 해야 함.
-
 * franchise 부분 DB 스키마 추가 작성해야 함
-  > 1. 브랜드 소개 부분은 일단은 text 로 넣고 나중에 pdf 로 서빙할지 정하기
-  > 2. 브랜드정보-대표메뉴 부분은 이미지만 --> 이미지 + 이미지이름 까지 할지 정하기
-  > 3. 브랜드정보-브랜드소개,브랜드 경쟁력 --> pdf 로 처리해야 할지 나중에 물어보기
 
 * user table 에 대한 CRUD 작성
 
@@ -18,7 +13,6 @@
 * swagger 정리하기
 * detail 호출하는 모든 api 에서 views 올려야 함(이거 관련 질문사항 있음)
 * kakao oauth 과정에서 전화번호 가져오기
-* naver oauth 적용시키기
 * consult setManager api 담당자가 있는지 체크해야 함
 * consult pagination api 에서 검색 기능 추가해야 함.
 * 모든 api 의 auth 설정하기
@@ -27,6 +21,7 @@
   > newSale, franchise, interior 는 15개
   > consult 부분은 30개
 
+* admin 부분 최고관리자가 1명 이상 존재하는 지 판단해야 함
 
 ## 2. 비교적 이후 우선순위
 

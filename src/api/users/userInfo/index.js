@@ -10,7 +10,7 @@ userInfo// create 은 user 라우트 단계에서 처리됨.
 .get('/search', userInfoCtrl.search)  // user.name 으로 검색한 결과 페이지네이션 후 보여줌
 .post('/update', userInfoCtrl.update)  // 회원정보 수정
 .delete('/remove/:id', userInfoCtrl.delete)  // 회원삭제
-.post('/setAdmin')  // 회원 관리자 승격/강등 관리
+.post('/setAdmin', userInfoCtrl.setADM)  // 회원 관리자 승격/강등 관리
 
 
 module.exports = userInfo;

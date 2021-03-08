@@ -37,7 +37,6 @@ users.post('/exist', async ctx=>{
     myToken = token.get({UUID: isExist.uuid});
   }
 
-  console.log(myToken);
   ctx.body = {
     status: 200,
     data: {

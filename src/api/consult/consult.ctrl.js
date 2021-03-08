@@ -2,10 +2,6 @@ const Joi = require('joi');
 const { consult, user } = require('../../databases');
 const { setADM } = require('../../databases/models/user');
 
-// TODO: swagger 에서 enum 의 분기를 통해 interior 와 franchise 의 create 를
-// 다르게 할 수 있는 지 알아보기
-// TODO: consult 부분에서 상담 완료를 확인하는 태그가 필요
-// test test
 exports.create = async (ctx)=>{
     const { type } = ctx.params;
 
@@ -51,8 +47,6 @@ exports.create = async (ctx)=>{
         ctx.body = {
             status : 200
         }
-    }else{
-
     }
 }
 /*
@@ -96,7 +90,17 @@ exports.createNewSale = async (ctx) => {
 }
 
 exports.setManager = async (ctx)=>{
-    const { id, manager } = ctx.query;
+
+    const params = Joi.object({
+        id: Joi.number().integer().required(),
+        manager: Joi.string().required()
+    }).validate(ctx.query);
+
+    if(params.error){
+        ctx.throw(400, "잘못된 요청입니다.")
+    }
+
+    const { id, manager } = params.value;
 
     const mngExist = await user.checkADM(2, manager)
 
@@ -118,7 +122,18 @@ exports.setManager = async (ctx)=>{
 // 아래 함수에서 type 은 view 는 조회순, date 는 날짜순
 exports.pagenate = async (ctx) => {
     // api/consult/show?type={}&order={}&pagenum={}
-    const { type, order, pagenum, manager } = ctx.query;
+    const params = Joi.object({
+        type: Joi.string().regex(/\bnoFilter\b|\binterior\b|\bfranchise\b/).required(),
+        order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
+        pagenum: Joi.number().integer().required(),
+        manager: Joi.string().required()
+    }).validate(ctx.query)
+
+    if(params.error){
+        ctx.throw(400, "잘못된 요청입니다.")
+    }
+
+    const { type, order, pagenum, manager } = params.value;
 
     const result = await consult.filteredPagination(type, manager, order, pagenum, 15);
 
@@ -131,7 +146,19 @@ exports.pagenate = async (ctx) => {
 
 exports.pagenateNewSale = async (ctx) => {
     // api/consult/showNewSalea?type={}&order={}&pagenum={}
-    const { realtyName, found, manager, order, page, contents } = ctx.query;
+    const params = Joi.object({
+        realtyName: Joi.string().required(),
+        found: Joi.string().required(),
+        manager: Joi.string().required(),
+        order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
+        page: Joi.number().integer().required()
+    }).validate(ctx.query)
+
+    if(params.error){
+        ctx.throw(400, "잘못된 요청입니다.")
+    }
+
+    const { realtyName, found, manager, order, page } = params.value;
 
     const result = await consult.filteredPaginateNewSale(realtyName, found, manager, order, page, 15);
 
@@ -143,9 +170,17 @@ exports.pagenateNewSale = async (ctx) => {
 }
 
 exports.delete = async(ctx) => {
+    const params = Joi.object({
+        id: Joi.number().integer().required()
+    }).validate(ctx.params);
+
+    if(params.error){
+        ctx.throw(400, "잘못된 요청입니다.")
+    }
+
     const { id } = ctx.params;
 
-    console.log(ctx.params);
+    // console.log(ctx.params);
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
     if(consult.isExist(id)){
         await consult.delete(id)
@@ -156,3 +191,6 @@ exports.delete = async(ctx) => {
         ctx.throw(400)
     }
 }
+
+
+// TODO: consult DB 에 상담완료 관련한 칼럼 추가해야 함

@@ -6,6 +6,7 @@ const { auth } = require('../../lib');
 consult
 .post('/create/:type', consultCtrl.create) //상담 생성(franchise, interior)
 
+consult.use(auth.login);
 consult.use(auth.level1);
 
 consult

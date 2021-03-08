@@ -136,6 +136,7 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      summary: 신규매물 생성
       description: >
         신규매매 생성 api</br>
         접근 권한 : auth 2, auth 3
@@ -286,6 +287,7 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      summary: 신규매물 상세정보
       description: 매물에 대한 세부 정보 가져오는 api
       parameters:
         - in: path
@@ -304,6 +306,7 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      summary: 신규매물 검색
       description: 검색어를 통한 매물 가져옴(페이지네이션 함)
       parameters:
         - in: query
@@ -340,6 +343,7 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      summary: 신규매물 15개씩 보여줌
       description: 15개씩 컨텐츠 요약해서 보여주는 api(영상 미리보기 부분)
       parameters:
         - in: query
@@ -412,6 +416,7 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      summary: 신규매물 수정
       description: update 를 하는 api 인데 클라이언트가 직접 데이터를 제공하는 부분은 따로 처리했음</br>
         텍스만 update 하는 api 임
       parameters:
@@ -536,6 +541,7 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      summary: 신규매물 update 에서 사진 지울 때 사용
       description: >
         클라이언트가 S3 에 올린 데이터를 지우고 싶을 때 사용하는 api </br>
         update 에서 로컬에 이미지 업데이트 할 때 먼저 지우기 위한 api
@@ -578,9 +584,11 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      summary: 신규매물 update 에서 사진 다시 등록 할 때 사용
       description: >
         update 에서 로컬에 이미지 올리는 api</br>
         update 에서 처리하는 것을 만들어 두는 거</br>
+        이 api 는 사진순서를 배열의 index 로 취급하며 해당 index 를 idx 에 넣으면 그 자리에 사진이 들어감</br>
         **주의 사항 : 반드시 delImg api 를 먼저 요청하고 해당 idx 로 이 api 요청 할 것!**</br>
         접근권한 : auth 2, auth 3
       parameters:
@@ -641,6 +649,7 @@ paths:
         - BearerAuth: []
       tags:
         - NewSale
+      summary: 신규매물을 삭제함
       description: >
         컨텐츠를 삭제하는 api</br>
 
@@ -660,6 +669,7 @@ paths:
         - BearerAuth: []
       tags:
         - Interior
+      summary: 인테리어 매물 세부 정보
       description: 매물에 대한 세부 정보 가져오는 api
       parameters:
         - in: path
@@ -678,6 +688,7 @@ paths:
         - BearerAuth: []
       tags:
         - Interior
+      summary: 인테리어 매물 페이지네이션
       description: 검색어를 통한 매물 가져옴(페이지네이션 함)
       parameters:
         - in: query
@@ -714,6 +725,7 @@ paths:
         - BearerAuth: []
       tags:
         - Interior
+      summary: 인테리어 페이지네이션으로 매물 보여줌
       description: 15개씩 컨텐츠 요약해서 보여주는 api(영상 미리보기 부분)
       parameters:
         - in: query
@@ -786,6 +798,7 @@ paths:
         - BearerAuth: []
       tags:
         - Interior
+      summary: 인테리어 매물 생성
       description: >
         인테리어 컨텐츠 생성</br>
         접근권한 : auth 2, auth 3
@@ -912,6 +925,7 @@ paths:
         - BearerAuth: []
       tags: 
         - Interior
+      summary: 인테리어 매물 수정
       description: 인테리어 매물정보 수정(외부에서 가져오는 이미지를 제외한 사용자가 올리는 자료는 api 분리 해 놓음)
       parameters:
         - in: path
@@ -1022,6 +1036,7 @@ paths:
         - BearerAuth: []
       tags:
         - Interior
+      summary: 인테리어 매물 수정(로컬에서 올리는 자료 용)
       description: >
         update 에서 로컬에 이미지 올리는 api</br>
         update 에서 처리하는 것을 만들어 두는 거</br>
@@ -1081,6 +1096,7 @@ paths:
         - BearerAuth: []
       tags:
         - Interior
+      summary: 인테리어 매물 수정에서 로컬 자료 삭제용
       description: >
         클라이언트가 S3 에 올린 데이터를 지우고 싶을 때 사용하는 api </br>
         update 에서 로컬에 이미지 업데이트 할 때 먼저 지우기 위한 api
@@ -1120,6 +1136,7 @@ paths:
         - BearerAuth: []
       tags:
         - Interior
+      summary: 매물 삭제
       description: >
         컨텐츠를 삭제하는 api</br>
 
@@ -1154,6 +1171,7 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      summary: 상담요청
       description: >
         상담요청 api(interior, franchise)</br>
         접근권한 : auth 0 (권한인증 필요 없음)</br>
@@ -1207,6 +1225,7 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      summary: 상담요청 - 신규매매 회원 전용
       description: >
         상담요청 api(newSale) </br>
         접근권한 : auth 1
@@ -1248,6 +1267,7 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      summary: 요청된 상담 확인
       description: >
         들어온 상담 보여주는 api(interior, franchise)</br>
         접근권한 : auth 2, auth 3
@@ -1300,6 +1320,7 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      summary: 상담들 보여줌 - 신규매매, 회원전용
       description: >
         들어온 상담 보여주는 api</br>
         접근권한 : auth 2, auth 3
@@ -1347,20 +1368,28 @@ paths:
         '200':
           $ref: '#/components/responses/200'
 
-  /consult/setManager/{id}:
+  /consult/setManager:
     post:
       security:
         - BearerAuth: []
       tags:
         - Consult
+      summary: 매니저 선택
       description: >
         들어온 상담요청에서 매니저 지정해 주는 api</br>
         접근권한 : auth 2
       parameters:
-        - in: path
+        - in: query
           name: id
           schema:
             type: integer
+          description: 상담의 id
+          required: true
+        - in: query
+          name: manager
+          schema:
+            type: string
+          description: 상담을 담당할 담당자
           required: true
       responses:
         '200':
@@ -1372,6 +1401,7 @@ paths:
         - BearerAuth: []
       tags:
         - Consult
+      summary: 상담 삭제
       description: >
         들어온 상담요청 삭제
       parameters:
@@ -1392,6 +1422,7 @@ paths:
         - BearerAuth: []
       tags:
         - KakaoMap
+      summary: kakao api 를 이용한 지역코드 모두 받아옴
       description: >
         kakao api 사용하여 입력한 지역코드 전체 보여주는 api</br>
         접근권한 : auth 2, auth 3
@@ -1406,7 +1437,11 @@ paths:
         - BearerAuth: []
       tags:
         - KakaoMap
+      summary: kakao api 를 이용한 지역코드 삽입
       description: >
+        지역코드 삽입시 아래 사항을 따라야 함</br>
+        특별시, 광역시 : **(시) **구</br>
+        그 외 시,도 : ***도 **시<br>
         kakaoApi 로 받아온 지역코드 입력 api</br>
         접근권한 : auth 2, auth 3
 

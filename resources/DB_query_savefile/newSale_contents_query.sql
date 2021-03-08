@@ -66,5 +66,5 @@ create table newSale(
 
     registAt datetime default now(),
     updateAt datetime,
-    views int -- 조회수
+    views int default 0 -- 조회수
 );

@@ -12,8 +12,8 @@ interior
 .get('/show', interiorCtrl.pagenate)   // 15개씩 보여주는 페이지를 위한 페이지네이션 포함 라우트
 // type:{date, veiws}, order:{desc, asc}, pagenum:{int num}
 
-// interior.use(auth.login);
-// interior.use(auth.level2);
+interior.use(auth.login);
+interior.use(auth.level2);
 
 // TODO: maxcount 기능에 맞게 바꾸기
 interior

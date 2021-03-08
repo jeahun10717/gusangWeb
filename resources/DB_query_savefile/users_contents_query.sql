@@ -1,10 +1,14 @@
 use gusang;
-select * from users;
+select * from users;	
 drop table users;
+desc users;
 
 -- test query ---------------------------------------------------
 select name from users where Auth >= "2" && name = "jaeahun";
 alter table users change address realty_address varchar(256);
+delete from users where id =4;
+select login_type, hex(uuid) user_id, login_id, name from users;
+select hex(uuid) uuid, name from users;
 -- --------------------------------------------------------------
 
 

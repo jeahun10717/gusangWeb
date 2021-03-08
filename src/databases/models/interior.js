@@ -29,7 +29,7 @@ exports.pageForSearch = async(name1, name2, name3, conType, page, contents) =>{
 	when contents_name like ? then locate(?, contents_name)+200
 	when contents_name like ? then locate(?, contents_name)+300
     else 10000
-	end as zorder, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
+	end as zorder, id, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
     from interior
     where contents_type = ?
     order by 

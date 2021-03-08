@@ -18,10 +18,10 @@ exports.pagenate = async (ctx) => {
         ctx.throw(400)
     }
     // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
-    const { order, tag, type, pagenum } = ctx.query;
+    const { order, tag, type, pagenum } = params.value;
     // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
-    // type : {views, id} --> id 는 최신순 정렬하는 거
-    // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
+    // type : {views, id} //> id 는 최신순 정렬하는 거
+    // TODO: 밑의 2 부분 30 으로 바꿔야 함
     const result = await franchise.pagination( order, type, tag, pagenum, 2);
 
     ctx.body = {
@@ -58,7 +58,7 @@ exports.search = async (ctx) => {
     splitData = searchName.split(' ');
 
     const result = await franchise.pageForSearch(splitData[0],splitData[1],splitData[2], page, 2);
-
+    // TODO: 위의 2 30 으로 바꾸기
     //search pagenation 구현하기
     // const final = await newsale.pageForSearch(result, pagenum, 2)
     ctx.body = {
@@ -71,36 +71,44 @@ exports.search = async (ctx) => {
     // console.log(ctx.query , ' : 쿼리 확인용');
 }
 
+// TODO: 전화번호 관련해서 Joi 검증 소스 수정하기
 exports.create = async (ctx) => {
     const params = Joi.object({
-        franchise_name : Joi.string().required(), // : 컨텐츠에 표시될 텍스트, 검색될 이름
-        franchise_tag : Joi.string().required(), // : 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
-        franchise_logo : Joi.string().required(), // : franchise 로고
-
+        franchise_name: Joi.string().required(), // : 컨텐츠에 표시될 텍스트, 검색될 이름
+        franchise_tag: Joi.string().valid(...tagArr).required(), // : 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
+        franchise_logo: Joi.string().required(), // : franchise 로고
+        
         // 가맹정보 부분 //////////////////////////////////////////////////
-        franchise_storenum : Joi.number().required(),     // 매장 수
-        franchise_cost : Joi.number().required(),         // 창업 비용
-        franchise_monthSale : Joi.number().required(),    // 월 평균 매출액
-        // franchise_name //> 이 부분은 위에 등록 해 두었음 : 상호명
-        franchise_ceo : Joi.string().required(),  // 대표
-        franchise_type : Joi.string().required(), // 사업자 유형
-        franchise_address : Joi.string().required(), // 주소
-        franchise_registnum : Joi.string().required(), // 사업자등록번호
-        franchise_crn : Joi.string().required(),  // 법인등록번호
-        franchise_phone : Joi.string().required(), // 대표 번호
-        franchise_fax : Joi.string().required(),  // 대표 팩스 번호
-        franchise_detailsale : Joi.string().required(), // 브랜드 창업 비용
-                                           // 도표에 들어가는 자료인데 구분자로 여래개 받아서 넣을 듯
-        // 그래프용 월평균 매출
-        // 그래프용 가맹점 증감추이
-        // 그래프용 가맹점 계약 현황
+        franchise_storenum: Joi.number().integer().required(),     // 매장 수
+        franchise_cost: Joi.number().integer().required(),         // 창업 비용
+        franchise_monthSale: Joi.number().integer().required(),    // 월 평균 매출액
+        // franchise_name //> 이 부분은 위에 등록 해 두었음 : 상호명   
+        franchise_ceo: Joi.string().required(),  // 대표
+        franchise_type: Joi.string().required(), // 사업자 유형
+        franchise_address: Joi.string().required(), // 주소
+        franchise_registnum: Joi.string().required(), // 사업자등록번호
+        franchise_crn: Joi.string().required(),  // 법인등록번호
+        franchise_phone: Joi.string().required(), // 대표 번호
+        franchise_fax: Joi.string().required(),  // 대표 팩스 번호
+        franchise_detailsale: Joi.string().required(), // 브랜드 창업 비용
+                                        //: 도표에 들어가는 자료인데 구분자로 여래개 받아서 넣을 듯
+        // 아래 3개의 정보들은 배열로 넣는데 2010~2021 순인데 년도가 수정되면 추가할 수 있음
+        // 그래프용 연별 매출
+        franchise_month_sales: Joi.string().required(),
+        // 그 가맹점 증감추이
+        franchise_market_num: Joi.string().required(),
+        // 그 가맹점 계약 현황
+        franchise_market_contract: Joi.string().required(),
+        
         // ////////////////////////////////////////////////////////////////
 
-        brand_introduce : Joi.string().required(), // 브랜드 정보 / 브랜드 소개
-        brand_menu : Joi.string().required(), // 브랜드 정보 / 브랜드 대표메뉴
-        brand_competitiveness : Joi.string().required(), // 브랜드 정보 / 브랜드 경쟁력
-        brand_video : Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
+        brand_introduce: Joi.string().required(), // 브랜드 정보 / 브랜드 소개
+        brand_menu: Joi.string().required(), // 브랜드 정보 / 브랜드 대표메뉴
+        brand_competitiveness: Joi.string().required(), // 브랜드 정보 / 브랜드 경쟁력//>pdf 로 처리할거임
+        brand_video: Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
 
+        blog_review: Joi.string().required(),
+        
         }).validate(ctx.request.body)
 
     if(params.error) {
@@ -128,86 +136,6 @@ exports.delete = async(ctx) => {
     }
 }
 
-exports.update = async (ctx) => {
-    const { type, id } = ctx.params;
-    if(await franchise.isExist(id)===0){
-        ctx.throw(400)
-    }
-    if(type === 'basicInfo'){ // 기본 정보 수정
-        const params = Joi.object({
-            franchise_name : Joi.string(),
-            franchise_tag : Joi.string(),
-        }).validate(ctx.request.body);
-        console.log(params.value);
-        if(params.error) {
-            ctx.throw(400);
-        }
-        await franchise.update(id, params.value);
-
-        ctx.body ={
-            status: 200
-        }
-    }else if(type === 'franchiseInfo'){ // 견적정보 수정
-        const params = Joi.object({
-            franchise_storenum : Joi.number(),     // 매장 수
-            franchise_cost : Joi.number(),         // 창업 비용
-            franchise_monthSale : Joi.number(),    // 월 평균 매출액
-            // franchise_name --> 이 부분은 위에 등록 해 두었음 : 상호명
-            franchise_ceo : Joi.string(),  // 대표
-            franchise_type : Joi.string(), // 사업자 유형
-            franchise_address : Joi.string(), // 주소
-            franchise_registnum : Joi.string(), // 사업자등록번호
-            franchise_crn : Joi.string(),  // 법인등록번호
-            franchise_phone : Joi.string(), // 대표 번호
-            franchise_fax : Joi.string(),  // 대표 팩스 번호
-            franchise_detailsale : Joi.string(), // 브랜드 창업 비용
-        }).validate(ctx.request.body);
-        if(params.error) {
-            ctx.throw(400);
-        }
-        await franchise.update(id, params.value);
-
-        ctx.body ={
-            status: 200
-        }
-    }else if(type === 'videoLink'){ //
-        const params = Joi.object({
-            youtube_info_link : Joi.string(), // 안내영상 링크(youtube link)
-            youtube_inner_link : Joi.string() // 내부영상 링크(youtube link)
-        }).validate(ctx.request.body);
-        if(params.error) {
-            ctx.throw(400);
-        }
-        await franchise.update(id, params.value);
-
-        ctx.body ={
-            status: 200
-        }
-    }else if(type === 'kakaoMap'){ //
-        const params = Joi.object({
-            kakaomap_info_latitude : Joi.number(),
-            kakaomap_info_longtitude : Joi.number(),
-            kakaomap_info_address : Joi.string()
-        }).validate(ctx.request.body);
-        if(params.error) {
-            ctx.throw(400);
-        }
-        await franchise.update(id, params.value);
-
-        ctx.body ={
-            status: 200
-        }
-    }else if(type === 'infoImage'){
-        const params = Joi.object({
-            info_image : Joi.string() // 안내자료에 들어갈 이미지 로컬링크
-        })
-        if(params.error) {
-            ctx.throw(400);
-        }
-        await franchise.update(id, params.value);
-
-        ctx.body ={
-            status: 200
-        }
-    }
-}
+// exports.update = async(ctx)=>{
+    
+// }

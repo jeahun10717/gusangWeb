@@ -1,5 +1,4 @@
 const Joi = require('joi');
-const users = require('..');
 const { user } = require('../../../databases');
 
 exports.show = async(ctx)=>{
@@ -86,32 +85,53 @@ exports.delete = async (ctx)=>{
     }
 }
 
-/* TODO: 최고관리자는 복수로 가능. 최고관리자 관련해서 front 에서 alert 띄워줘야 함
-auth 3 이 auth 1 한테 auth 2 부여할 때 : front 재확인 필요 없음
-auth 3 이 auth 2 한테 auth 1 부여할 때 : front 재확인 필요 없음
-auth 3 이 auth 2 한테 auth 3 부여할 때 : front 재확인 필요
-auth 3 이 auth 3 한테 auth 2 부여할 때 : front 재확인 필요 + DB 에서 검증이 필요
-*/
-// TODO: 밑의 소스 다시 auth 3 관련한 부분 다시 짜야 할 듯
-
-exports.setADM = async (ctx)=>{
+// TODO: 밑의 setADM, setMasterADM 함수는 유저 여러명 가능할 때 따로 검증해야 함.(검증 안했음)
+exports.setADM = async (ctx)=>{ 
+    // adm 이 2일 때 1을 2로 승급
+    // adm 이 1일 때 2를 1로 강등
     const params = Joi.object({
+        uuid: Joi.string().custom(v=>Buffer.from(v,'hex')).required(),
         adm: Joi.number().integer().required()
-    }).validate(ctx.query);
+    }).validate(ctx.request.body);
     
     if(params.error){
         ctx.throw(400, "잘못된 요청입니다");
     }
-    UUID = await user.isExist
-    // if(){
-    // }
 
-    const { adm } = params.value;
-    console.log(id);
+    const { uuid, adm } = params.value;
+
     if(params.error){
         ctx.throw(400, "없는 관리자 number 입니다.");
     }
 
-    await user.setADM(id, adm);
+    await user.setADM(uuid, adm);
 }
 
+exports.setMasterADM = async (ctx)=>{
+    const params = Joi.object({
+        uuid: Joi.string().custom(v=>Buffer.from(v,'hex')).required(),
+        adm: Joi.number().integer().required()
+    }).validate(ctx.request.body);
+    
+    if(params.error){
+        ctx.throw(400, "잘못된 요청입니다");
+    }
+
+    const { uuid, adm } = params.value;
+
+    if(params.error){
+        ctx.throw(400, "없는 관리자 number 입니다.");
+    }
+
+    if(adm === 3){ // 일반 관리자(auth 2) 를 최고 관리자(auth 3)로 승급 
+        await user.setADM(uuid, adm)
+    }else if(adm == 2){ // 다른 최고관리자(auth 3) 을 일반 관리자(auth 2)로 강등
+        if(await user.chkMstAdmExist <= 1){
+            ctx.body={
+                status: 400,
+                msg: `최고관리자가 1명 이하이므로 해당 동작을 수행할 수 없습니다.`
+            }
+        }
+        await user.setADM(uuid, adm);
+    }
+}

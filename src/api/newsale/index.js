@@ -42,4 +42,6 @@ newSaleCtrl.upImg
 .delete('/delImg/:id', newSaleCtrl.delImg)
 .delete('/remove/:id', newSaleCtrl.delete)
 // body : field, key
+
+
 module.exports = newsale;

@@ -55,7 +55,7 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
     ctx.body = {
         status: 200,
         data: {
-          access_token: token.get({UUID: userToken.token})
+          userToken: userToken.token
         }
     };
 });

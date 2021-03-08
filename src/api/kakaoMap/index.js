@@ -3,6 +3,7 @@ const kakaoMap = new Router();
 const kakaoMapCtrl = require('./kakaoMap.ctrl');
 const { auth } = require('../../lib')
 
+kakaoMap.use(auth.login);
 kakaoMap.use(auth.level2);
 
 kakaoMap

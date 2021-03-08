@@ -19,7 +19,9 @@ exports.delete = async(id)=>{
 
 // order 는 desc, asc / type 은 views, id
 exports.pagination = async(order, type, tag, page, contents) =>{
-    return await db.query(`select * from franchise 
+    return await db.query(`
+    select id, franchise_name, franchise_logo, franchise_tag
+    from franchise 
     where franchise_tag = ? 
     order by ${type} ${order} limit ? offset ?`
     ,[tag, contents, page * contents]);
@@ -27,16 +29,17 @@ exports.pagination = async(order, type, tag, page, contents) =>{
 
 // search 후 pagination
 exports.pageForSearch = async(name1, name2, name3, page, contents) =>{
-    return await db.query(`select *
+    return await db.query(`select case
+	when franchise_name like ? then locate(?, franchise_name)+100
+	when franchise_name like ? then locate(?, franchise_name)+200
+	when franchise_name like ? then locate(?, franchise_name)+300
+    else 10000
+	end as zorder, id, franchise_logo, franchise_name, franchise_tag
     from franchise
-    order by
-    case
-        when franchise_name like ? then locate(? , franchise_name)+100
-        when franchise_name like ? then locate(? , franchise_name)+200
-        when franchise_name like ? then locate(? , franchise_name)+300
-        end
-        asc limit ? offset ?`
-    ,[`%${name1}%`, `%${name2}%`, `%${name3}%` ,contents, page * contents]);
+    order by 
+	    zorder
+        limit ? offset ?`
+    ,[`%${name1}%`,name1, `%${name2}%`, name2, `%${name3}%`, name3, contents, page * contents]);
 }
 //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
 exports.isExist = async(id)=>{

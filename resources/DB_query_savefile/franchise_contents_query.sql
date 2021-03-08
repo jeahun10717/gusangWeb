@@ -46,12 +46,13 @@ create table franchise(
 
     brand_introduce text, -- 브랜드 정보 / 브랜드 소개
     brand_menu text, -- 브랜드 정보 / 브랜드 대표메뉴
-    brand_competitiveness text, -- 브랜드 정보 / 브랜드 경쟁력-->pdf 로 처리할거임
+    brand_competitiveness longtext, -- 브랜드 정보 / 브랜드 경쟁력-->pdf 로 처리할거임
     brand_video text, -- 브랜드 정보 / 브랜드 홍보영상
     -- 위의 brand_video 는 영상파일인지 youtube 링크인지 구분해서 넣어줄 것
 
-
+	blog_review varchar(256),
+    
     registAt datetime default now(),
     updateAt datetime,
-    views int -- 조회수
+    views int default 0 -- 조회수
 );

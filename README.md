@@ -11,10 +11,11 @@
   > 2. upImg api 에서 에러처리 확인해야 함
 
 * swagger 정리하기
-* kakao oauth 과정에서 전화번호 가져오기
+* detail 호출하는 모든 api 에서 views 올려야 함(franchise 만 남음)
 * consult setManager api 담당자가 있는지 체크해야 함
 * consult pagination api 에서 검색 기능 추가해야 함.
 * 모든 api 의 auth 설정하기
+* kakao oauth 과정에서 전화번호 가져오기
 
 * 모든 api 의 pagination 에서 contents 변수 갯수 수정해야 함
   > newSale, franchise, interior 는 15개

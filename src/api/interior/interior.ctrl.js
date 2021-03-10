@@ -120,6 +120,8 @@ exports.create = async (ctx) => {
         kakaomap_info_address : Joi.string().required(), // 주소
     }).validate(ctx.request.body)
 
+    if(params.error) ctx.throw(400, "잘못된 요청입니다.")
+
     let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
     let preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
     let image_link = ctx.files['image_link'].map(i=>i.key);

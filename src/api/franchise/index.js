@@ -1,8 +1,9 @@
 const Router = require('koa-router');
 const franchise = new Router();
 const franchiseCtrl = require('./franchise.ctrl');
-const { auth } = require('../../lib');
+const { auth, S3 } = require('../../lib');
 
+const upload = S3.upload();
 
 franchise
 // .get('/', (ctx, next)=>{ctx.body="adfasdfadfasdfasdfasdf"})
@@ -15,7 +16,13 @@ franchise.use(auth.login);
 franchise.use(auth.level2);
 
 franchise
-.post('/create', franchiseCtrl.create)
+.post('/create',
+upload.fields([
+    {name: "franchise_logo", maxcount: 1},
+    {name: "brand_menu", maxcount: 3},
+    {name: "brand_video", maxcount: 1}
+]),
+franchiseCtrl.create)
 // .post('/update/:id/:type', franchiseCtrl.update)
 .delete('/remove/:id', franchiseCtrl.delete)
 

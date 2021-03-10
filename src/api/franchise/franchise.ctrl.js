@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { S3 } = require('../../lib');
 const { franchise } = require('../../databases');
 const tagArr = ["cafe","bakery","dessert","chicken","pizza",
 "korean","chinese","japanese","special","snack",
@@ -78,7 +79,7 @@ exports.create = async (ctx) => {
     const params = Joi.object({
         franchise_name: Joi.string().required(), // : 컨텐츠에 표시될 텍스트, 검색될 이름
         franchise_tag: Joi.string().valid(...tagArr).required(), // : 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
-        franchise_logo: Joi.string().required(), // : franchise 로고
+        // franchise_logo: Joi.string().required(), // : franchise 로고
         
         // 가맹정보 부분 //////////////////////////////////////////////////
         franchise_storenum: Joi.number().integer().required(),     // 매장 수
@@ -105,17 +106,31 @@ exports.create = async (ctx) => {
         // ////////////////////////////////////////////////////////////////
 
         brand_introduce: Joi.string().required(), // 브랜드 정보 / 브랜드 소개
-        brand_menu: Joi.string().required(), // 브랜드 정보 / 브랜드 대표메뉴
+        // brand_menu: Joi.string().required(), // 브랜드 정보 / 브랜드 대표메뉴
         brand_competitiveness: Joi.string().required(), // 브랜드 정보 / 브랜드 경쟁력//>pdf 로 처리할거임
-        brand_video: Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
+        // brand_video: Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
 
         blog_review: Joi.string().required()    
     }).validate(ctx.request.body);
-    console.log(params.error);
+    // console.log(params.error);
     if(params.error) {
         ctx.throw(400, "잘못된 요청입니다.");
     }
-    franchise.insert(params.value);
+
+    let franchise_logo = ctx.files['franchise_logo'].map(i=>i.key);
+    let brand_menu = ctx.files['brand_menu'].map(i=>i.key);
+    let brand_video = ctx.files['brand_video'].map(i=>i.key);
+
+    franchise_logo = JSON.stringify(franchise_logo)
+    brand_menu = JSON.stringify(brand_menu)
+    brand_video = JSON.stringify(brand_video)
+
+    await franchise.insert({
+        ...params.value,
+        franchise_logo,
+        brand_video,
+        brand_menu
+    });
 
     ctx.body ={
         status: 200
@@ -140,3 +155,8 @@ exports.delete = async(ctx) => {
 // exports.update = async(ctx)=>{
     
 // }
+
+exports.test = async(ctx, next)=>{
+    console.log('!!!!!!!!!test!!!!!!!!!!!!')
+    return await next();
+}

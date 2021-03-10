@@ -919,7 +919,7 @@ paths:
     post:
       security:
         - BearerAuth: []
-      tags: 
+      tags:
         - Interior
       summary: 인테리어 매물 수정
       description: 인테리어 매물정보 수정(외부에서 가져오는 이미지를 제외한 사용자가 올리는 자료는 api 분리 해 놓음)
@@ -1025,7 +1025,7 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/200'
-  
+
   /interior/upImg:
     post:
       security:
@@ -1085,7 +1085,7 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/200'
-    
+
   /interior/delImg/{id}:
     delete:
       security:
@@ -1150,7 +1150,7 @@ paths:
     post:
       security:
         - BearerAuth : []
-      tags: 
+      tags:
         - Franchise
       summary: 프랜차이즈 매물 생성
       description: 프랜차이즈 매물 생성 api</br>접근권한 auth 2, auth 3</br>
@@ -1168,8 +1168,9 @@ paths:
                   description: 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
                 franchise_logo:
                   type: string
+                  format: binary
                   description: franchise 로고
-                
+
                 franchise_storenum:
                   type: integer
                   description:  매장 수
@@ -1204,7 +1205,7 @@ paths:
                 franchise_detailsale:
                   type: string
                   description:  브랜드 창업 비용
-                  
+
                 franchise_month_sales:
                   type: string
                   description:  그래프용 가맹점 연별 월매출 평균
@@ -1219,19 +1220,23 @@ paths:
                   type: string
                   description:  브랜드 정보 / 브랜드 소개
                 brand_menu:
-                  type: string
-                  description:  브랜드 정보 / 브랜드 대표메뉴
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description:  브랜드 정보 / 브랜드 대표메뉴(사진 여러개)
                 brand_competitiveness:
                   type: string
-                  description:  브랜드 정보 / 브랜드 경쟁력//>pdf 로 처리할거임
+                  description:  브랜드 정보 / 브랜드 경쟁력(html 로 바로 때려짐)
                 brand_video:
                   type: string
+                  format: binary
                   description:  브랜드 정보 / 브랜드 홍보영상
 
                 blog_review:
                   type: string
-                  description: 블로그 리뷰 링크(iframe 형태) 
-                  
+                  description: 블로그 리뷰 링크(iframe 형태)
+
               required:
                 - franchise_name
                 - franchise_tag

@@ -1,11 +1,11 @@
 const Router = require('koa-router');
 const franchise = new Router();
-const franchiseCtrl = require('./franchise.ctrl.js');
+const franchiseCtrl = require('./franchise.ctrl');
 const { auth } = require('../../lib');
 
 
 franchise
-// .get('/')
+// .get('/', (ctx, next)=>{ctx.body="adfasdfadfasdfasdfasdf"})
 .get('/detail/:id', franchiseCtrl.detail) // 한개의 정보전체를 뿌려주는 라우트
 .get('/search', franchiseCtrl.search) // 검색 정렬을 위한 라우트 + 페이지네이션
 .get('/show', franchiseCtrl.pagenate)   // 15개씩 보여주는 페이지를 위한 페이지네이션 포함 라우트

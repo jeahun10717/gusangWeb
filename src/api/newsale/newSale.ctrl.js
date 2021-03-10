@@ -247,7 +247,7 @@ exports.delImg = async (ctx)=>{
     const params = Joi.object({
         field: Joi.string().valid("thumnail_image","preview_video_link","vr_image","info_image").required(),
         key: Joi.string().required()
-    }).validate(ctx.request.body);
+    }).validate(ctx.query);
     if(params.error) ctx.throw(400, '잘못된 요청');
 
     const { field, key } = params.value;

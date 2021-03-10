@@ -16,7 +16,7 @@ exports.create = async (ctx)=>{
             // -----------------------------------------------------------------
         }).validate(ctx.request.body)
         if(params.error) {
-            ctx.throw(400);
+            ctx.throw(400, "잘못된 요청입니다");
         }
         consult.insert({
             ...params.value,
@@ -38,7 +38,7 @@ exports.create = async (ctx)=>{
             consult_req_sector : Joi.string().required() // 상담 요청한 업종
         }).validate(ctx.request.body)
         if(params.error) {
-            ctx.throw(400);
+            ctx.throw(400, "잘못된 요청입니다");
         }
         consult.insert({
             ...params.value,

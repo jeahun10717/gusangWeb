@@ -73,6 +73,8 @@ exports.search = async (ctx) => {
 
 // TODO: 전화번호 관련해서 Joi 검증 소스 수정하기
 exports.create = async (ctx) => {
+    // const { franchise_name } = ctx.request.body
+    // console.log(franchise_name);
     const params = Joi.object({
         franchise_name: Joi.string().required(), // : 컨텐츠에 표시될 텍스트, 검색될 이름
         franchise_tag: Joi.string().valid(...tagArr).required(), // : 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
@@ -107,12 +109,11 @@ exports.create = async (ctx) => {
         brand_competitiveness: Joi.string().required(), // 브랜드 정보 / 브랜드 경쟁력//>pdf 로 처리할거임
         brand_video: Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
 
-        blog_review: Joi.string().required(),
-        
-        }).validate(ctx.request.body)
-
+        blog_review: Joi.string().required()    
+    }).validate(ctx.request.body);
+    console.log(params.error);
     if(params.error) {
-        ctx.throw(400);
+        ctx.throw(400, "잘못된 요청입니다.");
     }
     franchise.insert(params.value);
 

@@ -30,7 +30,7 @@ paths:
           name: page
           schema:
             type: integer
-          description: 0부터 시작 한단다
+          description: 0부터 시작
           required: true
         - in: query
           name: order
@@ -552,31 +552,27 @@ paths:
             type: integer
           description: 지우고 싶은 사진이 존재하는 매물의 id
           required: true
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                field:
-                  type: string
-                  enum:
-                    - thumnail_image
-                    - preview_video_link
-                    - vr_image
-                    - info_image
-                  description: 이미지를 지우기 위한 DB 의 칼럼 이름
-                key:
-                  type: string
-                  description: S3 에서 데이터를 찾기 위한 key
-              required: 
-                - field
-                - key
+        - in: query
+          name: field
+          schema:
+            type: string
+            enum:
+              - thumnail_image
+              - preview_video_link
+              - vr_image
+              - info_image
+          description: 지우고 싶은 사진이 존재하는 DB 의 칼럼
+          required: true
+        - in: query
+          name: key
+          schema:
+            type: string
+          description: 지우고 싶은 사진의 S3 키값(링크)
+          required: true
 
       responses:
         '200':
             $ref: '#/components/responses/200'
-
 
   /newsale/upImg:
     post:
@@ -1107,29 +1103,27 @@ paths:
             type: integer
           description: 지우고 싶은 사진이 존재하는 매물의 id
           required: true
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                field:
-                  type: string
-                  enum:
-                    - thumnail_image
-                    - preview_video_link
-                    - image_link
-                  description: 이미지를 지우기 위한 DB 의 칼럼 이름
-                key:
-                  type: string
-                  description: S3 에서 데이터를 찾기 위한 key
-              required: 
-                - field
-                - key
+        - in: query
+          name: field
+          schema:
+            type: string
+          description: 지우고 싶은 사진이 존재하는 매물의 필드 값(DB 의 칼럼)
+          required: true
+        - in: query
+          name: key
+          schema:
+            type: string
+            enum:
+              - thumnail_image
+              - preview_video_link
+              - image_link
+          description: 지우고 싶은 사진이 존재하는 매물의 키 값(사지의 링크, S3 키값)
+          required: true
 
       responses:
         '200':
             $ref: '#/components/responses/200'
+
   /interior/remove/{id}:
     delete:
       security:
@@ -1152,16 +1146,119 @@ paths:
 
 # === franchise ==========================================================
 
-  # /franchise/create:
-  #   post:
-  #     security:
-  #       - BearerAuth : []
-  #     tags: 
-  #       - Franchise
-  #     description: 프랜차이즈 매물 생성 api</br>접근권한 auth 2, auth 3
+  /franchise/create:
+    post:
+      security:
+        - BearerAuth : []
+      tags: 
+        - Franchise
+      summary: 프랜차이즈 매물 생성
+      description: 프랜차이즈 매물 생성 api</br>접근권한 auth 2, auth 3</br>
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                franchise_name:
+                  type: string
+                  description: 컨텐츠에 표시될 텍스트, 검색될 이름
+                franchise_tag:
+                  type: string
+                  description: 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
+                franchise_logo:
+                  type: string
+                  description: franchise 로고
+                
+                franchise_storenum:
+                  type: integer
+                  description:  매장 수
+                franchise_cost:
+                  type: integer
+                  description:  창업 비용
+                franchise_monthSale:
+                  type: integer
+                  description:  월 평균 매출액
 
+                franchise_ceo:
+                  type: string
+                  description:  대표
+                franchise_type:
+                  type: string
+                  description:  사업자 유형
+                franchise_address:
+                  type: string
+                  description:  주소
+                franchise_registnum:
+                  type: string
+                  description:  사업자등록번호
+                franchise_crn:
+                  type: string
+                  description:  법인등록번호
+                franchise_phone:
+                  type: string
+                  description:  대표 번호
+                franchise_fax:
+                  type: string
+                  description:  대표 팩스 번호
+                franchise_detailsale:
+                  type: string
+                  description:  브랜드 창업 비용
+                  
+                franchise_month_sales:
+                  type: string
+                  description:  그래프용 가맹점 연별 월매출 평균
+                franchise_market_num:
+                  type: string
+                  description:  그래프용 가맹점 증가 추이
+                franchise_market_contract:
+                  type: string
+                  description: 그래프용 가맹점 계약 수
 
-      
+                brand_introduce:
+                  type: string
+                  description:  브랜드 정보 / 브랜드 소개
+                brand_menu:
+                  type: string
+                  description:  브랜드 정보 / 브랜드 대표메뉴
+                brand_competitiveness:
+                  type: string
+                  description:  브랜드 정보 / 브랜드 경쟁력//>pdf 로 처리할거임
+                brand_video:
+                  type: string
+                  description:  브랜드 정보 / 브랜드 홍보영상
+
+                blog_review:
+                  type: string
+                  description: 블로그 리뷰 링크(iframe 형태) 
+                  
+              required:
+                - franchise_name
+                - franchise_tag
+                - franchise_logo
+                - franchise_storenum
+                - franchise_cost
+                - franchise_monthSale
+                - franchise_ceo
+                - franchise_type
+                - franchise_address
+                - franchise_registnum
+                - franchise_crn
+                - franchise_phone
+                - franchise_fax
+                - franchise_detailsale
+                - franchise_month_sales
+                - franchise_market_num
+                - franchise_market_contract
+                - brand_introduce
+                - brand_menu
+                - brand_competitiveness
+                - brand_video
+                - blog_review
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
 
 # === consult ============================================================
 

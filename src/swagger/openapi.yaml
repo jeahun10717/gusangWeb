@@ -1145,7 +1145,116 @@ paths:
             $ref: '#/components/responses/200'
 
 # === franchise ==========================================================
+  /franchise/detail/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Franchise
+      summary: 프렌차이즈 컨텐츠 상세정보
+      description: 프렌차이즈 컨텐츠에 대한 모든 DB 자료가 출력되는 api
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: 가져올 매물의 db 에서의 id
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
 
+  /franchise/search:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Franchise
+      summary: 검색어를 통한 컨텐츠 노출
+      description: 검색어를 통한  컨텐츠 노출 (페이지네이션 포함됨)
+      parameters:
+        - in: query
+          name: searchName
+          schema:
+            type: string
+          description: 검색어
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: 페이지 번호
+          required: true
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+    
+  /franchise/show:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Franchise
+      summary: 기본 페이지네이션용 컨텐츠 노출 api
+      description: 메뉴바를 통한 기본 페이지네이션 api
+      parameters:
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+            default: desc
+          description: 오름차순, 내림차순
+          required: true
+        - in: query
+          name: tag
+          schema:
+            type: string
+            enum:
+              - cafe
+              - bakery
+              - dessert
+              - chicken
+              - pizza
+              - korean
+              - chinese
+              - japanese
+              - special
+              - snack
+              - fastfood
+              - pub
+              - convStore
+              - sale
+              - laundry
+              - pcRoom
+              - game
+              - studyCafe
+              - education
+              - life
+          description: 프랜차이즈 태그</br>
+            cafe(카페), bakery(제과제빵) ,dessert(디저트), chicken(치킨), pizza(피자),</br>
+            korean(한식), chinese(중식), japanese(일식) ,special(별식, 퓨전요리), snack(분식),</br>
+            fastfood(패스트푸드), pub(주점), convStore(편의점), sale(도소매), laundry(빨래방),</br>
+            pcRoom(pc방), game(여가, 오락), studyCafe(스터디카페, 독서실), education(교육, 육아), life(생활서비스)
+          required: true
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum:
+              - views
+              - id
+            default: views
+          description: views->조회수순</br>id->최신순
+          required: true 
+          
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+    
   /franchise/create:
     post:
       security:

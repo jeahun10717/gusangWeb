@@ -33,10 +33,7 @@ exports.detail = async (ctx) => {
     }).validate(ctx.params);
 
     if(params.error){
-        ctx.body = {
-            status: 400,
-            msg: "잘못된 요청"
-        }
+        ctx.throw(400, "잘못된 요청입니다.")
     }
 
     const { id } = params.value;

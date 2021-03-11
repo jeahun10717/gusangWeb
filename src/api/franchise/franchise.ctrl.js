@@ -32,7 +32,13 @@ exports.pagenate = async (ctx) => {
 }
 
 exports.detail = async (ctx) => {
-    const { id } = ctx.params;
+    const params = Joi.object({
+        id: Joi.number().integer()
+    }).validate(ctx.params);
+
+    if(params.error) ctx.throw(400, "잘못된 요청입니다.")
+
+    const { id } = params.value;
 
     // Promise 함수인데 await 안붙히면 Promise 리턴해서 무조건 true 값이 됨. VSS
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력

@@ -11,6 +11,8 @@ async function levelChk(user_id, level){
 }
 exports.level1 = async (ctx, next) =>{
   const { UUID } = ctx.request.user;
+  console.log(UUID);
+  console.log(await levelChk(UUID, 1))
   if(await levelChk(UUID, 1)) return next();
   else ctx.throw(401,'인증 오류');
 }

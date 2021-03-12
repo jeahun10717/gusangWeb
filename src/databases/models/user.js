@@ -4,7 +4,7 @@ exports.insert = async (query)=>{
     return await db.query("INSERT INTO users set ?", query);
 }
 
-exports.show = async (auth, order, page, contents)=>{ 
+exports.show = async (auth, order, page, contents)=>{
   if(auth == 'noFilter'){ // 전체
     return await db.query(`select hex(uuid) user_id, Auth, phone, name, realty_name, realty_address, realty_owner_name, realty_owner_phone, registAt from users
     order by id ${order} limit ? offset ?`, [contents, page * contents])
@@ -65,7 +65,7 @@ exports.isExistFromUUID = async(id)=>{
 
 
 exports.getAuth = async (user_id) =>{
-  const [result] = await db.query(`select Auth from Users where uuid = ?`,Buffer.from(user_id,'hex'));
+  const [result] = await db.query(`select Auth from users where uuid = ?`,Buffer.from(user_id,'hex'));
   if(result) return result.Auth;
   return result;
 }

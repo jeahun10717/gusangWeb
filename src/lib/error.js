@@ -7,7 +7,6 @@ module.exports = async ( ctx, next )=>{
     let status = e.status || 500;
 
     if(status == 500) console.error(e); // 500 이면 에러로그 출력
-
     ctx.status = status;
     ctx.body = {
       status: status,

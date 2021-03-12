@@ -10,7 +10,7 @@ kakao.get('/', async (ctx,next)=>{ // get : /src/api/users/kakao
 
    ctx.body = {
      status: 200,
-     access_token
+     access_token : access_token.access_token
    }
    // const kakaoData = await oauth.kakao(code);
    // const userToken = await login.regist({

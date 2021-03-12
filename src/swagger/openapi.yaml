@@ -5,18 +5,18 @@ info:
     REST API 문서
   version: 1.0.0
 servers:
-  - url: 'http://localhost:4000/api'
+  - url: 'http://15.164.165.160/api'
 
 paths:
 # === User ======================================================================
   /users/exist:
     post:
-      tags: 
+      tags:
         - User
       summary: 유저가 존재하는지 확인(로그인 시 무조건 실행해야 함)
       description: 유저가 존재하면 isExist 가 true, 존재하지 않으면 false</br>
-                  isExist->true 면 accescc_token 을 뱉어주는데 이 access_token 은 BearerAuth 에서 사용될 토큰임</br>
-                  isExist->false 면 access_token 을 주지 않고 users/add 라우트를 실행해야 함 
+                  isExist->true 면 access_token 을 뱉어주는데 이 access_token 은 BearerAuth 에서 사용될 토큰임</br>
+                  isExist->false 면 access_token 을 주지 않고 users/add 라우트를 실행해야 함
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -29,13 +29,13 @@ paths:
                     - 1
                     - 2
                   description: 1 -> naver</br>2 -> kakao
-                accescc_token:
+                access_token:
                   type: string
                   description: 로그인 버튼 누르고 나오는 url 에서 받아오는 access_token 임
       responses:
         '200':
           $ref: '#/components/responses/200'
-      
+
   /users/add:
     post:
       tags:
@@ -56,7 +56,7 @@ paths:
                     - 1
                     - 2
                   description: 1 -> naver</br>2 -> kakao
-                accescc_token:
+                access_token:
                   type: string
                   description: /users/isExist 의 body 에서 받아온 token
                 phone:
@@ -1272,7 +1272,7 @@ paths:
       responses:
         '200':
             $ref: '#/components/responses/200'
-    
+
   /franchise/show:
     get:
       security:
@@ -1332,12 +1332,12 @@ paths:
               - id
             default: views
           description: views->조회수순</br>id->최신순
-          required: true 
-          
+          required: true
+
       responses:
         '200':
             $ref: '#/components/responses/200'
-    
+
   /franchise/create:
     post:
       security:

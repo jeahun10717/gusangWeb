@@ -1,10 +1,10 @@
 module.exports = {
     localhost: {
        connectionLimit : 20,
-       host:'database-1.ciuhkgz17djf.ap-northeast-2.rds.amazonaws.com',
+       host:'localhost',
        port:'3306',
-       user:'admin',
-       password:'jk124578',
+       user:'root',
+       password:'1234',
        database:'gusang'
     }
  }

@@ -9,6 +9,89 @@ servers:
 
 paths:
 # === User ======================================================================
+  /users/exist:
+    post:
+      tags: 
+        - User
+      summary: 유저가 존재하는지 확인(로그인 시 무조건 실행해야 함)
+      description: 유저가 존재하면 isExist 가 true, 존재하지 않으면 false</br>
+                  isExist->true 면 accescc_token 을 뱉어주는데 이 access_token 은 BearerAuth 에서 사용될 토큰임</br>
+                  isExist->false 면 access_token 을 주지 않고 users/add 라우트를 실행해야 함 
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                login_type:
+                  type: integer
+                  enum:
+                    - 1
+                    - 2
+                  description: 1 -> naver</br>2 -> kakao
+                accescc_token:
+                  type: string
+                  description: 로그인 버튼 누르고 나오는 url 에서 받아오는 access_token 임
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+      
+  /users/add:
+    post:
+      tags:
+        - User
+      summary: exist api 요청 이후 수행하는 등록 api
+      description: /users/exist 에서 isExist 가 false 면 실행되는 api 이다.</br>
+                  여기서 나머지 필드를 다 채우고 정확한 값을 요청하면 status 200 과</br>
+                  BearerAuth 에서 사용된 accescc_token 을 함께 띄워준다.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                login_type:
+                  type: integer
+                  enum:
+                    - 1
+                    - 2
+                  description: 1 -> naver</br>2 -> kakao
+                accescc_token:
+                  type: string
+                  description: /users/isExist 의 body 에서 받아온 token
+                phone:
+                  type: string
+                  description: 회원의 전화번호
+                name:
+                  type: string
+                  description: 회원의 이름
+                realty_name:
+                  type: string
+                  description: 회원의 소속 업체 이름
+                realty_address:
+                  type: string
+                  description: 회원의 소속 업체 주소
+                realty_owner_name:
+                  type: string
+                  description: 회원의 소속 업체 대표 이름
+                realty_owner_phone:
+                  type: string
+                  description: 회원의 소속 업체 대표
+              required:
+                - login_type
+                - accescc_token
+                - phone
+                - name
+                - realty_name
+                - realty_address
+                - realty_owner_name
+                - realty_owner_phone
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+
   /users/userinfo/show:
     get:
       security:

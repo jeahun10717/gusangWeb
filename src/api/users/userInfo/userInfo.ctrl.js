@@ -36,7 +36,7 @@ exports.show = async(ctx)=>{
     const { auth, page, order } = params.value;
 
     // TODO: contents 부분(show 함수의 매개변수 1 부분) 30개로 바꿔야 함
-    const result = await user.show(auth, order, page, 1);
+    const result = await user.show(auth, order, page, 2);
 
     ctx.body = {
         status:200,
@@ -80,10 +80,10 @@ exports.update = async(ctx)=>{
         realty_owner_phone: Joi.string().regex(/^[0-9]{10,13}$/).required()
     }).validate(ctx.request.body);
     if(params.error) ctx.throw(400, 'bed request');
-    
+
     const result = await user.update(user_id, params.value);
     if(result.affectedRows === 0) ctx.throw(400, "id 가 존재하지 않음");
-    
+
     ctx.body = {
         status:200,
     }
@@ -98,21 +98,21 @@ exports.delete = async (ctx)=>{
 
     const result = await user.delete(id);
     if(result.affectedRows === 0) ctx.throw(400, "id 가 존재하지 않음");
-    
+
     ctx.body = {
         status: 200,
     }
 }
 
 // TODO: 밑의 setADM, setMasterADM 함수는 유저 여러명 가능할 때 따로 검증해야 함.(검증 안했음)
-exports.setADM = async (ctx)=>{ 
+exports.setADM = async (ctx)=>{
     // adm 이 2일 때 1을 2로 승급
     // adm 이 1일 때 2를 1로 강등
     const params = Joi.object({
         uuid: Joi.string().custom(v=>Buffer.from(v,'hex')).required(),
         adm: Joi.number().integer().required()
     }).validate(ctx.request.body);
-    
+
     if(params.error){
         ctx.throw(400, "잘못된 요청입니다");
     }
@@ -131,7 +131,7 @@ exports.setMasterADM = async (ctx)=>{
         uuid: Joi.string().custom(v=>Buffer.from(v,'hex')).required(),
         adm: Joi.number().integer().required()
     }).validate(ctx.request.body);
-    
+
     if(params.error){
         ctx.throw(400, "잘못된 요청입니다");
     }
@@ -142,7 +142,7 @@ exports.setMasterADM = async (ctx)=>{
         ctx.throw(400, "없는 관리자 number 입니다.");
     }
 
-    if(adm === 3){ // 일반 관리자(auth 2) 를 최고 관리자(auth 3)로 승급 
+    if(adm === 3){ // 일반 관리자(auth 2) 를 최고 관리자(auth 3)로 승급
         await user.setADM(uuid, adm)
     }else if(adm == 2){ // 다른 최고관리자(auth 3) 을 일반 관리자(auth 2)로 강등
         if(await user.chkMstAdmExist <= 1){

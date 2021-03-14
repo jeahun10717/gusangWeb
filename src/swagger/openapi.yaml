@@ -9,6 +9,18 @@ servers:
 
 paths:
 # === User ======================================================================
+  /users/token:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: 로그인 확인하는 API
+      description: 만료기간 reset 되며 새로운 토큰이 발행됨.</br> BearerAuth 에 토큰이 무조건 존재해야지 검증이 가능함.
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
   /users/exist:
     post:
       tags:

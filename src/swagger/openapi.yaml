@@ -55,6 +55,7 @@ paths:
                   enum:
                     - 1
                     - 2
+                  default: 2
                   description: 1 -> naver</br>2 -> kakao
                 access_token:
                   type: string
@@ -79,7 +80,7 @@ paths:
                   description: 회원의 소속 업체 대표
               required:
                 - login_type
-                - accescc_token
+                - access_token
                 - phone
                 - name
                 - realty_name
@@ -1738,6 +1739,31 @@ paths:
         그 외 시,도 : ***도 **시<br>
         kakaoApi 로 받아온 지역코드 입력 api</br>
         접근권한 : auth 2, auth 3
+      parameters:
+        - in: query
+          name: local
+          schema:
+            type: string
+          required: true
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
+  /kakaoMap/remove/{code}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - KakaoMap
+      summary: 삽입된 local 코드 삭제
+      description: 지역코드 삭제
+      parameters:
+        - in: path
+          name: code
+          schema:
+            type: string
+          required: true
 
       responses:
         '200':

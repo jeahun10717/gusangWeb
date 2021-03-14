@@ -1,5 +1,24 @@
 const Joi = require('joi');
 const { user } = require('../../../databases');
+const { token } = require('../../../lib')
+
+exports.token = async(ctx)=>{
+    const { UUID } = ctx.request.user;
+    // console.log(UUID);
+    const bufUUID = Buffer.from(UUID, 'hex');
+
+    const result = await user.isExistFromUUID(bufUUID);
+    // console.log(result);
+    if(!result) ctx.throw(401, "인증 오류 입니다.");
+
+    ctx.body={
+        status:200,
+        data:{
+            token:token.get({UUID})
+        }
+    }
+
+}
 
 exports.show = async(ctx)=>{
 

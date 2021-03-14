@@ -1,8 +1,7 @@
 use gusang;
 select * from users;	
-drop table users;
 desc users;
-
+show tables;
 -- test query ---------------------------------------------------
 select name from users where Auth >= "2" && name = "jaeahun";
 alter table users change address realty_address varchar(256);

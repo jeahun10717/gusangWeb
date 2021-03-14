@@ -4,6 +4,9 @@ const userInfoCtrl = require('./userInfo.ctrl');
 const { auth } = require('../../../lib');
 
 userInfo.use(auth.login);
+
+userInfo.get('/token', userInfoCtrl.token);
+
 userInfo.use(auth.level2);
 
 userInfo// create 은 user 라우트 단계에서 처리됨.

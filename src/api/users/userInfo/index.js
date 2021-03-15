@@ -5,7 +5,9 @@ const { auth } = require('../../../lib');
 
 userInfo.use(auth.login);
 
-userInfo.get('/token', userInfoCtrl.token);
+userInfo
+.get('/token', userInfoCtrl.token)
+.get('/userMe', userInfoCtrl.userMe)
 
 userInfo.use(auth.level2);
 

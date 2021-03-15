@@ -2,6 +2,20 @@ const Joi = require('joi');
 const { user } = require('../../../databases');
 const { token } = require('../../../lib')
 
+exports.userMe = async(ctx)=>{
+  const { UUID } = ctx.request.user;
+  console.log(UUID);
+  const bufUUID = Buffer.from(UUID, 'hex');
+
+  const result = await user.isExistFromUUID(bufUUID);
+
+  if(!result) ctx.throw(401, "인증 오류 입니다.");
+  ctx.body = {
+    status: 200,
+    result
+  }
+}
+
 exports.token = async(ctx)=>{
     const { UUID } = ctx.request.user;
     // console.log(UUID);
@@ -52,7 +66,8 @@ exports.show = async(ctx)=>{
 exports.search = async(ctx)=>{
     const params = Joi.object({
         search: Joi.string().required(),
-        order: Joi.string().required(),
+        order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
+        filter: Joi.string().regex(/\bname\b|\brealty_name\b|\brealty_owner_name\b/).required(),
         page: Joi.number().integer().required()
     }).validate(ctx.query);
 
@@ -60,10 +75,10 @@ exports.search = async(ctx)=>{
         ctx.throw(400, "잘못된 요청입니다.")
     }
 
-    const { search, order, page } = ctx.query;
+    const { search, order, filter, page } = params.value;
     const name = search.split(' ');
     //TODO: 여기서 1 부분 30 으로 바꾸기
-    const result = await user.search(name[0], name[1], order, page, 1)
+    const result = await user.search(name[0], name[1], order, filter, page, 2)
 
     ctx.body = {
         status:200,

@@ -6,25 +6,25 @@ exports.insert = async (query)=>{
 
 exports.show = async (auth, order, page, contents)=>{
   if(auth == 'noFilter'){ // 전체
-    return await db.query(`select hex(uuid) user_id, Auth, phone, name, realty_name, realty_address, realty_owner_name, realty_owner_phone, registAt from users
+    return await db.query(`select hex(uuid) user_id, id, Auth, phone, name, realty_name, realty_address, realty_owner_name, realty_owner_phone, registAt from users
     order by id ${order} limit ? offset ?`, [contents, page * contents])
   }else{
     if(auth === 'admin'){ // 관리자
-      return await db.query(`select hex(uuid) user_id, Auth, phone, name, realty_name, realty_address, realty_owner_name, realty_owner_phone, registAt from users where auth > 1
+      return await db.query(`select hex(uuid) user_id, id, Auth, phone, name, realty_name, realty_address, realty_owner_name, realty_owner_phone, registAt from users where auth > 1
       order by id ${order} limit ? offset ?`, [contents, page * contents])
     }else if(auth == 'common'){ // 일반유저(부동산)
-      return await db.query(`select hex(uuid) user_id, Auth, phone, name, realty_name, realty_address, realty_owner_name, realty_owner_phone, registAt from users where auth < 2
+      return await db.query(`select hex(uuid) user_id, id, Auth, phone, name, realty_name, realty_address, realty_owner_name, realty_owner_phone, registAt from users where auth < 2
       order by id ${order} limit ? offset ?`, [contents, page * contents])
     }
   }
 }
 
 // TODO: 이부분 지금은 부동산 이름으로 검색하는데 다른 거 필요할지 선택해야 함
-exports.search = async(name1, name2, order, page, contents) =>{
+exports.search = async(name1, name2, order, filter, page, contents) =>{
   return await db.query(`select
-  *
+  hex(uuid) user_id, id, Auth, phone, name, realty_name, realty_address, realty_owner_name, realty_owner_phone, registAt
   from users
-  where realty_name like ? || realty_name like ?
+  where ${filter} like ? || ${filter} like ?
   order by id ${order} limit ? offset ?`
   ,[`%${name1}%`, `%${name2}%`, contents, page * contents]);
 }

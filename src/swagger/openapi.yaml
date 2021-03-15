@@ -9,7 +9,20 @@ servers:
 
 paths:
 # === User ======================================================================
-  /users/token:
+  /users/userInfo/userMe:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: 로그인된 유저 자신의 정보
+      description: 로그인도니 유저 자신의 정보를 가져온다.</br>
+                  토큰이 유효하지 않으면 오류를 뱉는다.
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+  /users/userInfo/token:
     get:
       security:
         - BearerAuth: []
@@ -147,12 +160,59 @@ paths:
                     user_id: 유저 ID
                     Auth: 권한
                     phone: 폰 번호
-                    name: 2름
+                    name: 이름
                     realty_name: 부동산 이름
                     realty_address: 부동산 주소
                     realty_owner_name: 부동산 대표 이름
                     realty_owner_phone: 부동산 대표 전화번호
                     registAt: 등록일
+
+  /users/userInfo/search:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: 필터를 통한 유저검색
+      description: 필터 : 유저이름, 부동산이름, 부동산대표이름
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: 검색어
+          required: true
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+            default: desc
+          description: 오름차순 내림차순-> desc asc
+          required: true
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - name
+              - realty_name
+              - realty_owner_name
+          description: 유저이름, 부동산이름, 부동산대표이름
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: 페이지번호
+          required: true
+
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
+
 
   /users/userInfo/update:
     post:

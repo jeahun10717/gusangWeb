@@ -1,6 +1,9 @@
 const Joi = require('joi');
 const { S3 } = require('../../lib');
 const { interior } = require('../../databases');
+//TODO: 퍼플리싱 하기 전에 밑에 contentNum 15로 고쳐야 함.
+const contentNum = 2;
+
 
 // 아래 함수에서 type 은 view 는 조회순, date 는 날짜순
 exports.pagenate = async (ctx) => {
@@ -24,11 +27,15 @@ exports.pagenate = async (ctx) => {
     // console.log(ctx.query);
     // TODO: query 에서 원하는 값이 안들어오면 400 띄우는 소스 필요
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
-    const result = await interior.pagination( order, type, localCode, conType, pagenum, 2);
+    const result = await interior.pagination( order, type, localCode, conType, pagenum, contentNum);
+
+    const conNum = await interior.conNum();
 
     ctx.body = {
         status : 200,
-        result
+        result,
+        conNum: conNum[0].cnt,
+        pageNum: Math.ceil(conNum[0].cnt/contentNum)
     }
 }
 
@@ -75,13 +82,17 @@ exports.search = async (ctx) => {
 
     data = searchName.split(' ');
 
-    const result = await interior.pageForSearch(data[0],data[1],data[2],conType,page, 2);
+    const result = await interior.pageForSearch(data[0],data[1],data[2],conType,page, contentNum);
+
+    const conNum = await interior.conNum();
 
     ctx.body = {
         status : 200,
-        result
+        result,
+        conNum: conNum[0].cnt,
+        pageNum: Math.ceil(conNum[0].cnt/contentNum)
     }
-} 
+}
 
 exports.create = async (ctx) => {
     const params = Joi.object({

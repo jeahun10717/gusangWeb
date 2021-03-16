@@ -67,3 +67,7 @@ exports.insertImgs = async (query, id)=>{
 exports.upViews = async(id)=>{
     await db.query(`update newSale set views=views+1 where id = ?`, id)
 }
+
+exports.conNum = async() => {
+  return await db.query(`select count(*) cnt from newSale`)
+}

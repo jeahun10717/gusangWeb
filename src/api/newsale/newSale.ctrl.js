@@ -1,6 +1,8 @@
 const Joi = require('joi');
 const { S3 } = require('../../lib');
 const { newsale } = require('../../databases');
+//TODO: 퍼블리싱 하기 전 킽의 contentNum 을 15 로 고쳐야 함
+const contentNum = 2;
 
 exports.pagenate = async (ctx) => {
     const params = Joi.object({
@@ -19,11 +21,22 @@ exports.pagenate = async (ctx) => {
     // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
     // type : {views, id} --> id 는 최신순 정렬하는 거
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
-    const result = await newsale.pagination( order, type, localCode, conType, pagenum, 2);
+    const result = await newsale.pagination( order, type, localCode, conType, pagenum, contentNum);
+    const conNum = await newsale.conNum();
+    // let pgNum=0;
+    //
+    // if(conNum[0].cnt%contentNum === 0){
+    //   pgNum = Math.floor(conNum[0].cnt/contentNum);
+    // }else{
+    //   pgNum = Math.floor(conNum[0].cnt/contentNum) + 1;
+    // }
+
 
     ctx.body = {
         status : 200,
-        result
+        result,
+        conNum: conNum[0].cnt,
+        pageNum: Math.ceil(conNum[0].cnt/contentNum)
     }
 }
 
@@ -71,11 +84,14 @@ exports.search = async (ctx) => {
     // searchName : 검색어 | page : {페이지 num} | conType : {preview video, 360 vr, live, market}
     const data = searchName.split(' ');
 
-    const result = await newsale.pageForSearch(data[0],data[1],data[2],conType,page, 2);
+    const result = await newsale.pageForSearch(data[0],data[1],data[2],conType,page, contentNum);
+    const conNum = await newsale.conNum();
 
     ctx.body = {
         status : 200,
-        result
+        result,
+        conNum: conNum[0].cnt,
+        pageNum: Math.ceil(conNum[0].cnt/contentNum)
     }
 }
 

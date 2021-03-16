@@ -19,7 +19,7 @@ exports.delete = async(id)=>{
 
 // interior.get('/show') 의 함수로 쓰일 거
 exports.pagination = async(order, type, localCode, conType, page, contents) =>{
-    return await db.query(`select * from interior where contents_type = ? and local_address = ? order by ${type} ${order} limit ? offset ?`
+    return await db.query(`select id, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views from interior where contents_type = ? and local_address = ? order by ${type} ${order} limit ? offset ?`
     ,[conType, localCode, contents, page * contents]);
 }
 
@@ -32,7 +32,7 @@ exports.pageForSearch = async(name1, name2, name3, conType, page, contents) =>{
 	end as zorder, id, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
     from interior
     where contents_type = ?
-    order by 
+    order by
 	    zorder
         limit ? offset ?`
     ,[`%${name1}%`,name1, `%${name2}%`, name2, `%${name3}%`, name3, conType, contents, page * contents]);
@@ -65,4 +65,8 @@ exports.insertImgs = async (query, id)=>{
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 exports.upViews = async(id)=>{
     await db.query(`update interior set views=views+1 where id = ?`, id)
+}
+
+exports.conNum = async() => {
+  return await db.query(`select count(*) cnt from interior`)
 }

@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const { user } = require('../../../databases');
 const { token } = require('../../../lib');
-// TODO: 퍼블리싱 하기 전에 밑에 부분 15로 고쳐야 함
+// TODO: 퍼블리싱 하기 전에 밑에 부분 30 으로 고쳐야 함
 const contentNum = 2;
 
 exports.userMe = async(ctx)=>{
@@ -63,8 +63,7 @@ exports.show = async(ctx)=>{
         status:200,
         result,
         userNum: userNum[0].cnt,
-        pageNum: Math.floor(userNum[0].cnt/contentNum)+1
-
+        pageNum: Math.ceil(userNum[0].cnt/contentNum)
     }
 }
 
@@ -85,10 +84,14 @@ exports.search = async(ctx)=>{
     const name = search.split(' ');
     //TODO: 여기서 1 부분 30 으로 바꾸기
     const result = await user.search(name[0], name[1], order, filter, page, contentNum)
+    const userNum = await user.userNum();
+
 
     ctx.body = {
         status:200,
-        result
+        result,
+        userNum: userNum[0].cnt,
+        pageNum: Math.ceil(userNum[0].cnt/contentNum)
     }
 }
 

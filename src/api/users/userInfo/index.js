@@ -26,4 +26,4 @@ userInfo
 .post('/setMasterAdmin', userInfoCtrl.setMasterADM)  // 최고 관리자 승격/강등 관리
 
 
-module.exports = userInfo;
+module.exports = userInfo

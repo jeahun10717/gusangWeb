@@ -79,3 +79,7 @@ exports.chkMstAdmExist = async() => {
   const [result] = await db.query('select count(*) cnt from users where Auth = 3');
   return result.cnt;
 }
+
+exports.userNum = async() => {
+  return await db.query(`select count(*) cnt from users`)
+}

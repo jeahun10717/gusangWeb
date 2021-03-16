@@ -1,6 +1,8 @@
 const Joi = require('joi');
 const { user } = require('../../../databases');
-const { token } = require('../../../lib')
+const { token } = require('../../../lib');
+// TODO: 퍼블리싱 하기 전에 밑에 부분 15로 고쳐야 함
+const contentNum = 2;
 
 exports.userMe = async(ctx)=>{
   const { UUID } = ctx.request.user;
@@ -22,17 +24,18 @@ exports.token = async(ctx)=>{
     const bufUUID = Buffer.from(UUID, 'hex');
 
     const result = await user.isExistFromUUID(bufUUID);
-    // console.log(result);
+    console.log(result);
     if(!result) ctx.throw(401, "인증 오류 입니다.");
 
     ctx.body={
         status:200,
         data:{
-            token:token.get({UUID})   // 여기서 던져주는 token 은 새로운 token 임
-                                      // TODO: 토큰 만료기간 설정하고 나중에 되는지 확인해야 함
-                                      // UUID 로 받아오는 토큰 1번, 새로 받아오는 토큰 2번
-                                      // ex: 만료기간이 1분이면 위의 api 요청후 1분 후에
-                                      // 1번은 동작하지 않아야 함. 2번은 동작해야 함.
+            token:token.get({UUID}),   // 여기서 던져주는 token 은 새로운 token 임
+                                       // TODO: 토큰 만료기간 설정하고 나중에 되는지 확인해야 함
+                                       // UUID 로 받아오는 토큰 1번, 새로 받아오는 토큰 2번
+                                       // ex: 만료기간이 1분이면 위의 api 요청후 1분 후에
+                                       // 1번은 동작하지 않아야 함. 2번은 동작해야 함.
+            auth: result.Auth
         }
     }
 
@@ -53,12 +56,15 @@ exports.show = async(ctx)=>{
     // order 오름차순 내림차순
     const { auth, page, order } = params.value;
 
-    // TODO: contents 부분(show 함수의 매개변수 1 부분) 30개로 바꿔야 함
-    const result = await user.show(auth, order, page, 2);
+    const result = await user.show(auth, order, page, contentNum);
+    const userNum = await user.userNum();
 
     ctx.body = {
         status:200,
-        result
+        result,
+        userNum: userNum[0].cnt,
+        pageNum: Math.floor(userNum[0].cnt/contentNum)+1
+
     }
 }
 
@@ -78,7 +84,7 @@ exports.search = async(ctx)=>{
     const { search, order, filter, page } = params.value;
     const name = search.split(' ');
     //TODO: 여기서 1 부분 30 으로 바꾸기
-    const result = await user.search(name[0], name[1], order, filter, page, 2)
+    const result = await user.search(name[0], name[1], order, filter, page, contentNum)
 
     ctx.body = {
         status:200,

@@ -174,7 +174,7 @@ paths:
       tags:
         - User
       summary: 필터를 통한 유저검색
-      description: 필터 : 유저이름, 부동산이름, 부동산대표이름
+      description: 필터 -> 유저이름, 부동산이름, 부동산대표이름
       parameters:
         - in: query
           name: search

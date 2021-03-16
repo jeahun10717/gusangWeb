@@ -31,6 +31,9 @@ users.post('/exist', async ctx=>{
   }
   const isExist = await User.isExist(login_type, login_id);
 
+  const bufUUID = Buffer.from(isExist.uuid, 'hex');
+  const result = await User.isExistFromUUID(bufUUID);
+
   let myToken;
 
   if(isExist){
@@ -41,7 +44,8 @@ users.post('/exist', async ctx=>{
     status: 200,
     data: {
       isExist: isExist ? true : false,
-      access_token: myToken
+      access_token: myToken,
+      Auth: result.Auth
     }
   }
 });

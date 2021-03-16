@@ -2,6 +2,7 @@ require('dotenv').config();
 const koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
+const cors = require('@koa/cors');
 
 const app = new koa();
 const router = new Router();
@@ -144,7 +145,7 @@ router.get('/add', ctx=>{
 // });
 
 router.use('/api', api.routes());
-
+app.use(cors());
 app.use(serve('./public'))
 app.use(bodyParser());
 app.use(require('koa-morgan')('dev'));

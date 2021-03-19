@@ -258,19 +258,84 @@ paths:
         '200':
           $ref: '#/components/responses/200'
 
-  /users/userInfo/delete/{user_id}:
+  /users/userInfo/userUpdate:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: 마스터 관리자의 다른 유저 정보 변경
+      description: 마스터 관리자는 다른 유저의 정보를 모두 변경 가능</br>
+                  접속한 마스터 관리자가 자신의 정보를 변경할 수 도 있음</br>
+                  만약 마스터관리자가 자신의 권한을 낮추고 싶을 경우 아래의 플로우를 따름</br>
+                  전체 유저중 마스터 관리자가 2명 이상일 때 -> 자신의 권한 낮추는 거 가능</br>
+                  전체 유저중 마스터 관리자가 2명 미만일 때 -> 자신의 권한 낮추는 거 불가
+      # parameters:
+      #   - in: query
+      #     name: target
+      #     schema:
+      #       type: string
+      #       enum:
+      #         - me
+      #         - other
+      #       default:
+      #         - other
+      #       description: me 는 자신의 정보 수정, other 은 다른사람 정보수정
+      #       required: true
+
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                  description: 유저를 특정할 uuid
+                auth:
+                  type: string
+                  description: 수정할 auth(api 의 description 참조)
+                phone:
+                  type: string
+                  description: 유저의 전화번호
+                name:
+                  type: string
+                  description: 유저의 이름
+                realty_name:
+                  type: string
+                  description: 유저의 부동산 이름
+                realty_address:
+                  type: string
+                  description: 유저의 부동산 주소
+                realty_owner_name:
+                  type: string
+                  description: 유저의 부동산 대표 이름
+                realty_owner_phone:
+                  type: string
+                  description: 유저의 부동산 대표 전화번호
+              required:
+                - uuid
+                - auth
+                - phone
+                - name
+                - realty_name
+                - realty_address
+                - realty_owner_name
+                - realty_owner_phone
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+
+
+  /users/userInfo/delete:
     delete:
       security:
         - BearerAuth: []
       tags:
         - User
-      summary: 유저 삭제 [관리자 전용]
-      parameters:
-        - in: path
-          name: user_id
-          schema:
-            type: string
-          required: true
+      summary: 회원 탈퇴(유저 본인)
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -285,9 +350,28 @@ paths:
                   code: 0
                   msg: 아이디가 없음
 
+  /users/userInfo/userDelete:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      summary: 관리자가 다른 유저 탈퇴시키는 api
+      description: 관리자가 다른 유저 탈퇴시키는 api</br>
+      parameters:
+        - in: query
+          name: uuid
+          schema:
+            type: string
+          description: 입력 받는 uuid
+          required: true
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
 # === newSale ===================================================================
-  /newsale/create:
-    post:
+  post:
+    /newsale/create:
       security:
         - BearerAuth: []
       tags:
@@ -1526,6 +1610,9 @@ paths:
                     type: string
                     format: binary
                   description:  브랜드 정보 / 브랜드 대표메뉴(사진 여러개)
+                brand_menutext:
+                  type: string
+                  description: 브랜드 정보에 대한 텍스트
                 brand_competitiveness:
                   type: string
                   description:  브랜드 정보 / 브랜드 경쟁력(html 로 바로 때려짐)
@@ -1558,6 +1645,7 @@ paths:
                 - franchise_market_contract
                 - brand_introduce
                 - brand_menu
+                - brand_menutext
                 - brand_competitiveness
                 - brand_video
                 - blog_review

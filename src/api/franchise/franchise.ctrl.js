@@ -86,12 +86,12 @@ exports.create = async (ctx) => {
         franchise_name: Joi.string().required(), // : 컨텐츠에 표시될 텍스트, 검색될 이름
         franchise_tag: Joi.string().valid(...tagArr).required(), // : 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
         // franchise_logo: Joi.string().required(), // : franchise 로고
-        
+
         // 가맹정보 부분 //////////////////////////////////////////////////
         franchise_storenum: Joi.number().integer().required(),     // 매장 수
         franchise_cost: Joi.number().integer().required(),         // 창업 비용
         franchise_monthSale: Joi.number().integer().required(),    // 월 평균 매출액
-        // franchise_name //> 이 부분은 위에 등록 해 두었음 : 상호명   
+        // franchise_name //> 이 부분은 위에 등록 해 두었음 : 상호명
         franchise_ceo: Joi.string().required(),  // 대표
         franchise_type: Joi.string().required(), // 사업자 유형
         franchise_address: Joi.string().required(), // 주소
@@ -108,15 +108,16 @@ exports.create = async (ctx) => {
         franchise_market_num: Joi.string().required(),
         // 그 가맹점 계약 현황
         franchise_market_contract: Joi.string().required(),
-        
+
         // ////////////////////////////////////////////////////////////////
 
         brand_introduce: Joi.string().required(), // 브랜드 정보 / 브랜드 소개
         // brand_menu: Joi.string().required(), // 브랜드 정보 / 브랜드 대표메뉴
-        brand_competitiveness: Joi.string().required(), // 브랜드 정보 / 브랜드 경쟁력//>pdf 로 처리할거임
+        brand_menutext:Joi.string().required(),
+        brand_competitiveness: Joi.string().required(), // 브랜드 정보 -> html 로 바로 넣을거임
         // brand_video: Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
 
-        blog_review: Joi.string().required()    
+        blog_review: Joi.string().required()
     }).validate(ctx.request.body);
     // console.log(params.error);
     if(params.error) {
@@ -159,7 +160,7 @@ exports.delete = async(ctx) => {
 }
 
 // exports.update = async(ctx)=>{
-    
+
 // }
 
 exports.test = async(ctx, next)=>{

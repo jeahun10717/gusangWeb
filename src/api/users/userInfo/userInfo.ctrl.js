@@ -1,16 +1,18 @@
 const Joi = require('joi');
 const { user } = require('../../../databases');
 const { token } = require('../../../lib');
+const axios = require('axios');
+const { KAKAO_ADMIN_KEY } = process.env;
+
 // TODO: 퍼블리싱 하기 전에 밑에 부분 30 으로 고쳐야 함
 const contentNum = 2;
 
 exports.userMe = async(ctx)=>{
   const { UUID } = ctx.request.user;
-  console.log(UUID);
   const bufUUID = Buffer.from(UUID, 'hex');
 
   const result = await user.isExistFromUUID(bufUUID);
-
+  result.uuid = UUID
   if(!result) ctx.throw(401, "인증 오류 입니다.");
   ctx.body = {
     status: 200,
@@ -99,6 +101,9 @@ exports.update = async(ctx)=>{
     const { UUID } = ctx.request.user;
     const user_id = Buffer.from(UUID, 'hex');
 
+    const admNum = await user.chkMstAdmExist();
+
+
     const params = Joi.object({
         phone: Joi.string().regex(/^[0-9]{10,13}$/).required(), // 회원전화번호
         name: Joi.string().required(),  // 회원 이름
@@ -117,20 +122,127 @@ exports.update = async(ctx)=>{
     }
 }
 
-exports.delete = async (ctx)=>{
-    const params = Joi.object({
-        id: Joi.string().custom(v=>Buffer.from(v,'hex')).required()
-    }).validate(ctx.params);
-    // TODO params.error
-    const { id } = params.value;
+exports.userUpdate = async(ctx)=>{
+  const { UUID } = ctx.request.user;
+  const myUUID = Buffer.from(UUID, 'hex');
 
-    const result = await user.delete(id);
+  // const query = Joi.object({
+  //   target: Joi.string().regex(/\bme\b|\bother\b/)
+  // }).validate(ctx.query);
+
+  const reqBody = Joi.object({
+    uuid: Joi.string().custom(v=>Buffer.from(v,'hex')).required(),
+    auth: Joi.number().integer().required(),
+    phone: Joi.string().regex(/^[0-9]{10,13}$/).required(), // 회원전화번호
+    name: Joi.string().required(),  // 회원 이름
+    realty_name: Joi.string().required(),
+    realty_address: Joi.string().required(),
+    realty_owner_name: Joi.string().required(),
+    realty_owner_phone: Joi.string().regex(/^[0-9]{10,13}$/).required()
+  }).validate(ctx.request.body);
+
+  // if(query.error) ctx.throw(400, "잘못된 요청입니다");
+  if(reqBody.error) ctx.throw(400, "잘못된 요청입니다");
+
+  // console.log("query : ",query.value);
+  // console.log("reqBody : ",reqBody.value);
+  //
+  // console.log(query.value.target);
+
+  const admNum = await user.chkMstAdmExist();
+  if(reqBody.value.uuid === UUID){
+    // console.log(admNum, "dddddddddddddddddddddd");
+      if(admNum >1){
+
+        await user.update(reqBody.value.uuid,reqBody.value);
+
+      }else if(admNum<=1){
+        if(reqBody.value.auth != 3) ctx.throw(400, "마스터관리자가 1명 이하이므로 강등이 불가합니다")
+        await user.update(reqBody.value.uuid,reqBody.value);
+      }
+
+    // await user.setADM(myUUID, reqBody.value.auth);
+    // console.log("asdfasdfasdfadfasdfasdfasdfasdfasdfasda");
+  }else if(reqBody.value.uuid !== UUID){
+    await user.update(reqBody.value.uuid,reqBody.value);
+  }
+
+  ctx.body = {
+    status: 200
+  }
+}
+
+exports.userDelete = async (ctx)=>{
+    const params = Joi.object({
+        uuid: Joi.string().custom(v=>Buffer.from(v,'hex')).required()
+    }).validate(ctx.query);
+    // TODO params.error
+
+    if(params.error) ctx.throw(400, "잘못된 요청입니다")
+
+    const { uuid } = params.value;
+
+    const result = await user.delete(uuid);
     if(result.affectedRows === 0) ctx.throw(400, "id 가 존재하지 않음");
 
     ctx.body = {
         status: 200,
     }
 }
+
+exports.delete = async(ctx)=>{
+  // console.log(ctx.request)
+  // console.log('asdljkfalskdjflaksdjfljasdlfkjasldf');
+  const { UUID } = ctx.request.user;
+  const bufUUID = Buffer.from(UUID, 'hex');
+
+  // console.log(ctx.request.user);
+
+  const admNum = await user.chkMstAdmExist();
+  const userInfo = await user.isExistFromUUID(bufUUID)
+
+  // console.log(userInfo);
+  // console.log(userInfo.uuid);
+  // console.log(userInfo.login_id);
+  let targetID = userInfo.login_id.replace(/kakao:/,"")
+  targetID=Number(targetID);
+  console.log(typeof targetID);
+
+  // const token = ctx.request.header.authorization;
+  // console.log(token);
+  if(userInfo === 3 && admNum <= 1) ctx.throw(400, "최종관리자가 본인 밖에 존재하지 않으므로 탈퇴가 불가합니다.")
+  // console.log(KAKAO_ADMIN_KEY);
+  // const config = {
+  //   headers: {
+  //     "Authorization": "KakaoAK "+ KAKAO_ADMIN_KEY
+  //   }
+  // }
+  // const data = {
+  //   data: {
+  //     target_id_type: "user_id",
+  //     target_id: `${Number(targetID)}`
+  //   }
+  // }
+  // const result = await axios.post('https://kapi.kakao.com/v1/user/unlink', data ,config);
+  // axios({
+  //   method: "POST",
+  //   url: 'https://kapi.kakao.com/v1/user/unlink',
+  //   data: {
+  //     target_id_type: "user_id",
+  //     target_id: `${Number(targetID)}`
+  //   },
+  //   headers: {
+  //     "Authorization": "KakaoAK "+ KAKAO_ADMIN_KEY
+  //   }
+  // }).then((res)=>)
+  // console.log(result);
+  await user.delete(bufUUID);
+  ctx.body={
+    status:200
+  }
+}
+
+
 
 // TODO: 밑의 setADM, setMasterADM 함수는 유저 여러명 가능할 때 따로 검증해야 함.(검증 안했음)
 exports.setADM = async (ctx)=>{

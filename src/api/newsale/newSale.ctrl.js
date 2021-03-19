@@ -23,13 +23,7 @@ exports.pagenate = async (ctx) => {
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
     const result = await newsale.pagination( order, type, localCode, conType, pagenum, contentNum);
     const conNum = await newsale.conNum();
-    // let pgNum=0;
-    //
-    // if(conNum[0].cnt%contentNum === 0){
-    //   pgNum = Math.floor(conNum[0].cnt/contentNum);
-    // }else{
-    //   pgNum = Math.floor(conNum[0].cnt/contentNum) + 1;
-    // }
+
 
 
     ctx.body = {

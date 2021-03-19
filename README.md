@@ -2,35 +2,14 @@
 
 ## 1. 이번 주 내로 해결
 
-* franchise 부분 DB 스키마 추가 작성해야 함
-
-* user table 에 대한 CRUD 작성
-
-* S3 관련 작성
-  > 1. franchise, interior 에 소스 적용
-  > 2. upImg api 에서 에러처리 확인해야 함
-
-* swagger 정리하기
-* detail 호출하는 모든 api 에서 views 올려야 함(franchise 만 남음)
-* consult setManager api 담당자가 있는지 체크해야 함
-* consult pagination api 에서 검색 기능 추가해야 함.
-* 모든 api 의 auth 설정하기
-* kakao oauth 과정에서 전화번호 가져오기
-
-* 모든 api 의 pagination 에서 contents 변수 갯수 수정해야 함
-  > newSale, franchise, interior 는 15개
-  > consult 부분은 30개
-
-* admin 부분 최고관리자가 1명 이상 존재하는 지 판단해야 함
+* franchise create 부분 마무리 (대표메뉴부분)
+* 사진데이터 파싱해서 넘겨주기
+* 엔터가 포함된 긴 텍스트가 프론트에서 넘어올 때 \n, </br> 중 어느 것인지 확인하기
 
 ## 2. 비교적 이후 우선순위
 
-* 공정거래위원회 api 사용가능한지 확인
 * DB 전화번호 관련한 스키마 `-` 빼고 수정하기
-* 저장소에 올릴 DB 스키마는 empty로 처리하기
-* select * where ~ 에서 * 부분 특정하기
 * 모든 페이지네이션 관련 api 들 contents 부분 15개, 30개로 수정
-* x
 
 ## 3. publishing 이후 수정해야 할 것
 

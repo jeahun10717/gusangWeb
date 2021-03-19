@@ -31,23 +31,36 @@ users.post('/exist', async ctx=>{
   }
   const isExist = await User.isExist(login_type, login_id);
 
-  const bufUUID = Buffer.from(isExist.uuid, 'hex');
-  const result = await User.isExistFromUUID(bufUUID);
+  // const bufUUID = Buffer.from(isExist.uuid, 'hex');
+  // const result = await User.isExistFromUUID(bufUUID);
 
   let myToken;
 
   if(isExist){
     myToken = token.get({UUID: isExist.uuid});
-  }
-
-  ctx.body = {
-    status: 200,
-    data: {
-      isExist: isExist ? true : false,
-      access_token: myToken,
-      Auth: result.Auth
+    const bufUUID = Buffer.from(isExist.uuid, 'hex');
+    const result = await User.isExistFromUUID(bufUUID);
+    // console.log(result.Auth);
+    ctx.body = {
+      status: 200,
+      data: {
+        Auth: result.Auth,
+        isExist: isExist ? true : false,
+        access_token: myToken
+      }
     }
-  }
+}else{
+    ctx.body = {
+      status: 200,
+      data: {
+        isExist: isExist ? true : false,
+        access_token: myToken,
+        // Auth: result.Auth
+      }
+    }
+}
+// console.log(isExist);
+
 });
 
 users.use('/kakao', kakao.routes());

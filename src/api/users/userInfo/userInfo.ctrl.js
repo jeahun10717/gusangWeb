@@ -5,7 +5,7 @@ const axios = require('axios');
 const { KAKAO_ADMIN_KEY } = process.env;
 
 // TODO: 퍼블리싱 하기 전에 밑에 부분 30 으로 고쳐야 함
-const contentNum = 2;
+const contentNum = 1;
 
 exports.userMe = async(ctx)=>{
   const { UUID } = ctx.request.user;
@@ -59,7 +59,7 @@ exports.show = async(ctx)=>{
     const { auth, page, order } = params.value;
 
     const result = await user.show(auth, order, page, contentNum);
-    const userNum = await user.userNum();
+    const userNum = await user.pagenum(auth);
 
     ctx.body = {
         status:200,
@@ -86,8 +86,7 @@ exports.search = async(ctx)=>{
     const name = search.split(' ');
     //TODO: 여기서 1 부분 30 으로 바꾸기
     const result = await user.search(name[0], name[1], order, filter, page, contentNum)
-    const userNum = await user.userNum();
-
+    const userNum = await user.pagenumSearch(name[0], name[1], filter, page, contentNum);
 
     ctx.body = {
         status:200,
@@ -132,7 +131,7 @@ exports.userUpdate = async(ctx)=>{
 
   const reqBody = Joi.object({
     uuid: Joi.string().custom(v=>Buffer.from(v,'hex')).required(),
-    auth: Joi.number().integer().required(),
+    auth: Joi.number().integer().valid(0,1,2,3).required(),
     phone: Joi.string().regex(/^[0-9]{10,13}$/).required(), // 회원전화번호
     name: Joi.string().required(),  // 회원 이름
     realty_name: Joi.string().required(),
@@ -148,22 +147,25 @@ exports.userUpdate = async(ctx)=>{
   // console.log("reqBody : ",reqBody.value);
   //
   // console.log(query.value.target);
+  // console.log(reqBody.value.uuid, "!!!!!!!!!!!!!!!!!!!!!!!!");
+  // console.log(ctx.request.body.uuid);
+  // console.log(UUID, "?????????????????????!");
 
   const admNum = await user.chkMstAdmExist();
-  if(reqBody.value.uuid === UUID){
+  if(ctx.request.body.uuid === UUID){
     // console.log(admNum, "dddddddddddddddddddddd");
       if(admNum >1){
 
-        await user.update(reqBody.value.uuid,reqBody.value);
+        await user.update(ctx.request.body.uuid,reqBody.value);
 
       }else if(admNum<=1){
         if(reqBody.value.auth != 3) ctx.throw(400, "마스터관리자가 1명 이하이므로 강등이 불가합니다")
-        await user.update(reqBody.value.uuid,reqBody.value);
+        await user.update(ctx.request.body.uuid,reqBody.value);
       }
 
     // await user.setADM(myUUID, reqBody.value.auth);
     // console.log("asdfasdfasdfadfasdfasdfasdfasdfasdfasda");
-  }else if(reqBody.value.uuid !== UUID){
+  }else if(ctx.request.body.uuid !== UUID){
     await user.update(reqBody.value.uuid,reqBody.value);
   }
 
@@ -181,6 +183,17 @@ exports.userDelete = async (ctx)=>{
     if(params.error) ctx.throw(400, "잘못된 요청입니다")
 
     const { uuid } = params.value;
+    const { UUID } = ctx.request.user;
+    const admNum = await user.chkMstAdmExist();
+    const userInfo = await user.isExistFromUUID(uuid);
+
+    // console.log(admNum, ctx.query.uuid, "111111111111111111111111111111111");
+    // console.log(UUID, "????????????????????????", ctx.query.uuid);
+
+    // if(admNum < 2)
+    if((UUID.toLowerCase()==ctx.query.uuid.toLowerCase())&&(admNum<=1)){
+      ctx.throw(400, "이 대상을 삭제하면 최고관리자가 1명 미만이 되므로 삭제가 불가합니다.")
+    }
 
     const result = await user.delete(uuid);
     if(result.affectedRows === 0) ctx.throw(400, "id 가 존재하지 않음");
@@ -204,13 +217,15 @@ exports.delete = async(ctx)=>{
   // console.log(userInfo);
   // console.log(userInfo.uuid);
   // console.log(userInfo.login_id);
-  let targetID = userInfo.login_id.replace(/kakao:/,"")
-  targetID=Number(targetID);
-  console.log(typeof targetID);
+  // let targetID = userInfo.login_id.replace(/kakao:/,"")
+  // targetID=Number(targetID);
+  // console.log(typeof targetID);
 
   // const token = ctx.request.header.authorization;
   // console.log(token);
-  if(userInfo === 3 && admNum <= 1) ctx.throw(400, "최종관리자가 본인 밖에 존재하지 않으므로 탈퇴가 불가합니다.")
+  // console.log(userInfo, admNum, "dddddddddddddddddddddddddddddddd");
+  console.log(userInfo.Auth, admNum);
+  if(userInfo.Auth === 3 && admNum <= 1) ctx.throw(400, "본 유저가 탈퇴시 최종관리자가 1명도 없으므로 탈퇴가 불가합니다.")
   // console.log(KAKAO_ADMIN_KEY);
   // const config = {
   //   headers: {

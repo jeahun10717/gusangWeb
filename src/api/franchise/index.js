@@ -23,7 +23,16 @@ upload.fields([
     {name: "brand_video", maxcount: 1}
 ]),
 franchiseCtrl.create)
+.post('/upImg',
+upload.fields([
+    {name: "franchise_logo", maxcount: 1},
+    {name: "brand_menu", maxcount: 1},
+    {name: "brand_video", maxcount: 1}
+]),
+franchiseCtrl.upImg)
 // .post('/update/:id/:type', franchiseCtrl.update)
+.delete('/delImg/:id', franchiseCtrl.delImg)
 .delete('/remove/:id', franchiseCtrl.delete)
+
 
 module.exports = franchise;

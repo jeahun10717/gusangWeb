@@ -2,22 +2,23 @@
 
 ## 1. 이번 주 내로 해결
 
+* franchise, interior, newSale delete api 에서 S3 데이터 지우는 소스 추가해야 함.
+* franchise, interior, newSale 바이너리 데이터를 사용하는 api 들 모두 200 이 아닌 다른 status 가 떴을 때
+  S3 에 업로드 된 자료들 지워야 함.
+* xss 적용하기
+* S3 모듈 중에 extention 적용하기
+* naver, kakao 퍼블리싱 게정 적용하기
 * franchise create 부분 마무리 (대표메뉴부분)
-* 사진데이터 파싱해서 넘겨주기
 * 엔터가 포함된 긴 텍스트가 프론트에서 넘어올 때 \n, </br> 중 어느 것인지 확인하기
 
-## 2. 비교적 이후 우선순위
-
-* DB 전화번호 관련한 스키마 `-` 빼고 수정하기
-* 모든 페이지네이션 관련 api 들 contents 부분 15개, 30개로 수정
-
-## 3. publishing 이후 수정해야 할 것
+## 2. publishing 이후 수정해야 할 것
 
 * naver, kakao Oauth client 아이디로 수정할 것.
  > 위에 거 처리할 때 domain 정해지면 그걸로 수정
 
 * domain 구매
 * aws 서버 client 것으로 바꿀 것.
+* ssl 적용하기
 
 # Question List
 

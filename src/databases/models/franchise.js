@@ -21,8 +21,8 @@ exports.delete = async(id)=>{
 exports.pagination = async(order, type, tag, page, contents) =>{
     return await db.query(`
     select id, franchise_name, franchise_logo, franchise_tag
-    from franchise 
-    where franchise_tag = ? 
+    from franchise
+    where franchise_tag = ?
     order by ${type} ${order} limit ? offset ?`
     ,[tag, contents, page * contents]);
 }
@@ -36,7 +36,7 @@ exports.pageForSearch = async(name1, name2, name3, page, contents) =>{
     else 10000
 	end as zorder, id, franchise_logo, franchise_name, franchise_tag
     from franchise
-    order by 
+    order by
 	    zorder
         limit ? offset ?`
     ,[`%${name1}%`,name1, `%${name2}%`, name2, `%${name3}%`, name3, contents, page * contents]);
@@ -55,3 +55,21 @@ exports.rowNum = async()=>{
 //     return await db.query(`select * from franchise where contents_name like \'%${name1}%\' || contents_name like \'%${name2}%\' || contents_name like \'%${name3}%\'`
 //     , [name1, name2, name3]);
 // }
+
+exports.getImgs = async (id)=>{
+    const [result] = await db.query(`select franchise_logo, brand_menu, brand_video from franchise where id = ?`,id);
+    return result;
+}
+
+exports.getImgsFromField = async(id, field)=>{
+    const [result] = await db.query(`select ${field} from franchise where id = ?`,id);
+    return result;
+}
+
+exports.insertImgs = async (query, id)=>{
+    await db.query(`update franchise set ? where id = ?`,[query, id]);
+}
+
+exports.getMenuData = async (id)=>{
+  return await db.query(`select brand_menutext from franchise where id = ?`, id)
+}

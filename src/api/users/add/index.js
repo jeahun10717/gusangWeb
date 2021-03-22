@@ -18,19 +18,24 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
     }).validate(ctx.request.body);
 
     if(params.error) ctx.throw(400, 'bed request');
-    
+
     const { access_token, login_type, ...rest } = params.value;
-    
+
     let login_id;
 
     if(login_type === 2){   // kakao login
       const kakaoData = await oauth.kakaoData(access_token);
+      const result = await user.isExistFromUserID(`kakao:${kakaoData.id}`)
+      if(result) ctx.throw(400, "이미 존재하는 유저입니다.")
+      console.log(result);
       login_id = `kakao:${kakaoData.id}`;
     }
     else if(login_type === 1){  // naver login
       const naverData = await oauth.naverData(access_token);
-      console.log(naverData);
-      login_id = `naver:${naverData.id}`; 
+      // console.log(naverData);
+      const result = await user.isExistFromUserID(`kakao:${kakaoData.id}`)
+      if(result) ctx.throw(400, "이미 존재하는 유저입니다.")
+      login_id = `naver:${naverData.id}`;
     }
 
     // try{ // TODO: 이 부분에 왜 try-catch 로 했는지 확인하고 나중에 수정하기
@@ -50,7 +55,7 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
 
     // query=ctx.request.body
     // user.update(Buffer.from(UUID, 'hex'), query);
-
+    // kakao:1659856827
     ctx.status = 200;
     ctx.body = {
         status: 200,

@@ -19,6 +19,18 @@ exports.show = async (auth, order, page, contents)=>{
   }
 }
 
+exports.pagenum = async (auth)=>{
+  if(auth == 'noFilter'){ // 전체
+    return await db.query(`select count(*) as cnt from users`)
+  }else{
+    if(auth === 'admin'){ // 관리자
+      return await db.query(`select count(*) as cnt from users where auth > 1`)
+    }else if(auth == 'common'){ // 일반유저(부동산)
+      return await db.query(`select count(*) as cnt from users where auth <= 1`)
+    }
+  }
+}
+
 // TODO: 이부분 지금은 부동산 이름으로 검색하는데 다른 거 필요할지 선택해야 함
 exports.search = async(name1, name2, order, filter, page, contents) =>{
   return await db.query(`select
@@ -27,6 +39,12 @@ exports.search = async(name1, name2, order, filter, page, contents) =>{
   where ${filter} like ? || ${filter} like ?
   order by id ${order} limit ? offset ?`
   ,[`%${name1}%`, `%${name2}%`, contents, page * contents]);
+}
+
+exports.pagenumSearch = async(name1, name2, filter, page, contents)=>{
+  return await db.query(`select count(*) cnt from users
+  where ${filter} like ? || ${filter} like ?`
+  ,[`%${name1}%`, `%${name2}%`, contents, page * contents])
 }
 
 // 전체 수정( 예 개인정보 수정)
@@ -63,6 +81,10 @@ exports.isExistFromUUID = async(id)=>{
   return result;
 }
 
+exports.isExistFromUserID = async(user_id)=>{
+  const [result] = await db.query(`select login_id from users where login_id =?`,user_id);
+  return result;
+}
 
 exports.getAuth = async (user_id) =>{
   const [result] = await db.query(`select Auth from users where uuid = ?`,Buffer.from(user_id,'hex'));
@@ -78,8 +100,4 @@ exports.delete = async(id)=>{
 exports.chkMstAdmExist = async() => {
   const [result] = await db.query('select count(*) cnt from users where Auth = 3');
   return result.cnt;
-}
-
-exports.userNum = async() => {
-  return await db.query(`select count(*) cnt from users`)
 }

@@ -10,7 +10,7 @@ exports.pagenate = async (ctx) => {
     const params = Joi.object({
         order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
         localCode: Joi.string().required(), // TODO: 문자 개수 로컬코드 갯수로 검증해야 함
-        conType: Joi.string().regex(/\bpreview video\b|\b360 vr\b|\blive\b|\bmarket\b/).required(),
+        conType: Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(),
         type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
         pagenum: Joi.number().integer()
     }).validate(ctx.query)
@@ -97,7 +97,7 @@ exports.search = async (ctx) => {
 exports.create = async (ctx) => {
     const params = Joi.object({
         contents_name : Joi.string().required(), // 컨텐츠에 표시될 텍스트
-        contents_type : Joi.string().required(), // 영상,360 vr, 주거, 상가
+        contents_type : Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(), // 영상,360 vr, 주거, 상가
         local_address : Joi.string().required(), // : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                    // 프론트에서 데이터 정해줘야 할 듯
         // thumnail_image : Joi.string().required(),
@@ -176,7 +176,7 @@ exports.update = async (ctx) => {
 
     const params = Joi.object({
         contents_name : Joi.string().required(), // 컨텐츠에 표시될 텍스트
-        contents_type : Joi.string().required(), // 영상,360 vr, 주거, 상가
+        contents_type : Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(), // 영상,360 vr, 주거, 상가
         local_address : Joi.string().required(), // : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                    // 프론트에서 데이터 정해줘야 할 듯
         // thumnail_image : Joi.string().required(),

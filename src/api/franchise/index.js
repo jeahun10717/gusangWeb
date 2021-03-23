@@ -23,6 +23,7 @@ upload.fields([
     {name: "brand_video", maxcount: 1}
 ]),
 franchiseCtrl.create)
+.post('/update/:id', franchiseCtrl.update)
 .post('/upImg',
 upload.fields([
     {name: "franchise_logo", maxcount: 1},

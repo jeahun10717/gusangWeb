@@ -165,17 +165,62 @@ exports.delete = async(ctx) => {
     }
 }
 
-// exports.update = async(ctx)=>{
+exports.update = async(ctx)=>{
+  const { id } = ctx.params;
+  if(await franchise.isExist(id)===0){
+      ctx.throw(400, "없는 매물입니다")
+  }
 
-// }
+  const params = Joi.object({
+    franchise_name: Joi.string().required(), // : 컨텐츠에 표시될 텍스트, 검색될 이름
+    franchise_tag: Joi.string().valid(...tagArr).required(), // : 프론트에서 정해줘야 함 ex) 양식, 중식, 분식 등등
+    // franchise_logo: Joi.string().required(), // : franchise 로고
 
-exports.test = async(ctx, next)=>{
-    console.log('!!!!!!!!!test!!!!!!!!!!!!')
-    return await next();
+    // 가맹정보 부분 //////////////////////////////////////////////////
+    franchise_storenum: Joi.number().integer().required(),     // 매장 수
+    franchise_cost: Joi.number().integer().required(),         // 창업 비용
+    franchise_monthSale: Joi.number().integer().required(),    // 월 평균 매출액
+    // franchise_name //> 이 부분은 위에 등록 해 두었음 : 상호명
+    franchise_ceo: Joi.string().required(),  // 대표
+    franchise_type: Joi.string().required(), // 사업자 유형
+    franchise_address: Joi.string().required(), // 주소
+    franchise_registnum: Joi.string().required(), // 사업자등록번호
+    franchise_crn: Joi.string().required(),  // 법인등록번호
+    franchise_phone: Joi.string().required(), // 대표 번호
+    franchise_fax: Joi.string().required(),  // 대표 팩스 번호
+    franchise_detailsale: Joi.string().required(), // 브랜드 창업 비용
+                                    //: 도표에 들어가는 자료인데 구분자로 여래개 받아서 넣을 듯
+    // 아래 3개의 정보들은 배열로 넣는데 2010~2021 순인데 년도가 수정되면 추가할 수 있음
+    // 그래프용 연별 매출
+    franchise_month_sales: Joi.string().required(),
+    // 그 가맹점 증감추이
+    franchise_market_num: Joi.string().required(),
+    // 그 가맹점 계약 현황
+    franchise_market_contract: Joi.string().required(),
+
+    // ////////////////////////////////////////////////////////////////
+
+    brand_introduce: Joi.string().required(), // 브랜드 정보 / 브랜드 소개
+    // brand_menu: Joi.string().required(), // 브랜드 정보 / 브랜드 대표메뉴
+    brand_competitiveness: Joi.string().required(), // 브랜드 정보 -> html 로 바로 넣을거임
+    // brand_video: Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
+
+    blog_review: Joi.string().required()
+  }).validate(ctx.request.body);
+
+  if(params.error) ctx.throw(400, "잘못된 요청입니다.");
+
+  await franchise.update(id, {
+    ...params.value,
+    updateAt: new Date()
+  });
+
+  ctx.body = {
+    status: 200
+  }
 }
 
 exports.delImg = async (ctx)=>{
-    // TODO: id 가 존재하는 값인지 검증해야 함-->생각해보고 굳이 필요없겠다고 생각들면 안할것
     const { id } = ctx.params;
     if(await franchise.isExist(id)===0){
         ctx.throw(400, "없는 매물입니다")

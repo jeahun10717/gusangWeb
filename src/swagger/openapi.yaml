@@ -579,7 +579,7 @@ paths:
             enum:
               - common
               - live
-              - markete
+              - market
           description: 컨텐츠 타입(총 4개)
           required: true
         - in: query
@@ -692,10 +692,9 @@ paths:
                 contents_type:
                   type: string
                   enum:
-                    - preview video
-                    - 360 vr
+                    - common
                     - live
-                    - marketrs
+                    - market
                   description:  영상, 360 vr, 주거, 상가
                 local_address:
                   type: string
@@ -949,10 +948,9 @@ paths:
           schema:
             type: string
             enum:
-              - preview video
-              - 360 vr
+              - common
               - live
-              - markete
+              - market
           description: 컨텐츠 타입(총 4개)
           required: true
         - in: query
@@ -1009,8 +1007,7 @@ paths:
           schema:
             type: string
             enum:
-              - preview video
-              - 360 vr
+              - common
               - live
               - market
           description: 4개 중에 1개 선택
@@ -1059,8 +1056,7 @@ paths:
                 contents_type:
                   type: string
                   enum:
-                    - preview video
-                    - 360 vr
+                    - common
                     - live
                     - market
                   default: preview video
@@ -1208,8 +1204,7 @@ paths:
                 contents_type:
                   type: string
                   enum:
-                    - preview video
-                    - 360 vr
+                    - common
                     - live
                     - market
                   default: preview video
@@ -1563,10 +1558,10 @@ paths:
                     - education
                     - life
                   description: 프랜차이즈 태그</br>
-                    cafe(카페), bakery(제과제빵) ,dessert(디저트), chicken(치킨), pizza(피자),</br>
-                    korean(한식), chinese(중식), japanese(일식) ,special(별식, 퓨전요리), snack(분식),</br>
-                    fastfood(패스트푸드), pub(주점), convStore(편의점), sale(도소매), laundry(빨래방),</br>
-                    pcRoom(pc방), game(여가, 오락), studyCafe(스터디카페, 독서실), education(교육, 육아), life(생활서비스)
+                      cafe(카페), bakery(제과제빵) ,dessert(디저트), chicken(치킨), pizza(피자),</br>
+                      korean(한식), chinese(중식), japanese(일식) ,special(별식, 퓨전요리), snack(분식),</br>
+                      fastfood(패스트푸드), pub(주점), convStore(편의점), sale(도소매), laundry(빨래방),</br>
+                      pcRoom(pc방), game(여가, 오락), studyCafe(스터디카페, 독서실), education(교육, 육아), life(생활서비스)
                 franchise_logo:
                   type: string
                   format: binary
@@ -1690,6 +1685,160 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 
+  /franchise/update/{id}:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Franchise
+      summary: 프랜차이즈 update 부분 중 텍스트 관련만.
+      description: 데이터(영상, 사진등) 을 제외한 텍스트 관련한 것만 업데이트함</br>
+                  하지만 brand_menutext 는 이미지에 대한 설명이므로 upImg, delImg api 에서 따로 처리함
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                franchise_name:
+                  type: string
+                  description: 컨텐츠에 표시될 텍스트, 검색될 이름
+                franchise_tag:
+                  type: string
+                  enum:
+                    - cafe
+                    - bakery
+                    - dessert
+                    - chicken
+                    - pizza
+                    - korean
+                    - chinese
+                    - japanese
+                    - special
+                    - snack
+                    - fastfood
+                    - pub
+                    - convStore
+                    - sale
+                    - laundry
+                    - pcRoom
+                    - game
+                    - studyCafe
+                    - education
+                    - life
+                  description: 프랜차이즈 태그</br>
+                    cafe(카페), bakery(제과제빵) ,dessert(디저트), chicken(치킨), pizza(피자),</br>
+                    korean(한식), chinese(중식), japanese(일식) ,special(별식, 퓨전요리), snack(분식),</br>
+                    fastfood(패스트푸드), pub(주점), convStore(편의점), sale(도소매), laundry(빨래방),</br>
+                    pcRoom(pc방), game(여가, 오락), studyCafe(스터디카페, 독서실), education(교육, 육아), life(생활서비스)
+
+                franchise_storenum:
+                  type: string
+                  description: 매장 수
+                franchise_cost:
+                  type: string
+                  description: 창업 비용
+                franchise_monthSale:
+                  type: string
+                  description: 월 평균 매출액
+
+                franchise_ceo:
+                  type: string
+                  description: 대표
+                franchise_type:
+                  type: string
+                  description: 사업자 유형
+                franchise_address:
+                  type: string
+                  description: 주소
+                franchise_registnum:
+                  type: string
+                  description: 사업자등록번호
+                franchise_crn:
+                  type: string
+                  description:  법인등록번호
+                franchise_phone:
+                  type: string
+                  description: 대표 번호
+                franchise_fax:
+                  type: string
+                  description:  대표 팩스 번호
+                franchise_detailsale:
+                  type: string
+                  description: 브랜드 창업 비용
+
+                franchise_month_sales:
+                  type: string
+                  description:  그래프용 가맹점 연별 월매출 평균. 아래의 규칙을 따름</br>
+                                1. 배열로 들어가야 함</br>
+                                2. 2010 년 부터 차례로 들어감</br>
+                                3. 만약 년도에 대한 자료가 없을 경우 0 으로 삽입해야 함</br>
+                                  ex) [0,0,0,0,0,0,0,0,0,10,12,26]</br>
+                                4. 또한 해가 바뀌었을 경우 바로 뒤에 붙일수 있게 해야 함</br>
+                                  ex) 2022 년 50 이라는 정보가 들어왔을 경우</br>
+                                    [0,0,0,0,0,0,0,0,0,10,12,26, 50 ]</br>
+                franchise_market_num:
+                  type: string
+                  description:  그래프용 가맹점 연별 월매출 평균. 아래의 규칙을 따름</br>
+                                1. 배열로 들어가야 함</br>
+                                2. 2010 년 부터 차례로 들어감</br>
+                                3. 만약 년도에 대한 자료가 없을 경우 0 으로 삽입해야 함</br>
+                                  ex) [0,0,0,0,0,0,0,0,0,10,12,26]</br>
+                                4. 또한 해가 바뀌었을 경우 바로 뒤에 붙일수 있게 해야 함</br>
+                                  ex) 2022 년 50 이라는 정보가 들어왔을 경우</br>
+                                    [0,0,0,0,0,0,0,0,0,10,12,26, 50 ]</br>
+                franchise_market_contract:
+                  type: string
+                  description:  그래프용 가맹점 연별 월매출 평균. 아래의 규칙을 따름</br>
+                                1. 배열로 들어가야 함</br>
+                                2. 2010 년 부터 차례로 들어감</br>
+                                3. 만약 년도에 대한 자료가 없을 경우 0 으로 삽입해야 함</br>
+                                  ex) [0,0,0,0,0,0,0,0,0,10,12,26]</br>
+                                4. 또한 해가 바뀌었을 경우 바로 뒤에 붙일수 있게 해야 함</br>
+                                  ex) 2022 년 50 이라는 정보가 들어왔을 경우</br>
+                                    [0,0,0,0,0,0,0,0,0,10,12,26, 50 ]</br>
+
+                brand_introduce:
+                  type: string
+                  description: 브랜드 정보 / 브랜드 소개
+                brand_competitiveness:
+                  type: string
+                  description:  // 브랜드 정보 -> html 로 바로 넣을거임
+
+                blog_review:
+                  type: string
+                  description: 네이버 블로그 링크(iframe)
+
+              required:
+                - franchise_name
+                - franchise_tag
+                - franchise_storenum
+                - franchise_cost
+                - franchise_monthSale
+                - franchise_ceo
+                - franchise_type
+                - franchise_address
+                - franchise_registnum
+                - franchise_crn
+                - franchise_phone
+                - franchise_fax
+                - franchise_detailsale
+                - franchise_month_sales
+                - franchise_market_num
+                - franchise_market_contract
+                - brand_introduce
+                - brand_competitiveness
+                - blog_review
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
 
   /franchise/upImg:
     post:
@@ -1750,6 +1899,64 @@ paths:
         '200':
           $ref: '#/components/responses/200'
 
+  /franchise/delImg/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Franchise
+      summary: update 를 하기 위한 이미지 삭제 api
+      description: 기본적인 동작은 target id, 삭제할 칼럼이름, 이미지 링크 이름(S3 key) 을 통해 이미지 삭제하는 api. </br>
+                단 field 가 brand_menu 일 때 삭제할 이미지에 대한 brand_menutext 의 텍스트가 삭제됨.</br>
+                update 를 하기 위해 삭제하는 api 와 사진만을 삭제하고 싶을때도 사용할 수 있는 api 임.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: 매물의 id
+
+        - in: query
+          name: field
+          schema:
+            type: string
+            enum:
+              - franchise_logo
+              - brand_menu
+              - brand_video
+            required: true
+          description: DB 상의 칼럼 이름
+        - in: query
+          name: key
+          schema:
+            type: string
+            required: true
+          description: S3 에 저장되어 있는 key 값. DB 상의 배열안에 들어있는 이미지 링크
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+  /franchise/remove/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Franchise
+      summary: 프랜차이즈 매물 삭제함
+      description: >
+        컨텐츠를 삭제하는 api</br>
+
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+            $ref: '#/components/responses/200'
 
 # === consult ============================================================
 

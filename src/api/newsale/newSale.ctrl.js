@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { S3 } = require('../../lib');
 const { newsale } = require('../../databases');
+const upload = S3.upload();
 //TODO: 퍼블리싱 하기 전 킽의 contentNum 을 15 로 고쳐야 함
 const contentNum = 2;
 
@@ -128,12 +129,27 @@ exports.create = async (ctx) => {
         kakaomap_info_latitude : Joi.number().required(),
         kakaomap_info_longtitude : Joi.number().required(),
         kakaomap_info_address : Joi.string().required(),
-    }).validate(ctx.request.body)
+    }).validate(ctx.request.body);
+
+    console.log(params.error);
+
     if(params.error) {
-        ctx.throw(400);
+      const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+      const vr_image = ctx.files['vr_image'].map(i=>i.key);
+      const info_image = ctx.files['info_image'].map(i=>i.key);
+      const preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
+      const allFile = [
+        ...thumnail_image,
+        ...vr_image,
+        ...info_image,
+        ...preview_video_link
+      ]
+      for (let i = 0; i < allFile.length; i++) {
+        S3.delete(allFile[i]);
+      }
+      ctx.throw(400, "잘못된 요청입니다.")
     }
 
-    // console.log(ctx.files);
     let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
     let vr_image = ctx.files['vr_image'].map(i=>i.key);
     let info_image = ctx.files['info_image'].map(i=>i.key);
@@ -163,13 +179,32 @@ exports.delete = async(ctx) => {
     const { id } = ctx.params;
     // TODO: 나중에 시간 나면 s3 에서 사진 지우는 코드 작성해야 함
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
-    if(newsale.isExist(id)){
-        await newsale.delete(id)
-        ctx.body = {
-            status : 200
-        }
-    }else{
-        ctx.throw(400)
+    if(!(await newsale.isExist(id))) console.log("testefadfsef");
+
+    const binData = await newsale.getImgs(id);
+
+    const thumnail_image = JSON.parse(binData.thumnail_image);
+    const preview_video_link = JSON.parse(binData.preview_video_link);
+    const vr_image = JSON.parse(binData.vr_image);
+    const info_image = JSON.parse(binData.info_image);
+
+    for (var i = 0; i < thumnail_image.length; i++) {
+      S3.delete(thumnail_image[i]);
+    }
+    for (var i = 0; i < preview_video_link.length; i++) {
+      S3.delete(preview_video_link[i]);
+    }
+    for (var i = 0; i < vr_image.length; i++) {
+      S3.delete(vr_image[i]);
+    }
+    for (var i = 0; i < info_image.length; i++) {
+      S3.delete(info_image[i]);
+    }
+
+    await newsale.delete(id);
+
+    ctx.body = {
+      status: 200
     }
 }
 
@@ -219,10 +254,8 @@ exports.update = async (ctx) => {
         kakaomap_info_address : Joi.string().required(),
     }).validate(ctx.request.body)
     if(params.error) {
-        ctx.throw(400);
+        ctx.throw(400, "잘못된 요청입니다.");
     }
-
-// TODO: update at 설정하기
 
     // const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
     // const vr_image = ctx.files['vr_image'].map(i=>i.key);
@@ -255,7 +288,10 @@ exports.delImg = async (ctx)=>{
         field: Joi.string().valid("thumnail_image","preview_video_link","vr_image","info_image").required(),
         key: Joi.string().required()
     }).validate(ctx.query);
-    if(params.error) ctx.throw(400, '잘못된 요청');
+    if(params.error) {
+      // S3.delete(params.value.key);
+      ctx.throw(400, '잘못된 요청 입니다.');
+    }
 
     const { field, key } = params.value;
 
@@ -264,16 +300,13 @@ exports.delImg = async (ctx)=>{
 
     const idx = data.indexOf(key);
     if(idx == -1){
-        ctx.body = {
-            status: 400,
-            msg: "없는 이미지 입니다"
-        }
+        ctx.throw(400, "없는 이미지입니다.")
     }else{
-        console.log({
-            [field]: [...data.slice(0, idx), ...data.slice(idx+1, data.length)]
-        },JSON.stringify({
-            [field]: [...data.slice(0, idx), ...data.slice(idx+1, data.length)]
-        }))
+        // console.log({
+        //     [field]: [...data.slice(0, idx), ...data.slice(idx+1, data.length)]
+        // },JSON.stringify({
+        //     [field]: [...data.slice(0, idx), ...data.slice(idx+1, data.length)]
+        // }))
         await newsale.insertImgs({
             [field]: JSON.stringify([...data.slice(0, idx), ...data.slice(idx+1, data.length)])
         }, id)
@@ -286,12 +319,28 @@ exports.delImg = async (ctx)=>{
 }
 //key 와 field 로 추가하는 소스 필요함
 exports.upImg = async (ctx)=>{
-    const { id, field, imgIdx } = ctx.query;
-    // console.log(typeof imgIdx);
+    const params = Joi.object({
+      id: Joi.number().integer().required(),
+      field: Joi.string().regex(/\bthumnail_image\b|\bpreview_video_link\b|\bvr_image\b|\binfo_image\b/).required(),
+      imgIdx: Joi.number().integer().required()
+    }).validate(ctx.query)
+
+    if(params.error){
+      S3.delete(ctx.files[`${params.value.field}`][0].key);
+      ctx.throw(400, "잘못된 요청입니다.")
+    }
+
+    const { id, field, imgIdx } = params.value;
+
+    if(await newsale.isExist(id)===0) {
+      S3.delete(ctx.files[`${field}`][0].key);
+      ctx.throw(400, "없는 매물입니다.")
+    }
+
+    // TODO: imgIdx 은 검증이 안됨. 나중에 검증 추가하기
 
     const result = await newsale.getImgsFromField(id, field);
     const data = JSON.parse(result[field])
-    // console.log(data);
 
     let imgInfo = ctx.files[`${field}`]
     // console.log(imgInfo);

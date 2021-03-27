@@ -14,7 +14,9 @@ exports.pagenate = async (ctx) => {
         type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
         pagenum: Joi.number().integer()
     }).validate(ctx.query)
+
     console.log(params.error);
+
     if(params.error){
         ctx.throw(400)
     }
@@ -130,7 +132,7 @@ exports.create = async (ctx) => {
         kakaomap_info_longtitude : Joi.number().required(),    // 경도
         kakaomap_info_address : Joi.string().required(), // 주소
     }).validate(ctx.request.body)
-
+    // console.log(params.error);
     if(params.error) ctx.throw(400, "잘못된 요청입니다.")
 
     let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);

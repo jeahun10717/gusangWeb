@@ -5,6 +5,8 @@
 * franchise, interior, newSale delete api 에서 S3 데이터 지우는 소스 추가해야 함.
 * franchise, interior, newSale 바이너리 데이터를 사용하는 api 들 모두 200 이 아닌 다른 status 가 떴을 때
   S3 에 업로드 된 자료들 지워야 함.
+* 링크가 직접 들어가는(https:// 를 포함하는) api 들은 joi 검증 만들어야 함
+* S3 업로드를 하는 api 들 중 갯수제한이 있을 때 그 갯수를 `{file}.ctrl.js` 파일에서 검증하는 소스 필요함.
 * xss 적용하기
 * S3 모듈 중에 extention 적용하기
 * naver, kakao 퍼블리싱 게정 적용하기
@@ -24,15 +26,8 @@
 
 ## 1. to back-end engineer
 
-1. ~~search api 에서 aaa bbb ccc 로 검색했을 때 aaa 가 먼저 정렬되도록 하려면 어떻게?~~
-2. ~~이미지, 동영상을 업로드 할 때 create 를 할 때 링크를 따로 넣어줘야 함?~~
-3. ~~DB 에 대한 필터링 걸 때 노하우? if 문이 너무 많아져서 복잡해 보임~~
-4. ~~views 를 올리는 기준은 detail api 인데 이 api가 get method 이다. 그런데 views 를 올리려면 update 가 있어야 한다. 즉 post 를 써야 하는데 이 문제는 어떻게 해결해야 함? 지금 생각나는 건 2가지~~
-~~--> 1. get() 으로 정보 가져오고 이후 바로 post 로 views update~~
-~~--> 2. 애초에 detail api 를 post 로 요청해서 views update 를 동시에 처리~~
-5. ~~naver Oauth api 관련해서 `/api/users/exist` 와 `/api/users/add` 2개의 api 가 던져주는 access_token 의 차이점은? 기본적으로 BearerAuth 검증을 위한 token 은 exist 에 존재.~~
-6. client 가 만약 쿠키에 토큰을 가지고 있을 때 그 토큰이 유효한지 어떻게 검증해야 함?
-7. front 에서 넘어오는 개행이 포함된 문자열은 db 에 저장할 때 `\n` 로 저장됨?
+1. `newsale`, `interior`, `frachise` 의 바이너리 데이터를 다루는 api 에서 만약 `400` 을 던져줄 때 S3 에서 데이터 지우는 건 구현 했음. 혹시 내가 한 방법 말고 조금 더 간단한 방법은 없나?
+2. `newSale.ctrl.js` 파일에서 `exports.delete` 함수에서 반복적으로 사용되는 것들 간략화 하는 방법 없나?
 
 ## 2. to front-end engineer
 

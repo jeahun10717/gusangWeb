@@ -150,21 +150,6 @@ exports.create = async (ctx) => {
     }
 }
 
-exports.delete = async(ctx) => {
-    const { id } = ctx.params;
-
-    console.log(ctx.params);
-    //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
-    if(franchise.isExist(id)){
-        await franchise.delete(id)
-        ctx.body = {
-            status : 200
-        }
-    }else{
-        ctx.throw(400)
-    }
-}
-
 exports.update = async(ctx)=>{
   const { id } = ctx.params;
   if(await franchise.isExist(id)===0){
@@ -349,5 +334,19 @@ exports.upImg = async (ctx)=>{
           status: 200
       }
     }
+}
 
+exports.delete = async(ctx) => {
+    const { id } = ctx.params;
+
+    console.log(ctx.params);
+    //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
+    if(franchise.isExist(id)){
+        await franchise.delete(id)
+        ctx.body = {
+            status : 200
+        }
+    }else{
+        ctx.throw(400)
+    }
 }

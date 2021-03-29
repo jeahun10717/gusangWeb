@@ -10,12 +10,12 @@ exports.pagenate = async (ctx) => {
     const params = Joi.object({
         order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
         localCode: Joi.string().required(), // TODO: 문자 개수 로컬코드 갯수로 검증해야 함
-        conType: Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(),
+        conType: Joi.string().regex(/\bnoFilter\b|\bcommon\b|\blive\b|\bmarket\b/).required(),
         type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
-        pagenum: Joi.number().integer()
+        page: Joi.number().integer()
     }).validate(ctx.query)
 
-    console.log(params.error);
+    // console.log(params.error);
 
     if(params.error){
         ctx.throw(400)
@@ -23,13 +23,13 @@ exports.pagenate = async (ctx) => {
     // show/:type/:id
     // 위의 api router 에서 type 은 최신순, 조회순
     // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
-    const { order, localCode, conType, type, pagenum } = params.value;
+    const { order, localCode, conType, type, page } = params.value;
     // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
     // type : {views, id} --> id 는 최신순 정렬하는 거
     // console.log(ctx.query);
     // TODO: query 에서 원하는 값이 안들어오면 400 띄우는 소스 필요
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
-    const result = await interior.pagination( order, type, localCode, conType, pagenum, contentNum);
+    const result = await interior.pagination( order, type, localCode, conType, page, contentNum);
 
     const conNum = await interior.conNum();
 
@@ -37,7 +37,7 @@ exports.pagenate = async (ctx) => {
         status : 200,
         result,
         conNum: conNum[0].cnt,
-        pageNum: Math.ceil(conNum[0].cnt/contentNum)
+        page: Math.ceil(conNum[0].cnt/contentNum)
     }
 }
 
@@ -72,7 +72,7 @@ exports.detail = async (ctx) => {
 exports.search = async (ctx) => {
     const params = Joi.object({
         searchName: Joi.string().required(),
-        conType: Joi.string().required(),
+        conType: Joi.string().regex(/\bnoFilter\b|\bcommon\b|\blive\b|\bmarket\b/).required(),
         page: Joi.number().integer().required()
     }).validate(ctx.query);
 
@@ -92,7 +92,7 @@ exports.search = async (ctx) => {
         status : 200,
         result,
         conNum: conNum[0].cnt,
-        pageNum: Math.ceil(conNum[0].cnt/contentNum)
+        page: Math.ceil(conNum[0].cnt/contentNum)
     }
 }
 
@@ -132,8 +132,21 @@ exports.create = async (ctx) => {
         kakaomap_info_longtitude : Joi.number().required(),    // 경도
         kakaomap_info_address : Joi.string().required(), // 주소
     }).validate(ctx.request.body)
-    // console.log(params.error);
-    if(params.error) ctx.throw(400, "잘못된 요청입니다.")
+
+    if(params.error) {
+      const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+      const preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
+      const image_link = ctx.files['image_link'].map(i=>i.key);
+      const allFile = [
+        ...thumnail_image,
+        ...preview_video_link,
+        ...image_link,
+      ]
+      for (let i = 0; i < allFile.length; i++) {
+        S3.delete(allFile[i]);
+      }
+      ctx.throw(400, "잘못된 요청입니다.")
+    }
 
     let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
     let preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
@@ -145,15 +158,16 @@ exports.create = async (ctx) => {
 
     await interior.insert({
         ...params.value,
-        thumnail_image,
-        preview_video_link,
-        image_link,
+        thumnail_image: thumnail_image,
+        preview_video_link: preview_video_link,
+        image_link: image_link,
         views:0
     });
 
     ctx.body ={
         status: 200
     }
+
 }
 
 exports.delete = async(ctx) => {
@@ -271,32 +285,49 @@ exports.delImg = async (ctx)=>{
 exports.upImg = async (ctx)=>{
     const params = Joi.object({
         id: Joi.number().integer().required(),
-        field: Joi.string().required(),
+        field: Joi.string().valid('thumnail_image','preview_video_link','image_link').required(),
         imgIdx: Joi.number().integer().required()
     }).validate(ctx.query);
 
     if(params.error){
-        ctx.throw(400);
+      S3.delete(ctx.files[`${params.value.field}`][0].key);
+      ctx.throw(400, "잘못된 요청입니다.")
     }
 
     const { id, field, imgIdx } = params.value;
 
-    // console.log(params.value);
-    if(await interior.isExist(id)===0){
-        ctx.throw(400, "없는 매물입니다")
+    const imgExist = await interior.getImgs(id)
+    const imgArr = JSON.parse(imgExist[`${field}`]);
+
+    if(imgIdx > imgArr.length) {
+      S3.delete(ctx.files[`${field}`][0].key);
+      ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
     }
+
+    if(field === 'thumnail_image'||field === 'preview_video_link'){
+      if(imgExist[`${field}`] != '[]'){
+        S3.delete(ctx.files[`${field}`][0].key);
+        ctx.throw(400, "해당 필드는 데이터가 2개이상 들어갈 수 없습니다.(데이터가 이미 존재함).")
+      }
+    }
+
+    if(await interior.isExist(id)===0) {
+      S3.delete(ctx.files[`${field}`][0].key);
+      ctx.throw(400, "없는 매물입니다.")
+    }
+
+    // TODO: imgIdx 은 검증이 안됨. 나중에 검증 추가하기
 
     const result = await interior.getImgsFromField(id, field);
     const data = JSON.parse(result[field])
-    // console.log(data);
 
     let imgInfo = ctx.files[`${field}`]
     // console.log(imgInfo);
-    const imgName = imgInfo[0].key;
+    imgName = imgInfo[0].key;
     // console.log(imgName);
 
     // console.log(data);
-    data.splice(imgIdx, 0, imgName);
+    data.splice(imgIdx, 0,imgName);
     // console.log(data);
 
     await interior.insertImgs({
@@ -309,15 +340,29 @@ exports.upImg = async (ctx)=>{
 }
 
 exports.delete = async(ctx) => {
-    const { id } = ctx.params;
-    // TODO: 나중에 시간 나면 s3 에서 사진 지우는 코드 작성해야 함
-    //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
-    if(newsale.isExist(id)){
-        await newsale.delete(id)
-        ctx.body = {
-            status : 200
-        }
-    }else{
-        ctx.throw(400)
-    }
+  const { id } = ctx.params;
+  //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
+  if(!(await interior.isExist(id))) ctx.throw(400, "없는 매물입니다.")
+
+  const binData = await interior.getImgs(id);
+
+  const thumnail_image = JSON.parse(binData.thumnail_image);
+  const preview_video_link = JSON.parse(binData.preview_video_link);
+  const image_link = JSON.parse(binData.image_link);
+
+  for (var i = 0; i < thumnail_image.length; i++) {
+    S3.delete(thumnail_image[i]);
+  }
+  for (var i = 0; i < preview_video_link.length; i++) {
+    S3.delete(preview_video_link[i]);
+  }
+  for (var i = 0; i < image_link.length; i++) {
+    S3.delete(image_link[i]);
+  }
+
+  await interior.delete(id);
+
+  ctx.body = {
+    status: 200
+  }
 }

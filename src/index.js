@@ -3,6 +3,9 @@ const koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
+const xss = require('xss');
+const helmet = require('koa-helmet')
+
 
 const app = new koa();
 const router = new Router();
@@ -143,8 +146,13 @@ router.get('/add', ctx=>{
 //    const kakaoData = await oauth.kakao(code);
 //    ctx.body = kakaoData;
 // });
-
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 router.use('/api', api.routes());
+
 app.use(cors());
 app.use(serve('./public'))
 app.use(bodyParser());

@@ -9,20 +9,20 @@ exports.pagenate = async (ctx) => {
     const params = Joi.object({
         order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
         localCode: Joi.string().required(), // TODO: 문자 개수 로컬코드 갯수로 검증해야 함
-        conType: Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(),
+        conType: Joi.string().regex(/\bnoFilter\b|\bcommon\b|\blive\b|\bmarket\b/).required(),
         type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
-        pagenum: Joi.number().integer().required()
+        page: Joi.number().integer().required()
     }).validate(ctx.query);
     console.log(params.error);
     if(params.error){
         ctx.throw(400)
     }
     // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
-    const { order, localCode, conType, type, pagenum } = ctx.query;
+    const { order, localCode, conType, type, page } = ctx.query;
     // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
     // type : {views, id} --> id 는 최신순 정렬하는 거
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
-    const result = await newsale.pagination( order, type, localCode, conType, pagenum, contentNum);
+    const result = await newsale.pagination( order, type, localCode, conType, page, contentNum);
     const conNum = await newsale.conNum();
 
 
@@ -67,7 +67,7 @@ exports.detail = async (ctx) => {
 exports.search = async (ctx) => {
     const params = Joi.object({
         searchName: Joi.string().required(),
-        conType: Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(),
+        conType: Joi.string().regex(/\bnoFilter\b|\bcommon\b|\blive\b|\bmarket\b/).required(),
         page: Joi.number().integer().required()
     }).validate(ctx.query);
 
@@ -113,7 +113,7 @@ exports.create = async (ctx) => {
         // info_image : Joi.string().required(), // 안내자료에 들어갈 이미지 로컬링크
 
         // 설명 부분
-        newsale_info_type : Joi.number().required(),            // 1. 타입
+        newsale_info_type : Joi.string().required(),            // 1. 타입
         newsale_info_housenum : Joi.number().required(),        // 2. 총 세대수
         newsale_info_parknum : Joi.number().required(),         // 3. 주차 대수
         newsale_info_width : Joi.number().required(),           // 4. 평형대
@@ -179,7 +179,7 @@ exports.delete = async(ctx) => {
     const { id } = ctx.params;
     // TODO: 나중에 시간 나면 s3 에서 사진 지우는 코드 작성해야 함
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
-    if(!(await newsale.isExist(id))) console.log("testefadfsef");
+    if(!(await newsale.isExist(id))) ctx.throw(400, "없는 매물입니다.")
 
     const binData = await newsale.getImgs(id);
 
@@ -331,6 +331,21 @@ exports.upImg = async (ctx)=>{
     }
 
     const { id, field, imgIdx } = params.value;
+
+    const imgExist = await newsale.getImgs(id)
+    const imgArr = JSON.parse(imgExist[`${field}`]);
+
+    if(imgIdx > imgArr.length) {
+      S3.delete(ctx.files[`${field}`][0].key);
+      ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
+    }
+
+    if(field === 'thumnail_image'||field === 'preview_video_link'){
+      if(imgExist[`${field}`] != '[]'){
+        S3.delete(ctx.files[`${field}`][0].key);
+        ctx.throw(400, "해당 필드는 데이터가 2개이상 들어갈 수 없습니다.(데이터가 이미 존재함).")
+      }
+    }
 
     if(await newsale.isExist(id)===0) {
       S3.delete(ctx.files[`${field}`][0].key);

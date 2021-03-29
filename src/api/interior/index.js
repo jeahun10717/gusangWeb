@@ -6,18 +6,6 @@ const { auth, S3 } = require('../../lib');
 const upload = S3.upload();
 
 interior
-.get('/', (ctx)=>{
-  ctx.body=
-    `<html>
-        <head>
-            <script src="https://storage.googleapis.com/vrview/2.0/build/vrview.min.js"></script>
-        </head>
-        <body>
-          <img src="https://jeahun-test.s3.ap-northeast-2.amazonaws.com/test/rvMpuh4YCptGxx2a1616558927219.png">
-        </body>
-    </html>
-`
-})
 .get('/detail/:id', interiorCtrl.detail) // 한개의 정보전체를 뿌려주는 라우트
 .get('/search', interiorCtrl.search) // 검색 정렬을 위한 라우트 + 페이지네이션
 .get('/show', interiorCtrl.pagenate)   // 15개씩 보여주는 페이지를 위한 페이지네이션 포함 라우트

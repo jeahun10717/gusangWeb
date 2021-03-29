@@ -18,11 +18,47 @@ exports.delete = async(id)=>{
 
 // order 는 desc, asc / type 은 views, id
 exports.pagination = async(order, type, localCode, conType, page, contents) =>{
-    return await db.query(`select contents_name, contents_type, local_address, thumnail_image, preview_video_link, views from newSale where contents_type = ? and local_address = ? order by ${type} ${order} limit ? offset ?`
-    ,[conType, localCode, contents, page * contents]);
+    if(localCode === 'noFilter'){
+      if(conType === 'noFilter'){
+        return await db.query(`select id, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
+          from newSale
+          order by ${type} ${order} limit ? offset ?`
+        ,[contents, page * contents]);
+      }else{
+        return await db.query(`select id, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
+          from newSale
+          where contents_type = ? order by ${type} ${order} limit ? offset ?`
+        ,[conType, contents, page * contents]);
+      }
+    }else{
+      if(conType === 'noFilter'){
+        return await db.query(`select id, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
+          from newSale
+          where local_address = ? order by ${type} ${order} limit ? offset ?`
+        ,[localCode, contents, page * contents]);
+      }else{
+        return await db.query(`select id, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
+          from newSale
+          where contents_type = ? and local_address = ? order by ${type} ${order} limit ? offset ?`
+        ,[conType, localCode, contents, page * contents]);
+      }
+    }
 }
 
 exports.pageForSearch = async(name1, name2, name3, conType, page, contents) =>{
+  if(conType === 'noFilter'){
+    return await db.query(`select case
+	when contents_name like ? then locate(?, contents_name)+100
+	when contents_name like ? then locate(?, contents_name)+200
+	when contents_name like ? then locate(?, contents_name)+300
+  else 10000
+	end as zorder, id, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
+    from newSale
+    order by
+	    zorder
+        limit ? offset ?`
+    ,[`%${name1}%`,name1, `%${name2}%`, name2, `%${name3}%`, name3, contents, page * contents]);
+  }else{
     return await db.query(`select case
 	when contents_name like ? then locate(?, contents_name)+100
 	when contents_name like ? then locate(?, contents_name)+200
@@ -35,6 +71,7 @@ exports.pageForSearch = async(name1, name2, name3, conType, page, contents) =>{
 	    zorder
         limit ? offset ?`
     ,[`%${name1}%`,name1, `%${name2}%`, name2, `%${name3}%`, name3, conType, contents, page * contents]);
+  }
 }
 //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
 exports.isExist = async(id)=>{

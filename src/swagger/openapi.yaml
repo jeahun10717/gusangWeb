@@ -465,7 +465,7 @@ paths:
 
                 # 설명 부분
                 newsale_info_type:
-                  type: number
+                  type: string
                   description: 1. 타입
                 newsale_info_housenum:
                   type: number
@@ -577,6 +577,7 @@ paths:
           schema:
             type: string
             enum:
+              - noFilter
               - common
               - live
               - market
@@ -614,6 +615,7 @@ paths:
           schema:
             type: string
             enum:
+              - noFilter
               - 2644000000
               - 2641000000
               - 2629000000
@@ -630,6 +632,7 @@ paths:
               - 2611000000
               - 2635000000
               - 2671000000
+            default: noFilter
           description: 강서구, 금정구, 남구, 동구, 동래구, 부산진구, 북구, 사상구, 사하구, 서구, 수영구, 연제구, 영도구, 중구, 해운대구 순서임</br>
             위의 사항을 요청할 떄 front 에서는 지역코드를 노출시키는 게 아니라 지역코드에 해당하는 지역(구) 명을 노출시켜야 함
           required: true
@@ -638,6 +641,7 @@ paths:
           schema:
             type: string
             enum:
+              - noFilter
               - common
               - live
               - market
@@ -655,7 +659,7 @@ paths:
           required: true
 
         - in: query
-          name: pagenum
+          name: page
           schema:
             type: integer
           description: pagination 을 위한 페이지 번호
@@ -967,6 +971,7 @@ paths:
           schema:
             type: string
             enum:
+              - noFilter
               - common
               - live
               - market
@@ -1026,6 +1031,7 @@ paths:
           schema:
             type: string
             enum:
+              - noFilter
               - common
               - live
               - market
@@ -1043,7 +1049,7 @@ paths:
           required: true
 
         - in: query
-          name: pagenum
+          name: page
           schema:
             type: integer
           description: pagination 을 위한 페이지 번호
@@ -1344,7 +1350,6 @@ paths:
           required: true
 
       requestBody:
-        required: true
         content:
           multipart/form-data:
             schema:
@@ -1944,13 +1949,13 @@ paths:
               - franchise_logo
               - brand_menu
               - brand_video
-            required: true
+          required: true
           description: DB 상의 칼럼 이름
         - in: query
           name: key
           schema:
             type: string
-            required: true
+          required: true
           description: S3 에 저장되어 있는 key 값. DB 상의 배열안에 들어있는 이미지 링크
 
       responses:

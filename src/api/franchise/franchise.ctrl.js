@@ -11,7 +11,7 @@ const tagArr = ["cafe","bakery","dessert","chicken","pizza",
 exports.pagenate = async (ctx) => {
     const params = Joi.object({
         order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
-        tag: Joi.string().valid(...tagArr).required(),
+        tag: Joi.string().valid('noFilter',...tagArr).required(),
         type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
         pagenum: Joi.number().integer().required()
     }).validate(ctx.query);

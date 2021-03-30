@@ -134,11 +134,11 @@ exports.create = async (ctx) => {
     console.log(params.error);
 
     if(params.error) {
-      const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
-      const vr_image = ctx.files['vr_image'].map(i=>i.key);
-      const info_image = ctx.files['info_image'].map(i=>i.key);
-      const preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
-      const allFile = [
+      let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+      let vr_image = ctx.files['vr_image'].map(i=>i.key);
+      let info_image = ctx.files['info_image'].map(i=>i.key);
+      let preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
+      let allFile = [
         ...thumnail_image,
         ...vr_image,
         ...info_image,

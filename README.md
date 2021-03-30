@@ -2,9 +2,6 @@
 
 ## 1. 이번 주 내로 해결
 
-* franchise, interior, newSale delete api 에서 S3 데이터 지우는 소스 추가해야 함.
-* franchise, interior, newSale 바이너리 데이터를 사용하는 api 들 모두 200 이 아닌 다른 status 가 떴을 때
-  S3 에 업로드 된 자료들 지워야 함.
 * 링크가 직접 들어가는(https:// 를 포함하는) api 들은 joi 검증 만들어야 함
 * S3 업로드를 하는 api 들 중 갯수제한이 있을 때 그 갯수를 `{file}.ctrl.js` 파일에서 검증하는 소스 필요함.
 * xss 적용하기

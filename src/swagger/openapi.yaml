@@ -423,11 +423,11 @@ paths:
                 thumnail_image:
                   type: string
                   format: binary
-                  description: 매물에 대한 대표 이미지 링크
+                  description: 매물에 대한 대표 이미지 링크(1개)
                 preview_video_link:
                   type: string
                   format: binary
-                  description: 미리보기 영상 로컬링크
+                  description: 미리보기 영상 로컬링크(1개)
                 youtube_info_link:
                   type: string
                   description: 안내영상 링크(youtube link)
@@ -454,14 +454,14 @@ paths:
                     format: binary
 
                   description: >
-                    사진 슬라이드에 들어갈 이미지 로컬링크
+                    사진 슬라이드에 들어갈 이미지 로컬링크(1개 이상)
 
                 info_image:
                   type: array
                   items:
                     type: string
                     format: binary
-                  description: 안내자료에 들어갈 이미지 로컬링크
+                  description: 안내자료에 들어갈 이미지 로컬링크(1개 이상)
 
                 # 설명 부분
                 newsale_info_type:
@@ -898,19 +898,19 @@ paths:
                 thumnail_image:
                   type: string
                   format: binary
-                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것(1개)
                 preview_video_link:
                   type: string
                   format: binary
-                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것(1개)
                 vr_image:
                   type: string
                   format: binary
-                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것(1개)
                 info_image:
                   type: string
                   format: binary
-                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것(1개)
 
       responses:
         '200':
@@ -1111,12 +1111,12 @@ paths:
                 thumnail_image:
                   type: string
                   format: binary
-                  description: 대표 이미지 링크
+                  description: 대표 이미지 링크(1개)
 
                 preview_video_link:
                   type: string
                   format: binary
-                  description: 미리보기 영상 로컬링크
+                  description: 미리보기 영상 로컬링크(1개)
 
                 youtube_link:
                   type: string
@@ -1358,15 +1358,15 @@ paths:
                 thumnail_image:
                   type: string
                   format: binary
-                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것(1개)
                 preview_video_link:
                   type: string
                   format: binary
-                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것(1개)
                 image_link:
                   type: string
                   format: binary
-                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 query 필드에서 받아오는 필드에만 사진 넣을 것(1개)
 
       responses:
         '200':
@@ -1495,6 +1495,7 @@ paths:
           schema:
             type: string
             enum:
+              - noFilter
               - cafe
               - bakery
               - dessert
@@ -1589,7 +1590,7 @@ paths:
                 franchise_logo:
                   type: string
                   format: binary
-                  description: franchise 로고
+                  description: franchise 로고(1개)
 
                 franchise_storenum:
                   type: integer
@@ -1675,7 +1676,7 @@ paths:
                 brand_video:
                   type: string
                   format: binary
-                  description:  브랜드 정보 / 브랜드 홍보영상
+                  description:  브랜드 정보 / 브랜드 홍보영상(1개)
 
                 blog_review:
                   type: string
@@ -1904,15 +1905,15 @@ paths:
                 franchise_logo:
                   type: string
                   format: binary
-                  description: 위의 req-body 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 req-body 필드에서 받아오는 필드에만 사진 넣을 것(1개)
                 brand_menu:
                   type: string
                   format: binary
-                  description: 위의 req-body 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 req-body 필드에서 받아오는 필드에만 사진 넣을 것(1개)
                 brand_video:
                   type: string
                   format: binary
-                  description: 위의 req-body 필드에서 받아오는 필드에만 사진 넣을 것
+                  description: 위의 req-body 필드에서 받아오는 필드에만 사진 넣을 것(1개)
 
               required:
                 - id

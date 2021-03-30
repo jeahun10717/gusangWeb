@@ -19,12 +19,21 @@ exports.delete = async(id)=>{
 
 // order 는 desc, asc / type 은 views, id
 exports.pagination = async(order, type, tag, page, contents) =>{
+  if(tag === 'noFilter'){
+    return await db.query(`
+    select id, franchise_name, franchise_logo, franchise_tag
+    from franchise
+    order by ${type} ${order} limit ? offset ?`
+    ,[contents, page * contents]);
+  }else{
     return await db.query(`
     select id, franchise_name, franchise_logo, franchise_tag
     from franchise
     where franchise_tag = ?
     order by ${type} ${order} limit ? offset ?`
     ,[tag, contents, page * contents]);
+  }
+
 }
 
 // search 후 pagination

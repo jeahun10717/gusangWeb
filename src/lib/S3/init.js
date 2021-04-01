@@ -2,7 +2,8 @@ const AWS = require('aws-sdk');
 const multerS3 = require('multer-s3');
 const path = require('path');
 const randomString = require('random-string');
-
+const Joi = require('joi')
+// const extWhiteList = /\b.avi\b|\b.mp4\b|\b.m4v\b|\b.mov\b|\b.jpg\b|\b.jpeg\b|\b.jpe\b|\b.png\b|\b.gif\b|\b.tiff\b/
 const { AWS_S3_KEY, AWS_S3_SECRET, AWS_S3_REGION } = process.env;
 
 const s3 = new AWS.S3({
@@ -17,8 +18,10 @@ exports.getStorage = (bucket, folder)=>{
     s3: s3,
     bucket,
     key: function(req, file, cb){
-      let extension = path.extname(file.originalname);
-      cb(null, `${folder}/${randomString({length:16})+Date.now()+extension}`);
+      let extention = path.extname(file.originalname);
+      // const extVer = Joi.string().regex(extWhiteList).validate(extention);
+      // if(extVer.error) throw new Error(400);
+      cb(null, `${folder}/${randomString({length:16})+Date.now()+extention}`);
     },
     acl: 'public-read-write'
   });

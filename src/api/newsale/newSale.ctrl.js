@@ -23,15 +23,14 @@ exports.pagenate = async (ctx) => {
     // type : {views, id} --> id 는 최신순 정렬하는 거
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
     const result = await newsale.pagination( order, type, localCode, conType, page, contentNum);
-    const conNum = await newsale.conNum();
-
-
+    const conNum = await newsale.contentCnt(conType, localCode);
+    // console.log(conNum, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
     ctx.body = {
         status : 200,
         result,
-        conNum: conNum[0].cnt,
-        pageNum: Math.ceil(conNum[0].cnt/contentNum)
+        conNum: conNum,
+        pageNum: Math.ceil(conNum/contentNum)
     }
 }
 
@@ -80,13 +79,13 @@ exports.search = async (ctx) => {
     const data = searchName.split(' ');
 
     const result = await newsale.pageForSearch(data[0],data[1],data[2],conType,page, contentNum);
-    const conNum = await newsale.conNum();
+    const conNum = await newsale.contentCntForSearch(conType);
 
     ctx.body = {
         status : 200,
         result,
-        conNum: conNum[0].cnt,
-        pageNum: Math.ceil(conNum[0].cnt/contentNum)
+        conNum: conNum,
+        pageNum: Math.ceil(conNum/contentNum)
     }
 }
 

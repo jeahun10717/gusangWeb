@@ -26,10 +26,14 @@ exports.pagenate = async (ctx) => {
     // type : {views, id} //> id 는 최신순 정렬하는 거
     // TODO: 밑의 2 부분 30 으로 바꿔야 함
     const result = await franchise.pagination( order, type, tag, pagenum, contentNum);
+    const conNum = await franchise.contentCnt(tag);
+    // console.log(conNum, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
     ctx.body = {
         status : 200,
-        result
+        result,
+        conNum: conNum,
+        pageNum: Math.ceil(conNum/contentNum)
     }
 }
 
@@ -68,8 +72,8 @@ exports.search = async (ctx) => {
 
     const result = await franchise.pageForSearch(splitData[0],splitData[1],splitData[2], page, contentNum);
     // TODO: 위의 2 30 으로 바꾸기
-    //search pagenation 구현하기
-    // const final = await newsale.pageForSearch(result, pagenum, 2)
+
+    // const final = await franchise.pageForSearch(result, pagenum, 2)
     ctx.body = {
         status : 200,
         result
@@ -121,11 +125,23 @@ exports.create = async (ctx) => {
 
         blog_review: Joi.string().required()
     }).validate(ctx.request.body);
-    console.log(params.error);
-    console.log(params.value.brand_menutext);
+    // console.log(params.error);
+    // console.log(params.value.brand_menutext);
     if(params.error) {
-        ctx.throw(400, "잘못된 요청입니다.");
+      const franchise_logo = ctx.files['franchise_logo'].map(i=>i.key);
+      const brand_menu = ctx.files['brand_menu'].map(i=>i.key);
+      const brand_video = ctx.files['brand_video'].map(i=>i.key);
+      const allFile = [
+        ...franchise_logo,
+        ...brand_menu,
+        ...brand_video,
+      ]
+      for (let i = 0; i < allFile.length; i++) {
+        S3.delete(allFile[i]);
+      }
+      ctx.throw(400, "잘못된 요청입니다.")
     }
+
     // console.log(params.value[0].brand_menutext);
     // console.log();
 
@@ -272,15 +288,35 @@ exports.upImg = async (ctx)=>{
     }).validate(ctx.request.body);
 
     if(params.error){
+        S3.delete(ctx.files[`${params.value.field}`][0].key);
         ctx.throw(400, "잘못된 요청입니다.");
     }
-    console.log(params.value.field);
+
     if(params.value.field == "brand_menu"){
       const { id, field, imgIdx, menuText } = params.value;
       // console.log(params.value);
-      if(await franchise.isExist(id)===0){
-          ctx.throw(400, "없는 매물입니다")
+
+////////////검증관련 - 200 외의 status 는 들어온 S3 소스 지우는 소스/////////////////////
+      const imgExist = await franchise.getImgs(id)
+      const imgArr = JSON.parse(imgExist[`${field}`]);
+      // console.log(ctx.files);
+      if(imgIdx > imgArr.length) {
+        S3.delete(ctx.files[`${field}`][0].key);
+        ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
       }
+
+      if(field === 'thumnail_image'||field === 'preview_video_link'){
+        if(imgExist[`${field}`] != '[]'){
+          S3.delete(ctx.files[`${field}`][0].key);
+          ctx.throw(400, "해당 필드는 데이터가 2개이상 들어갈 수 없습니다.(데이터가 이미 존재함).")
+        }
+      }
+
+      if(await franchise.isExist(id)===0) {
+        S3.delete(ctx.files[`${field}`][0].key);
+        ctx.throw(400, "없는 매물입니다.")
+      }
+////////////////////////////////////////////////////////////////////////////////
 
       const result = await franchise.getImgsFromField(id, field);
       const data = JSON.parse(result[field])
@@ -307,6 +343,28 @@ exports.upImg = async (ctx)=>{
       }
     }else{
       const { id, field, imgIdx } = params.value;
+
+////////////검증관련 - 200 외의 status 는 들어온 S3 소스 지우는 소스/////////////////////
+      const imgExist = await franchise.getImgs(id)
+      const imgArr = JSON.parse(imgExist[`${field}`]);
+
+      if(imgIdx > imgArr.length) {
+        S3.delete(ctx.files[`${field}`][0].key);
+        ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
+      }
+
+      if(field === 'thumnail_image'||field === 'preview_video_link'){
+        if(imgExist[`${field}`] != '[]'){
+          S3.delete(ctx.files[`${field}`][0].key);
+          ctx.throw(400, "해당 필드는 데이터가 2개이상 들어갈 수 없습니다.(데이터가 이미 존재함).")
+        }
+      }
+
+      if(await franchise.isExist(id)===0) {
+        S3.delete(ctx.files[`${field}`][0].key);
+        ctx.throw(400, "없는 매물입니다.")
+      }
+////////////////////////////////////////////////////////////////////////////////
 
       // console.log(params.value);
       if(await franchise.isExist(id)===0){
@@ -338,15 +396,29 @@ exports.upImg = async (ctx)=>{
 
 exports.delete = async(ctx) => {
     const { id } = ctx.params;
-
-    console.log(ctx.params);
+    // TODO: 나중에 시간 나면 s3 에서 사진 지우는 코드 작성해야 함
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
-    if(franchise.isExist(id)){
-        await franchise.delete(id)
-        ctx.body = {
-            status : 200
-        }
-    }else{
-        ctx.throw(400)
+    if(!(await franchise.isExist(id))) ctx.throw(400, "없는 매물입니다.")
+
+    const binData = await franchise.getImgs(id);
+
+    const franchise_logo = JSON.parse(binData.franchise_logo);
+    const brand_menu = JSON.parse(binData.brand_menu);
+    const brand_video = JSON.parse(binData.brand_video);
+
+    for (var i = 0; i < franchise_logo.length; i++) {
+      S3.delete(franchise_logo[i]);
+    }
+    for (var i = 0; i < brand_menu.length; i++) {
+      S3.delete(brand_menu[i]);
+    }
+    for (var i = 0; i < brand_video.length; i++) {
+      S3.delete(brand_video[i]);
+    }
+
+    await franchise.delete(id);
+
+    ctx.body = {
+      status: 200
     }
 }

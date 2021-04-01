@@ -107,3 +107,37 @@ exports.upViews = async(id)=>{
 exports.conNum = async() => {
   return await db.query(`select count(*) cnt from interior`)
 }
+
+exports.contentCnt = async(conType, localCode)=>{
+  if(conType === 'noFilter'){
+    if(localCode === 'noFilter'){
+      const [result] = await db.query(`select count(*) cnt from interior`);
+      return result.cnt;
+    }else{
+      const [result] = await db.query(`select count(*) cnt from interior
+      where local_address = ?`, localCode);
+      return result.cnt;
+    }
+  }else{
+    if(localCode === 'noFilter'){
+      const [result] = await db.query(`select count(*) cnt from interior
+      where contents_type = ?`, conType);
+      return result.cnt;
+    }else{
+      const [result] = await db.query(`select count(*) cnt from interior
+      where contents_type = ? and local_address = ?`, [conType, localCode]);
+      return result.cnt;
+    }
+  }
+}
+
+exports.contentCntForSearch = async (conType) =>{
+  if(conType==='noFilter'){
+    const [result] = await db.query(`select count(*) cnt from interior`);
+    return result.cnt;
+  }else{
+    const [result] = await db.query(`select count(*) cnt from interior
+    where contents_type = ?`, conType);
+    return result.cnt;
+  }
+}

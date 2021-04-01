@@ -146,7 +146,7 @@ router.get('/add', ctx=>{
 //    const kakaoData = await oauth.kakao(code);
 //    ctx.body = kakaoData;
 // });
-app.use(
+app.use(// koa helmet 적용- 보안관련
   helmet({
     contentSecurityPolicy: false,
   })

@@ -82,3 +82,14 @@ exports.insertImgs = async (query, id)=>{
 exports.getMenuData = async (id)=>{
   return await db.query(`select brand_menutext from franchise where id = ?`, id)
 }
+
+exports.contentCnt = async(tag)=>{
+    if(tag === 'noFilter'){
+      const [result] = await db.query(`select count(*) cnt from franchise`);
+      return result.cnt;
+    }else{
+      const [result] = await db.query(`select count(*) cnt from franchise
+      where franchise_tag = ?`, tag);
+      return result.cnt;
+    }
+}

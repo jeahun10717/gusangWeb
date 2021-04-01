@@ -3,12 +3,9 @@
 ## 1. 이번 주 내로 해결
 
 * 링크가 직접 들어가는(https:// 를 포함하는) api 들은 joi 검증 만들어야 함
-* S3 업로드를 하는 api 들 중 갯수제한이 있을 때 그 갯수를 `{file}.ctrl.js` 파일에서 검증하는 소스 필요함.
-* xss 적용하기
 * S3 모듈 중에 extention 적용하기
 * naver, kakao 퍼블리싱 게정 적용하기
-* franchise create 부분 마무리 (대표메뉴부분)
-* 엔터가 포함된 긴 텍스트가 프론트에서 넘어올 때 \n, </br> 중 어느 것인지 확인하기
+* franchise create 부분에서
 
 ## 2. publishing 이후 수정해야 할 것
 

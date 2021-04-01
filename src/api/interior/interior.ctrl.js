@@ -30,14 +30,14 @@ exports.pagenate = async (ctx) => {
     // TODO: query 에서 원하는 값이 안들어오면 400 띄우는 소스 필요
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
     const result = await interior.pagination( order, type, localCode, conType, page, contentNum);
-
-    const conNum = await interior.conNum();
+    const conNum = await interior.contentCnt(conType, localCode);
+    // console.log(conNum, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
     ctx.body = {
         status : 200,
         result,
-        conNum: conNum[0].cnt,
-        page: Math.ceil(conNum[0].cnt/contentNum)
+        conNum: conNum,
+        pageNum: Math.ceil(conNum/contentNum)
     }
 }
 
@@ -85,14 +85,13 @@ exports.search = async (ctx) => {
     data = searchName.split(' ');
 
     const result = await interior.pageForSearch(data[0],data[1],data[2],conType,page, contentNum);
-
-    const conNum = await interior.conNum();
+    const conNum = await newsale.contentCntForSearch(conType);
 
     ctx.body = {
         status : 200,
         result,
-        conNum: conNum[0].cnt,
-        page: Math.ceil(conNum[0].cnt/contentNum)
+        conNum: conNum,
+        pageNum: Math.ceil(conNum/contentNum)
     }
 }
 
@@ -132,7 +131,7 @@ exports.create = async (ctx) => {
         kakaomap_info_longtitude : Joi.number().required(),    // 경도
         kakaomap_info_address : Joi.string().required(), // 주소
     }).validate(ctx.request.body)
-
+    // console.log(params.error);
     if(params.error) {
       const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
       const preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);

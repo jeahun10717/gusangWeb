@@ -155,7 +155,8 @@ router.use('/api', api.routes());
 
 app.use(cors());
 app.use(serve('./public'))
-app.use(bodyParser());
+app.use(bodyParser({
+    jsonLimit: '50mb', extended: true}))
 app.use(require('koa-morgan')('dev'));
 app.use(error);
 app.use(token.jwtMiddleware);

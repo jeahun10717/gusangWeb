@@ -85,7 +85,7 @@ exports.search = async (ctx) => {
     data = searchName.split(' ');
 
     const result = await interior.pageForSearch(data[0],data[1],data[2],conType,page, contentNum);
-    const conNum = await newsale.contentCntForSearch(conType);
+    const conNum = await interior.contentCntForSearch(conType);
 
     ctx.body = {
         status : 200,

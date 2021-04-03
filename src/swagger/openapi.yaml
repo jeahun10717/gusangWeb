@@ -1534,7 +1534,7 @@ paths:
           description: views->조회수순</br>id->최신순
           required: true
         - in: query
-          name: pagenum
+          name: page
           schema:
             type: integer
           required: true
@@ -1674,6 +1674,9 @@ paths:
                 brand_competitiveness:
                   type: string
                   description:  브랜드 정보 / 브랜드 경쟁력(html 로 바로 때려짐)
+                brand_comp_imgs:
+                  type: string
+                  description: /franchise/compUpImg 에서 받아오는 값을 그대로 배열 형태로 넣어야 함
                 brand_video:
                   type: string
                   format: binary
@@ -1835,8 +1838,10 @@ paths:
                   description: 브랜드 정보 / 브랜드 소개
                 brand_competitiveness:
                   type: string
-                  description:  // 브랜드 정보 -> html 로 바로 넣을거임
-
+                  description:  브랜드 경쟁력 전체 html 소스 삽입부분
+                brand_comp_imgs:
+                  type: string
+                  description: 브랜드 경쟁력 부분 DB 입력용 부분
                 blog_review:
                   type: string
                   description: 네이버 블로그 링크(iframe)
@@ -1925,6 +1930,68 @@ paths:
         '200':
           $ref: '#/components/responses/200'
 
+  /franchise/compUpImg:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Franchise
+      summary: franchise create 전 경쟁력 이미지를 위한 선작업
+      description: 처음 frachise 매물 생성하기 전에 먼저 이 api 를 사용하여 brand_competitiveness 부분을 위해 이미지를 올려야 한다.</br>
+                  위의 작업을 마친 후에 franchise/create 을 실행해야 한다.
+
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                brand_comp_imgs:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                    description: 브랜드 경쟁력 부분에 들어갈 이미지들
+              required:
+                - brand_comp_imgs
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+  /franchise/compImgUpdate:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Franchise
+      summary: brand_comp_imgs 를 위한 img Update api
+      description: brand_comp_imgs 의 수정을 위한 update api
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: 이미지를 업로드할 프랜차이즈 매물의 id
+                imgIdx:
+                  type: string
+                  description: 이미지를 업로드할 칼럼에서의 순번(index)
+                brand_comp_imgs:
+                  type: string
+                  format: binary
+                  description: 경쟁력 부분 이미지
+              required:
+                - id
+                - imgIdx
+                - brand_comp_imgs
+
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
+
   /franchise/delImg/{id}:
     delete:
       security:
@@ -1951,6 +2018,7 @@ paths:
               - franchise_logo
               - brand_menu
               - brand_video
+              - brand_comp_imgs
           required: true
           description: DB 상의 칼럼 이름
         - in: query

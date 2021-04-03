@@ -373,3 +373,11 @@ exports.upImg = async (ctx)=>{
         status: 200
     }
 }
+
+exports.test = async(ctx)=>{
+    const { text } = ctx.request.body;
+    console.log(text);
+    ctx.body = {
+        text: text
+    }    
+}

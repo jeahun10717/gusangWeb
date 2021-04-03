@@ -31,6 +31,16 @@ upload.fields([
     {name: "brand_video", maxcount: 1}
 ]),
 franchiseCtrl.upImg)
+.post('/compUpImg',
+upload.fields([
+    {name: "brand_comp_imgs", maxcount: 5}
+]),
+franchiseCtrl.compUpImg)
+.post('/compImgUpdate',
+upload.fields([
+    {name: "brand_comp_imgs", maxcount: 5}
+]),
+franchiseCtrl.compImgUpdate)
 // .post('/update/:id/:type', franchiseCtrl.update)
 .delete('/delImg/:id', franchiseCtrl.delImg)
 .delete('/remove/:id', franchiseCtrl.delete)

@@ -23,7 +23,9 @@ exports.getStorage = (bucket, folder)=>{
       // if(extVer.error) throw new Error(400);
       cb(null, `${folder}/${randomString({length:16})+Date.now()+extention}`);
     },
-    acl: 'public-read-write'
+    acl: 'public-read-write',
+    ContentEncoding: 'base64',
+    ContentDisposition: 'inline'
   });
 }
 

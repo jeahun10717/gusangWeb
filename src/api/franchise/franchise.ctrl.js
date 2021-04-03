@@ -13,7 +13,7 @@ exports.pagenate = async (ctx) => {
         order: Joi.string().regex(/\bdesc\b|\basc\b/).required(),
         tag: Joi.string().valid('noFilter',...tagArr).required(),
         type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
-        pagenum: Joi.number().integer().required()
+        page: Joi.number().integer().required()
     }).validate(ctx.query);
     console.log(params.error);
 
@@ -21,11 +21,11 @@ exports.pagenate = async (ctx) => {
         ctx.throw(400, "잘못된 요청입니다.")
     }
     // conType 은 contents_type 에 들어가는 것 : preveiw_video, live 등등
-    const { order, tag, type, pagenum } = params.value;
+    const { order, tag, type, page } = params.value;
     // order : {desc , asc} / conType : {preview video, 360 vr, live, market}
     // type : {views, id} //> id 는 최신순 정렬하는 거
     // TODO: 밑의 2 부분 30 으로 바꿔야 함
-    const result = await franchise.pagination( order, type, tag, pagenum, contentNum);
+    const result = await franchise.pagination( order, type, tag, page, contentNum);
     const conNum = await franchise.contentCnt(tag);
     // console.log(conNum, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
@@ -121,11 +121,12 @@ exports.create = async (ctx) => {
         // brand_menu: Joi.string().required(), // 브랜드 정보 / 브랜드 대표메뉴
         brand_menutext:Joi.string().required(),
         brand_competitiveness: Joi.string().required(), // 브랜드 정보 -> html 로 바로 넣을거임
+        brand_comp_imgs: Joi.string(),
         // brand_video: Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
 
         blog_review: Joi.string().required()
     }).validate(ctx.request.body);
-    // console.log(params.error);
+    console.log(params.error);
     // console.log(params.value.brand_menutext);
     if(params.error) {
       const franchise_logo = ctx.files['franchise_logo'].map(i=>i.key);
@@ -205,7 +206,7 @@ exports.update = async(ctx)=>{
     // brand_menu: Joi.string().required(), // 브랜드 정보 / 브랜드 대표메뉴
     brand_competitiveness: Joi.string().required(), // 브랜드 정보 -> html 로 바로 넣을거임
     // brand_video: Joi.string().required(), // 브랜드 정보 / 브랜드 홍보영상
-
+    brand_comp_imgs: Joi.string(),
     blog_review: Joi.string().required()
   }).validate(ctx.request.body);
 
@@ -227,7 +228,7 @@ exports.delImg = async (ctx)=>{
         ctx.throw(400, "없는 매물입니다")
     }
     const params = Joi.object({
-        field: Joi.string().valid("franchise_logo","brand_menu","brand_video").required(),
+        field: Joi.string().valid("franchise_logo","brand_menu","brand_video","brand_comp_imgs").required(),
         key: Joi.string().required()
     }).validate(ctx.query);
     if(params.error) ctx.throw(400, '잘못된 요청');
@@ -288,58 +289,92 @@ exports.upImg = async (ctx)=>{
     }).validate(ctx.request.body);
 
     if(params.error){
-        S3.delete(ctx.files[`${params.value.field}`][0].key);
-        ctx.throw(400, "잘못된 요청입니다.");
+        if(ctx.files[`brand_menu`]===undefined){
+          ctx.throw(400, "잘못된 요청입니다.");
+        }else{
+          S3.delete(ctx.files[`${params.value.field}`][0].key);
+          ctx.throw(400, "잘못된 요청입니다.");
+        }
     }
 
     if(params.value.field == "brand_menu"){
       const { id, field, imgIdx, menuText } = params.value;
       // console.log(params.value);
+      if(ctx.files[`brand_menu`]===undefined){
+  ////////////검증관련 - 200 외의 status 는 들어온 S3 소스 지우는 소스/////////////////////
+        const imgExist = await franchise.getImgs(id)
+        const imgArr = JSON.parse(imgExist[`${field}`]);
 
-////////////검증관련 - 200 외의 status 는 들어온 S3 소스 지우는 소스/////////////////////
-      const imgExist = await franchise.getImgs(id)
-      const imgArr = JSON.parse(imgExist[`${field}`]);
-      // console.log(ctx.files);
-      if(imgIdx > imgArr.length) {
-        S3.delete(ctx.files[`${field}`][0].key);
-        ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
-      }
-
-      if(field === 'thumnail_image'||field === 'preview_video_link'){
-        if(imgExist[`${field}`] != '[]'){
-          S3.delete(ctx.files[`${field}`][0].key);
-          ctx.throw(400, "해당 필드는 데이터가 2개이상 들어갈 수 없습니다.(데이터가 이미 존재함).")
+        if(await franchise.isExist(id)===0) {
+          ctx.throw(400, "없는 매물입니다.")
         }
-      }
+        // console.log(ctx.files);
+        if(imgIdx > imgArr.length) {
+          ctx.throw(400, "해당하는 인덱스에 이미지를 삽입할 수 없습니다.")
+        }
+  ////////////////////////////////////////////////////////////////////////////////
 
-      if(await franchise.isExist(id)===0) {
-        S3.delete(ctx.files[`${field}`][0].key);
-        ctx.throw(400, "없는 매물입니다.")
-      }
-////////////////////////////////////////////////////////////////////////////////
+        const result = await franchise.getImgsFromField(id, field);
+        const data = JSON.parse(result[field])
+        // console.log(data);
 
-      const result = await franchise.getImgsFromField(id, field);
-      const data = JSON.parse(result[field])
-      // console.log(data);
+        // console.log(imgInfo);
+        // console.log(imgName);
+        const menuData = await franchise.getMenuData(id);
+        let brandMenuText = JSON.parse(menuData[0].brand_menutext);
+        // console.log(brandMenuText);
+        // console.log(data);
+        // data.splice(imgIdx, 0, imgName);
+        // console.log(data);
+        brandMenuText.splice(imgIdx, 0, menuText);
+        await franchise.insertImgs({
+            brand_menutext: JSON.stringify(brandMenuText)
+        }, id)
 
-      let imgInfo = ctx.files[`${field}`]
-      // console.log(imgInfo);
-      const imgName = imgInfo[0].key;
-      // console.log(imgName);
-      const menuData = await franchise.getMenuData(id);
-      let brandMenuText = JSON.parse(menuData[0].brand_menutext);
-      console.log(brandMenuText);
-      // console.log(data);
-      data.splice(imgIdx, 0, imgName);
-      // console.log(data);
-      brandMenuText.splice(imgIdx, 0, menuText);
-      await franchise.insertImgs({
-          [field]: JSON.stringify(data),
-          brand_menutext: JSON.stringify(brandMenuText)
-      }, id)
+        ctx.body ={
+            status: 200
+        }
 
-      ctx.body ={
-          status: 200
+      }else{
+  ////////////검증관련 - 200 외의 status 는 들어온 S3 소스 지우는 소스/////////////////////
+        const imgExist = await franchise.getImgs(id)
+        const imgArr = JSON.parse(imgExist[`${field}`]);
+
+        if(await franchise.isExist(id)===0) {
+          S3.delete(ctx.files[`${field}`][0].key);
+          ctx.throw(400, "없는 매물입니다.")
+        }
+        // console.log(ctx.files);
+        if(imgIdx > imgArr.length) {
+          S3.delete(ctx.files[`${field}`][0].key);
+          ctx.throw(400, "해당하는 인덱스에 이미지를 삽입할 수 없습니다.")
+        }
+  ////////////////////////////////////////////////////////////////////////////////
+
+        const result = await franchise.getImgsFromField(id, field);
+        const data = JSON.parse(result[field])
+        // console.log(data);
+
+        let imgInfo = ctx.files[`${field}`]
+        // console.log(imgInfo);
+        const imgName = imgInfo[0].key;
+        // console.log(imgName);
+        const menuData = await franchise.getMenuData(id);
+        let brandMenuText = JSON.parse(menuData[0].brand_menutext);
+        console.log(brandMenuText);
+        // console.log(data);
+        data.splice(imgIdx, 0, imgName);
+        // console.log(data);
+        brandMenuText.splice(imgIdx, 0, menuText);
+        await franchise.insertImgs({
+            [field]: JSON.stringify(data),
+            brand_menutext: JSON.stringify(brandMenuText)
+        }, id)
+
+        ctx.body ={
+            status: 200
+        }
+
       }
     }else{
       const { id, field, imgIdx } = params.value;
@@ -348,6 +383,11 @@ exports.upImg = async (ctx)=>{
       const imgExist = await franchise.getImgs(id)
       const imgArr = JSON.parse(imgExist[`${field}`]);
 
+      if(await franchise.isExist(id)===0) {
+        S3.delete(ctx.files[`${field}`][0].key);
+        ctx.throw(400, "없는 매물입니다.")
+      }
+
       if(imgIdx > imgArr.length) {
         S3.delete(ctx.files[`${field}`][0].key);
         ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
@@ -360,10 +400,6 @@ exports.upImg = async (ctx)=>{
         }
       }
 
-      if(await franchise.isExist(id)===0) {
-        S3.delete(ctx.files[`${field}`][0].key);
-        ctx.throw(400, "없는 매물입니다.")
-      }
 ////////////////////////////////////////////////////////////////////////////////
 
       // console.log(params.value);
@@ -421,4 +457,66 @@ exports.delete = async(ctx) => {
     ctx.body = {
       status: 200
     }
+}
+
+
+exports.compUpImg = async(ctx)=>{
+  let brand_comp_imgs = ctx.files['brand_comp_imgs'].map(i=>i.key);
+
+  ctx.body = {
+    status:200,
+    brand_comp_imgs
+  }
+}
+
+exports.compImgUpdate = async(ctx)=>{
+  const params = Joi.object({
+      id: Joi.number().integer().required(),
+      imgIdx: Joi.number().integer().required(),
+  }).validate(ctx.request.body);
+
+  const field = "brand_comp_imgs";
+
+  if(params.error){
+      S3.delete(ctx.files[`${field}`][0].key);
+      ctx.throw(400, "잘못된 요청입니다.");
+  }
+
+  // console.log(params.value);
+  const { id, imgIdx } = params.value;
+
+////////////검증관련 - 200 외의 status 는 들어온 S3 소스 지우는 소스/////////////////////
+  const imgExist = await franchise.getImgs(id)
+  const imgArr = JSON.parse(imgExist[`${field}`]);
+  // console.log(ctx.files);
+  if(await franchise.isExist(id)===0) {
+    S3.delete(ctx.files[`${field}`][0].key);
+    ctx.throw(400, "없는 매물입니다.")
+  }
+
+  if(imgIdx > imgArr.length) {
+    S3.delete(ctx.files[`${field}`][0].key);
+    ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  const result = await franchise.getImgsFromField(id, field);
+  const data = JSON.parse(result[field])
+  // console.log(data);
+
+  let imgInfo = ctx.files[`${field}`]
+  // console.log(imgInfo);
+  const imgName = imgInfo[0].key;
+
+  data.splice(imgIdx, 0, imgName);
+  // console.log(data);
+  await franchise.insertImgs({
+      [field]: JSON.stringify(data),
+  }, id)
+
+  ctx.body ={
+      status: 200,
+      brand_comp_imgs: imgName
+  }
 }

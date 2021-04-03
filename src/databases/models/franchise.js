@@ -66,7 +66,7 @@ exports.rowNum = async()=>{
 // }
 
 exports.getImgs = async (id)=>{
-    const [result] = await db.query(`select franchise_logo, brand_menu, brand_video from franchise where id = ?`,id);
+    const [result] = await db.query(`select franchise_logo, brand_menu, brand_video, brand_comp_imgs from franchise where id = ?`,id);
     return result;
 }
 

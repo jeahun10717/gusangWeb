@@ -27,10 +27,12 @@
     "multer-s3": "^2.9.0",
     "mysql2": "^2.2.5",
     "random-string": "^0.2.0",
+    "serve": "^11.3.2",
     "swagger-jsdoc": "^6.0.1",
     "swagger-ui-koa": "0.0.1",
     "uuid4": "^2.0.2",
     "xss": "^1.0.8",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "yarn": "^1.22.10"
   }
 }

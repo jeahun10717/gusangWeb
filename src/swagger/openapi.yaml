@@ -369,6 +369,18 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/200'
+
+  /users/userInfo/getAllAdm:
+    get:
+      tags:
+        - User
+      summary: 모든 관리자 목록
+      desctiption: 모든 관리자 목록을 가져오는 api.</br>
+                  이 api 는 consult 에서 관리자 리스트를 위해 만들었음
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+
 # === newSale ===================================================================
   /newsale/create:
     post:
@@ -538,7 +550,7 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 
-  /newsale/detail/{id}:
+  /newsale/detail/{id}/{views}:
     get:
       security:
         - BearerAuth: []
@@ -552,6 +564,15 @@ paths:
           schema:
             type: integer
           description: 가져올 매물의 id
+          required: true
+        - in: path
+          name: views
+          schema:
+            type: integer
+            enum:
+              - 0
+              - 1
+          description: 1 일때는 이미 본 계시물, 0일 때는 안본 계시
           required: true
       responses:
         '200':
@@ -936,7 +957,7 @@ paths:
         '200':
             $ref: '#/components/responses/200'
 # === interior ===========================================================
-  /interior/detail/{id}:
+  /interior/detail/{id}/{views}:
     get:
       tags:
         - Interior
@@ -949,6 +970,16 @@ paths:
             type: integer
           description: 가져올 매물의 id
           required: true
+        - in: path
+          name: views
+          schema:
+            type: integer
+            enum:
+              - 0
+              - 1
+          description: 가져올 매물의 id
+          required: true
+
       responses:
         '200':
             $ref: '#/components/responses/200'
@@ -1433,7 +1464,7 @@ paths:
             $ref: '#/components/responses/200'
 
 # === franchise ==========================================================
-  /franchise/detail/{id}:
+  /franchise/detail/{id}/{views}:
     get:
       tags:
         - Franchise
@@ -1445,6 +1476,15 @@ paths:
           schema:
             type: integer
           description: 가져올 매물의 db 에서의 id
+          required: true
+        - in: path
+          name: views
+          schema:
+            type: integer
+            enum:
+              - 0
+              - 1
+          description: 1 일때는 이미 본 계시물, 0일 때는 안본 계시
           required: true
       responses:
         '200':
@@ -1468,6 +1508,38 @@ paths:
           schema:
             type: integer
           description: 페이지 번호
+          required: true
+        - in: query
+          name: tag
+          schema:
+            type: string
+            enum:
+              - noFilter
+              - cafe
+              - bakery
+              - dessert
+              - chicken
+              - pizza
+              - korean
+              - chinese
+              - japanese
+              - special
+              - snack
+              - fastfood
+              - pub
+              - convStore
+              - sale
+              - laundry
+              - pcRoom
+              - game
+              - studyCafe
+              - education
+              - life
+          description: 프랜차이즈 태그</br>
+            cafe(카페), bakery(제과제빵) ,dessert(디저트), chicken(치킨), pizza(피자),</br>
+            korean(한식), chinese(중식), japanese(일식) ,special(별식, 퓨전요리), snack(분식),</br>
+            fastfood(패스트푸드), pub(주점), convStore(편의점), sale(도소매), laundry(빨래방),</br>
+            pcRoom(pc방), game(여가, 오락), studyCafe(스터디카페, 독서실), education(교육, 육아), life(생활서비스)
           required: true
 
       responses:
@@ -1628,6 +1700,25 @@ paths:
                   type: string
                   description:  브랜드 창업 비용
 
+                brandcost_standard_width:
+                  type: integer
+                  description: 기준 점포 면적
+                brandcost_fran:
+                  type: integer
+                  description: 가맹비
+                brandcost_edu:
+                  type: integer
+                  description:  교육비
+                brandcost_depo:
+                  type: integer
+                  description:  보증금
+                brandcost_etc:
+                  type: integer
+                  description:  기타
+                brandcost_intr:
+                  type: integer
+                  description:  인테리어비
+
                 franchise_month_sales:
                   type: string
                   description:  그래프용 가맹점 연별 월매출 평균. 아래의 규칙을 따름</br>
@@ -1701,6 +1792,12 @@ paths:
                 - franchise_phone
                 - franchise_fax
                 - franchise_detailsale
+                - brandcost_standard_width
+                - brandcost_fran
+                - brandcost_edu
+                - brandcost_depo
+                - brandcost_etc
+                - brandcost_intr
                 - franchise_month_sales
                 - franchise_market_num
                 - franchise_market_contract
@@ -1799,8 +1896,27 @@ paths:
                   type: string
                   description:  대표 팩스 번호
                 franchise_detailsale:
-                  type: string
+                  type: integer
                   description: 브랜드 창업 비용
+
+                brandcost_standard_width:
+                  type: integer
+                  description: 기준 점포 면적
+                brandcost_fran:
+                  type: integer
+                  description: 가맹비
+                brandcost_edu:
+                  type: integer
+                  description:  교육비
+                brandcost_depo:
+                  type: integer
+                  description:  보증금
+                brandcost_etc:
+                  type: integer
+                  description:  기타
+                brandcost_intr:
+                  type: integer
+                  description:  인테리어비
 
                 franchise_month_sales:
                   type: string
@@ -1860,6 +1976,12 @@ paths:
                 - franchise_phone
                 - franchise_fax
                 - franchise_detailsale
+                - brandcost_standard_width
+                - brandcost_fran
+                - brandcost_edu
+                - brandcost_depo
+                - brandcost_etc
+                - brandcost_intr
                 - franchise_month_sales
                 - franchise_market_num
                 - franchise_market_contract
@@ -2097,7 +2219,12 @@ paths:
                 consult_req_sector:
                   type: string
                   description: 상담 요청한 업종 </br></br>**franchise 는 있어야 함**</br>**interior는 없어야 함**</br>interior 에서 consult_req_sector 값을 넣어서 보내게 되면 Bad request 뜸
-
+                consult_realty_name:
+                  type: string
+                  description: 상담요청한 사람의 부동산 이름
+                consult_realty_phoneNum:
+                  type: string
+                  description: 상담요청한 사람의 부동산 전화번호
               required:
                 - consult_name
                 - consult_req_email
@@ -2140,12 +2267,20 @@ paths:
                 consult_req_found:
                   type: string
                   description: 상담 요청한 찾는 물건(filter)
+                consult_realty_name:
+                  type: string
+                  description: 상담요청한 사람의 부동산 이름
+                consult_realty_phoneNum:
+                  type: string
+                  description: 상담요청한 사람의 부동산 전화번호
               required:
                 - consult_name
                 - consult_req_email
                 - consult_req_name
                 - consult_req_phone
                 - consult_req_found
+                - consult_realty_name
+                - consult_realty_phoneNum
       responses:
         '200':
           $ref: '#/components/responses/200'
@@ -2193,7 +2328,7 @@ paths:
           description: 이거는 아직 구현 안됨 구현된다면 초기값은 asc 가 맞음
 
         - in: query
-          name: pagenum
+          name: page
           schema:
             type: integer
             default: 0

@@ -2,7 +2,7 @@ const Joi = require('joi');
 const { S3 } = require('../../lib');
 const { interior } = require('../../databases');
 //TODO: 퍼플리싱 하기 전에 밑에 contentNum 15로 고쳐야 함.
-const contentNum = 2;
+const contentNum = 15;
 
 
 // 아래 함수에서 type 은 view 는 조회순, date 는 날짜순
@@ -43,16 +43,19 @@ exports.pagenate = async (ctx) => {
 
 exports.detail = async (ctx) => {
     const params = Joi.object({
-        id: Joi.number().integer().required()
+        id: Joi.number().integer().required(),
+        views: Joi.number().integer().required()
     }).validate(ctx.params)
 
     if(params.error){
         ctx.throw(400);
     }
 
-    const { id } = params.value;
+    const { id, views } = params.value;
 
-    await interior.upViews(id)
+    if(views === 1){
+      await interior.upViews(id)
+    }
     // Promise 함수인데 await 안붙히면 Promise 리턴해서 무조건 true 값이 됨. VSS
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
     if(await interior.isExist(id)){
@@ -334,7 +337,8 @@ exports.upImg = async (ctx)=>{
     }, id)
 
     ctx.body ={
-        status: 200
+        status: 200,
+        imgName
     }
 }
 

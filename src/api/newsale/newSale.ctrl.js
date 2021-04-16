@@ -3,7 +3,7 @@ const { S3 } = require('../../lib');
 const { newsale } = require('../../databases');
 const upload = S3.upload();
 //TODO: 퍼블리싱 하기 전 킽의 contentNum 을 15 로 고쳐야 함
-const contentNum = 2;
+const contentNum = 5;
 
 exports.pagenate = async (ctx) => {
     const params = Joi.object({
@@ -36,16 +36,19 @@ exports.pagenate = async (ctx) => {
 
 exports.detail = async (ctx) => {
     const params = Joi.object({
-        id: Joi.number().integer().required()
+        id: Joi.number().integer().required(),
+        views: Joi.number().integer().required()
     }).validate(ctx.params);
 
     if(params.error){
         ctx.throw(400, "잘못된 요청입니다.")
     }
 
-    const { id } = params.value;
+    const { id, views } = params.value;
+    if(views === 1){
+      await newsale.upViews(id);
+    }
 
-    await newsale.upViews(id);
 
     // Promise 함수인데 await 안붙히면 Promise 리턴해서 무조건 true 값이 됨. VSS
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
@@ -370,14 +373,7 @@ exports.upImg = async (ctx)=>{
     }, id)
 
     ctx.body ={
-        status: 200
+        status: 200,
+        imgName
     }
-}
-
-exports.test = async(ctx)=>{
-    const { text } = ctx.request.body;
-    console.log(text);
-    ctx.body = {
-        text: text
-    }    
 }

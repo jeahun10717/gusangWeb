@@ -6,24 +6,20 @@ const { auth, S3 } = require('../../lib');
 const upload = S3.upload();
 
 interior
-.get('/', ctx=>{
+.get('/', (ctx)=>{
   ctx.body = `
   <html>
       <head>
-
       </head>
       <body>
-          <!-- <img width="800" height="500" src="https://viar.live/embed/tour/tyvwqn" allowfullscreen style="border: none"></img>
-          <iframe width="800" height="500" src="https://viar.live/embed/tour/tyvwqn" allowfullscreen style="border: none"></iframe>
-          <iframe width="800" height="500" src="https://viar.live/embed/tour/tyvwqn" allowfullscreen style="border: none"></iframe>
-          <iframe width="800" height="500" src="https://viar.live/embed/tour/tyvwqn" allowfullscreen style="border: none"></iframe>  -->
-          <iframe src="https://jeahun-test.s3.ap-northeast-2.amazonaws.com/test/w5bF6j7NIq07Z4Jj1617339598498.txt" width="100%" height="100%"></iframe>
+        <img src="test/rvMpuh4YCptGxx2a1616558927219.png" alt="">
+<iframe width="800" height="500" src="https://viar.live/sphere/s24stg?play=true" allowfullscreen style="border: none" allow = "vr"></iframe>
       </body>
   </html>
 
   `
 })
-.get('/detail/:id', interiorCtrl.detail) // 한개의 정보전체를 뿌려주는 라우트
+.get('/detail/:id/:views', interiorCtrl.detail) // 한개의 정보전체를 뿌려주는 라우트
 .get('/search', interiorCtrl.search) // 검색 정렬을 위한 라우트 + 페이지네이션
 .get('/show', interiorCtrl.pagenate)   // 15개씩 보여주는 페이지를 위한 페이지네이션 포함 라우트
 // type:{date, veiws}, order:{desc, asc}, pagenum:{int num}

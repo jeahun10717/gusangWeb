@@ -79,14 +79,6 @@ exports.filteredPagination = async(type, manager, order, page, contents) => {
 
 exports.filteredPaginateNewSale = async(realtyName, found, manager, order, page, contents) => {
     if(realtyName === 'noFilter'){
-      // let str = 'select * from consult where consult_req_type = ? '
-      // let i = 1
-      // let arr = [tmp]
-      // str += found === 'noFilter' ? "and " : "";
-      //
-      // str += ? "orcder by "
-      // const TABLENAME = "newSale"
-      // `select * from ${TABLENAME}`
         if(found === 'noFilter'){
             if(manager === 'noFilter'){ // realtyName 필터 X, found 필터 X, manager 필터 X
                 return await db.query(`select *
@@ -176,4 +168,58 @@ exports.isExist = async(id)=>{
 
 exports.rowNum = async()=>{
     return await db.query('select count(*) cnt from consult');
+}
+
+exports.conCnt = async(type, manager)=>{
+    if(type == 'noFilter'){
+        if(manager == 'noFilter'){ // type 필터 X, manager 필터 X
+            return await db.query('select count(*) cnt from consult');
+        }else{  // type 필터 X, manager 필터 O
+            return await db.query('select count(*) cnt from consult where consult_manager_name = ?', manager);
+        }
+    }else if(type == 'interior'){
+        if(manager == 'noFilter'){ // type 필터 O, manager 필터 X
+            return await db.query('select count(*) cnt from consult where consult_req_type = ?', type);
+        }else{ // type 필터 O, manager 필터 O
+            return await db.query('select count(*) cnt from consult where consult_req_name = ? and consult_manager_name = ?', [manager, type]);
+        }
+    }else if(type == 'franchise'){
+        if(manager == 'noFilter'){ // type 필터 O, manager 필터 X
+            return await db.query('select count(*) cnt from consult where consult_req_type = ?', type);
+        }else{ // type 필터 O, manager 필터 O
+            return await db.query('select count(*) cnt from consult where consult_req_name = ? and consult_manager_name = ?', [manager, type]);
+        }
+    }
+}
+
+exports.conCntNewSale = async(realtyName, found, manager) => {
+    if(realtyName === 'noFilter'){
+        if(found === 'noFilter'){
+            if(manager === 'noFilter'){ // realtyName 필터 X, found 필터 X, manager 필터 X
+                return await db.query('select count(*) cnt from consult');
+            }else{ // realtyName 필터 X, found 필터 X, manager 필터 O
+                return await db.query('select count(*) cnt from consult where consult_manager_name = ?', manager);
+            }
+        }else{
+            if(manager === 'noFilter'){ // realtyName 필터 X, found 필터 O, manager 필터 X
+                return await db.query('select count(*) cnt from consult where consult_req_found = ?', found);
+            }else{ // realtyName 필터 X, found 필터 O, manager 필터 O
+                return await db.query('select count(*) cnt from consult where consult_req_found = ? and consult_manager_name = ?',[found, manager]);
+            }
+        }
+    }else{
+        if(found === 'noFilter'){
+            if(manager === 'noFilter'){ // realtyName 필터 O, found 필터 X, manager 필터 X
+                return await db.query('select count(*) cnt from consult where consult_realty_name = ?', realtyName);
+            }else{ // realtyName 필터 O, found 필터 X, manager 필터 O
+                return await db.query('select count(*) cnt from consult where consult_realty_name = ? and consult_manager_name = ?', [realtyName, manager]);
+            }
+        }else{
+            if(manager === 'noFilter'){ // realtyName 필터 O, found 필터 O, manager 필터 X
+                return await db.query('select count(*) cnt from consult where consult_realty_name = ? and consult_req_found = ?', [realtyName, found]);
+            }else{ // realtyName 필터 O, found 필터 O, manager 필터 O
+                return await db.query('select count(*) cnt from consult where consult_realty_name = ? and consult_req_found = ?, consult_manager_name = ?', [realtyName, found, manager]);
+            }
+        }
+    }
 }

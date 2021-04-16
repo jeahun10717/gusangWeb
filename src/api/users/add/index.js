@@ -33,7 +33,7 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
     else if(login_type === 1){  // naver login
       const naverData = await oauth.naverData(access_token);
       // console.log(naverData);
-      const result = await user.isExistFromUserID(`kakao:${kakaoData.id}`)
+      const result = await user.isExistFromUserID(`naver:${naverData.id}`)
       if(result) ctx.throw(400, "이미 존재하는 유저입니다.")
       login_id = `naver:${naverData.id}`;
     }

@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const { S3 } = require('../../lib');
 const { franchise } = require('../../databases');
-const contentNum = 2;
+const contentNum = 30;
 const tagArr = ["cafe","bakery","dessert","chicken","pizza",
 "korean","chinese","japanese","special","snack",
 "fastfood","pub","convStore","sale","laundry",
@@ -39,12 +39,16 @@ exports.pagenate = async (ctx) => {
 
 exports.detail = async (ctx) => {
     const params = Joi.object({
-        id: Joi.number().integer()
+        id: Joi.number().integer().required(),
+        views: Joi.number().integer().required()
     }).validate(ctx.params);
 
     if(params.error) ctx.throw(400, "잘못된 요청입니다.")
 
-    const { id } = params.value;
+    const { id, views } = params.value;
+    if(views === 1){
+      await franchise.upViews(id);
+    }
 
     // Promise 함수인데 await 안붙히면 Promise 리턴해서 무조건 true 값이 됨. VSS
     //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
@@ -65,18 +69,22 @@ exports.detail = async (ctx) => {
 exports.search = async (ctx) => {
     const params = Joi.object({
         searchName: Joi.string().required(),
+        tag: Joi.string().valid('noFilter',...tagArr).required(),
         page: Joi.number().integer().required()
     }).validate(ctx.query);
-    const { searchName, page } = params.value;
-    splitData = searchName.split(' ');
+    const { searchName, page, tag } = params.value;
+    const splitData = searchName.split(' ');
 
-    const result = await franchise.pageForSearch(splitData[0],splitData[1],splitData[2], page, contentNum);
+    const result = await franchise.pageForSearch(splitData[0],splitData[1],splitData[2], tag, page, contentNum);
+    const conNum = await franchise.contentCntForSearch(tag);
     // TODO: 위의 2 30 으로 바꾸기
 
     // const final = await franchise.pageForSearch(result, pagenum, 2)
     ctx.body = {
         status : 200,
-        result
+        result,
+        conNum: conNum,
+        pageNum: Math.ceil(conNum/contentNum)
     }
     // ctx.body = input
     // console.log(ctx.body);
@@ -106,6 +114,13 @@ exports.create = async (ctx) => {
         franchise_phone: Joi.string().required(), // 대표 번호
         franchise_fax: Joi.string().required(),  // 대표 팩스 번호
         franchise_detailsale: Joi.string().required(), // 브랜드 창업 비용
+
+        brandcost_standard_width: Joi.number().integer().required(),
+        brandcost_fran: Joi.number().integer().required(),
+        brandcost_edu: Joi.number().integer().required(),
+        brandcost_depo: Joi.number().integer().required(),
+        brandcost_etc: Joi.number().integer().required(),
+        brandcost_intr: Joi.number().integer().required(),
                                         //: 도표에 들어가는 자료인데 구분자로 여래개 받아서 넣을 듯
         // 아래 3개의 정보들은 배열로 넣는데 2010~2021 순인데 년도가 수정되면 추가할 수 있음
         // 그래프용 연별 매출
@@ -169,6 +184,7 @@ exports.create = async (ctx) => {
 
 exports.update = async(ctx)=>{
   const { id } = ctx.params;
+
   if(await franchise.isExist(id)===0){
       ctx.throw(400, "없는 매물입니다")
   }
@@ -190,8 +206,14 @@ exports.update = async(ctx)=>{
     franchise_crn: Joi.string().required(),  // 법인등록번호
     franchise_phone: Joi.string().required(), // 대표 번호
     franchise_fax: Joi.string().required(),  // 대표 팩스 번호
-    franchise_detailsale: Joi.string().required(), // 브랜드 창업 비용
+    franchise_detailsale: Joi.number().integer().required(), // 브랜드 창업 비용
                                     //: 도표에 들어가는 자료인데 구분자로 여래개 받아서 넣을 듯
+    brandcost_standard_width: Joi.number().integer().required(),
+    brandcost_fran: Joi.number().integer().required(),
+    brandcost_edu: Joi.number().integer().required(),
+    brandcost_depo: Joi.number().integer().required(),
+    brandcost_etc: Joi.number().integer().required(),
+    brandcost_intr: Joi.number().integer().required(),
     // 아래 3개의 정보들은 배열로 넣는데 2010~2021 순인데 년도가 수정되면 추가할 수 있음
     // 그래프용 연별 매출
     franchise_month_sales: Joi.string().required(),
@@ -210,8 +232,9 @@ exports.update = async(ctx)=>{
     blog_review: Joi.string().required()
   }).validate(ctx.request.body);
 
+  console.log(params.error);
   if(params.error) ctx.throw(400, "잘못된 요청입니다.");
-
+  // console.log("ad1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
   await franchise.update(id, {
     ...params.value,
     updateAt: new Date()
@@ -372,7 +395,9 @@ exports.upImg = async (ctx)=>{
         }, id)
 
         ctx.body ={
-            status: 200
+            status: 200,
+            imgName,
+            brandMenuText
         }
 
       }
@@ -425,7 +450,8 @@ exports.upImg = async (ctx)=>{
       }, id)
 
       ctx.body ={
-          status: 200
+          status: 200,
+          imgName
       }
     }
 }

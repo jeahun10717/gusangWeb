@@ -5,7 +5,7 @@ const axios = require('axios');
 const { KAKAO_ADMIN_KEY } = process.env;
 
 // TODO: 퍼블리싱 하기 전에 밑에 부분 30 으로 고쳐야 함
-const contentNum = 1;
+const contentNum = 15;
 
 exports.userMe = async(ctx)=>{
   const { UUID } = ctx.request.user;
@@ -308,4 +308,13 @@ exports.setMasterADM = async (ctx)=>{
         }
         await user.setADM(uuid, adm);
     }
+}
+
+exports.getAllAdm = async(ctx)=>{
+  const admins = await user.getAllAdm()
+
+  ctx.body = {
+    stauts: 200,
+    adm: admins
+  }
 }

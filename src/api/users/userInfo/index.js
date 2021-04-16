@@ -3,6 +3,8 @@ const userInfo = new Router();
 const userInfoCtrl = require('./userInfo.ctrl');
 const { auth } = require('../../../lib');
 
+userInfo
+.get('/getAllAdm', userInfoCtrl.getAllAdm);
 
 userInfo.use(auth.login);
 userInfo.use(auth.level1);

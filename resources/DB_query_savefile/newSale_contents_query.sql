@@ -7,23 +7,10 @@ select views from newsale;
 -- test query -----------------------------------------------------------------------------------------------------
 update newSale set views = views +1 where id = 1;
 insert into newSale.views values (123);
-select 
-	case
-	when contents_name like "%2%" then locate("2", contents_name)+100
-	when contents_name like "%3%" then locate("3", contents_name)+200
-	when contents_name like "%4%" then locate("4", contents_name)+300
-	end as zorder, contents_name, contents_type, local_address, thumnail_image, preview_video_link, views
-	from newSale
-    where contents_type = "preview video"
-order by 
-	zorder
-	limit 2 offset 0;
 alter table newSale modify newsale_info_etc text;
 -- ----------------------------------------------------------------------------------------------------------------
 update Users set Auth = 1 where id = 1;
-select * from Users;
 
-drop table newSale;
 create table newSale(
     id int unsigned auto_increment primary key,
     contents_name varchar(40), -- : 컨텐츠에 표시될 텍스트, 검색될 때 사용

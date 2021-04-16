@@ -1,8 +1,8 @@
 const multer = require('@koa/multer');
 const init = require('./init');
 
-const bucket = 'jeahun-test';
-const s3_newsale_folder = 'test';
+const bucket = 'gusang';
+const s3_newsale_folder = 'bindata';
 
 exports.upload = ()=>{
   return multer({

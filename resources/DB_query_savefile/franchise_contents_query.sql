@@ -2,17 +2,13 @@ use gusang;
 select * from franchise;
 -- test query------------------------------------------------------------------------------
 drop table franchise;
-select 
-	case
-	when franchise_name like "%bbb%" then locate('bbb',franchise_name)+100
-	when franchise_name like "%aaa%" then locate('aaa', franchise_name)+200
-	when franchise_name like "%xxx%" then locate('xxx', franchise_name)+300
-	end as zorder, franchise_name, franchise_address, franchise_tag
-from franchise
-where franchise_tag = "korean"
-order by 
-	zorder
-    limit 2 offset 0;
+alter table franchise add brand_comp_imgs text;
+
+alter table franchise add  brandcost_fran int;
+alter table franchise add  brandcost_edu int;
+alter table franchise add  brandcost_depo int;
+alter table franchise add  brandcost_etc int;
+alter table franchise add  brandcost_intr int;
 -- ----------------------------------------------------------------------------------------
 create table franchise(
     id int unsigned auto_increment primary key,
@@ -34,6 +30,12 @@ create table franchise(
     franchise_fax varchar(20),  -- 대표 팩스 번호
     franchise_detailsale varchar(256), -- 브랜드 창업 비용
                                        -- 도표에 들어가는 자료인데 구분자로 여래개 받아서 넣을 듯
+	brandcost_standard_width int,
+	brandcost_fran int,
+    brandcost_edu int,
+    brandcost_depo int,
+    brandcost_etc int,
+    brandcost_intr int,
     -- 아래 3개의 정보들은 배열로 넣는데 2010~2021 순인데 년도가 수정되면 추가할 수 있음
     -- 그래프용 연별 매출
     franchise_month_sales varchar(256),
@@ -46,11 +48,13 @@ create table franchise(
 
     brand_introduce text, -- 브랜드 정보 / 브랜드 소개
     brand_menu text, -- 브랜드 정보 / 브랜드 대표메뉴
-    brand_competitiveness longtext, -- 브랜드 정보 / 브랜드 경쟁력-->pdf 로 처리할거임
+	brand_menutext text,
+	brand_competitiveness text, -- 브랜드 정보 / 브랜드 경쟁력-->pdf 로 처리할거임
+    brand_comp_imgs text,
     brand_video text, -- 브랜드 정보 / 브랜드 홍보영상
     -- 위의 brand_video 는 영상파일인지 youtube 링크인지 구분해서 넣어줄 것
 
-	blog_review varchar(256),
+		blog_review varchar(256),
     
     registAt datetime default now(),
     updateAt datetime,

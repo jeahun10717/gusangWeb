@@ -25,7 +25,7 @@ function getBcode(address){
                     reject(false)
                 })
                 .catch(e=>{
-                    console.log(e.response.data);
+                    // console.log(e.response.data);
                     reject(false);
                 })
         }

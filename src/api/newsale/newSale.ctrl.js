@@ -3,7 +3,7 @@ const { S3 } = require('../../lib');
 const { newsale } = require('../../databases');
 const upload = S3.upload();
 //TODO: 퍼블리싱 하기 전 킽의 contentNum 을 15 로 고쳐야 함
-const contentNum = 5;
+const contentNum = 15;
 
 exports.pagenate = async (ctx) => {
     const params = Joi.object({
@@ -13,7 +13,7 @@ exports.pagenate = async (ctx) => {
         type: Joi.string().regex(/\bviews\b|\bid\b/).required(),
         page: Joi.number().integer().required()
     }).validate(ctx.query);
-    console.log(params.error);
+    // console.log(params.error);
     if(params.error){
         ctx.throw(400)
     }
@@ -80,10 +80,12 @@ exports.search = async (ctx) => {
     const { searchName, page, conType } = params.value;
     // searchName : 검색어 | page : {페이지 num} | conType : {preview video, 360 vr, live, market}
     const data = searchName.split(' ');
-
+    if(data[1]===undefined) data[1]=''
+    if(data[2]===undefined) data[2]=''
     const result = await newsale.pageForSearch(data[0],data[1],data[2],conType,page, contentNum);
-    const conNum = await newsale.contentCntForSearch(conType);
-
+    // console.log(data[1]);
+    const conNum = await newsale.contentCntForSearch(data[0], data[1], data[2], conType);
+    // console.log(conNum);
     ctx.body = {
         status : 200,
         result,
@@ -95,37 +97,37 @@ exports.search = async (ctx) => {
 exports.create = async (ctx) => {
     const params = Joi.object({
         contents_name : Joi.string().required(), // 컨텐츠에 표시될 텍스트, 검색될 때 사용
-        contents_type : Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(),  // 영상, 360 vr, 주거, 상가
+        contents_type : Joi.string().regex(/\blive\b|\bmarket\b/).required(),  // 영상, 360 vr, 주거, 상가
         local_address : Joi.string().required(), // : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                    // 프론트에서 데이터 정해줘야 할 듯
         // auth ,  // : 이 부분은 newSale 을 따로 뺐으니까 필요없을 듯함
         // thumnail_image : Joi.string().required(),
         // preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
-        youtube_info_link : Joi.string().required(), // 안내영상 링크(youtube link)
-        youtube_inner_link : Joi.string().required(), // 내부영상 링크(youtube link)
-        vr_link_inner : Joi.string().required(), // 내부 vr 영상을 위한 링크(youtube link)
-        vr_link_outer : Joi.string().required(), // 외부 vr 영상을 위한 링크(youtube link)
-        vr_link_typeA : Joi.string().required(), // type A vr 링크
-        vr_link_typeB : Joi.string().required(), // type B vr 링크
+        youtube_info_link : Joi.string(), // 안내영상 링크(youtube link)
+        youtube_inner_link : Joi.string(), // 내부영상 링크(youtube link)
+        vr_link_inner : Joi.string(), // 내부 vr 영상을 위한 링크(youtube link)
+        vr_link_outer : Joi.string(), // 외부 vr 영상을 위한 링크(youtube link)
+        vr_link_typeA : Joi.string(), // type A vr 링크
+        vr_link_typeB : Joi.string(), // type B vr 링크
 
-        // vr_image : Joi.string().required(), // 사진 슬라이드에 들어갈 이미지 로컬링크
+        // vr_image : Joi.string(), // 사진 슬라이드에 들어갈 이미지 로컬링크
         // 이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때)일 경우에는 어떻게 해야 함?
         // 위의 질문이 구현이 어렵다면 그냥 특정 개수로 태그를 달아서 하는 게 낫나?
 
-        // info_image : Joi.string().required(), // 안내자료에 들어갈 이미지 로컬링크
+        // info_image : Joi.string(), // 안내자료에 들어갈 이미지 로컬링크
 
         // 설명 부분
-        newsale_info_type : Joi.string().required(),            // 1. 타입
-        newsale_info_housenum : Joi.number().required(),        // 2. 총 세대수
-        newsale_info_parknum : Joi.number().required(),         // 3. 주차 대수
-        newsale_info_width : Joi.number().required(),           // 4. 평형대
-        newsale_info_price : Joi.number().required(),           // 5. 가격
-        newsale_info_perprice : Joi.number().required(),        // 6. 평당가격
-        newsale_info_roomnum : Joi.number().required(),         // 7. 방 개수
-        newsale_info_bathroomnum : Joi.number().required(),     // 7. 욕실
-        newsale_info_option : Joi.string().required(),  // 8. 옵션
-        newsale_info_floornum : Joi.number().required(),        // 9. 층수
-        newsale_info_etc : Joi.string().required(),    // 10. 기타설명
+        newsale_info_type : Joi.string(),            // 1. 타입
+        newsale_info_housenum : Joi.number(),        // 2. 총 세대수
+        newsale_info_parknum : Joi.number(),         // 3. 주차 대수
+        newsale_info_width : Joi.number(),           // 4. 평형대
+        newsale_info_price : Joi.number(),           // 5. 가격
+        newsale_info_perprice : Joi.number(),        // 6. 평당가격
+        newsale_info_roomnum : Joi.number(),         // 7. 방 개수
+        newsale_info_bathroomnum : Joi.number(),     // 7. 욕실
+        newsale_info_option : Joi.string(),  // 8. 옵션
+        newsale_info_floornum : Joi.number(),        // 9. 층수
+        newsale_info_etc : Joi.string(),    // 10. 기타설명
         //
 
         kakaomap_info_latitude : Joi.number().required(),
@@ -133,15 +135,17 @@ exports.create = async (ctx) => {
         kakaomap_info_address : Joi.string().required(),
     }).validate(ctx.request.body);
 
-    console.log(params.error);
+    // console.log(params.error);
 
     if(params.error) {
       let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+      let thumnail_image_vr = ctx.files['thumnail_image_vr'].map(i=>i.key);
       let vr_image = ctx.files['vr_image'].map(i=>i.key);
       let info_image = ctx.files['info_image'].map(i=>i.key);
       let preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
       let allFile = [
         ...thumnail_image,
+        ...thumnail_image_vr,
         ...vr_image,
         ...info_image,
         ...preview_video_link
@@ -153,11 +157,13 @@ exports.create = async (ctx) => {
     }
 
     let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+    let thumnail_image_vr = ctx.files['thumnail_image_vr'].map(i=>i.key);
     let vr_image = ctx.files['vr_image'].map(i=>i.key);
     let info_image = ctx.files['info_image'].map(i=>i.key);
     let preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
 
     thumnail_image = JSON.stringify(thumnail_image)
+    thumnail_image_vr = JSON.stringify(thumnail_image_vr)
     vr_image = JSON.stringify(vr_image)
     info_image = JSON.stringify(info_image)
     preview_video_link = JSON.stringify(preview_video_link)
@@ -165,6 +171,7 @@ exports.create = async (ctx) => {
     await newsale.insert({
         ...params.value,
         thumnail_image: thumnail_image,
+        thumnail_image_vr: thumnail_image_vr,
         preview_video_link: preview_video_link,
         vr_image: vr_image,
         info_image: info_image,
@@ -186,12 +193,16 @@ exports.delete = async(ctx) => {
     const binData = await newsale.getImgs(id);
 
     const thumnail_image = JSON.parse(binData.thumnail_image);
+    const thumnail_image_vr = JSON.parse(binData.thumnail_image_vr);
     const preview_video_link = JSON.parse(binData.preview_video_link);
     const vr_image = JSON.parse(binData.vr_image);
     const info_image = JSON.parse(binData.info_image);
 
     for (var i = 0; i < thumnail_image.length; i++) {
       S3.delete(thumnail_image[i]);
+    }
+    for (var i = 0; i < thumnail_image_vr.length; i++) {
+      S3.delete(thumnail_image_vr[i]);
     }
     for (var i = 0; i < preview_video_link.length; i++) {
       S3.delete(preview_video_link[i]);
@@ -218,43 +229,44 @@ exports.update = async (ctx) => {
 
     const params = Joi.object({
         contents_name : Joi.string().required(), // 컨텐츠에 표시될 텍스트, 검색될 때 사용
-        contents_type : Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(),  // 영상, 360 vr, 주거, 상가
+        contents_type : Joi.string().regex(/\blive\b|\bmarket\b/).required(),  // 영상, 360 vr, 주거, 상가
         local_address : Joi.string().required(), // : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                    // 프론트에서 데이터 정해줘야 할 듯
         // auth ,  // : 이 부분은 newSale 을 따로 뺐으니까 필요없을 듯함
         // thumnail_image : Joi.string().required(),
         // preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
-        youtube_info_link : Joi.string().required(), // 안내영상 링크(youtube link)
-        youtube_inner_link : Joi.string().required(), // 내부영상 링크(youtube link)
-        vr_link_inner : Joi.string().required(), // 내부 vr 영상을 위한 링크(youtube link)
-        vr_link_outer : Joi.string().required(), // 외부 vr 영상을 위한 링크(youtube link)
-        vr_link_typeA : Joi.string().required(), // type A vr 링크
-        vr_link_typeB : Joi.string().required(), // type B vr 링크
+        youtube_info_link : Joi.string().empty('').default(null), // 안내영상 링크(youtube link)
+        youtube_inner_link : Joi.string().empty('').default(null), // 내부영상 링크(youtube link)
+        vr_link_inner : Joi.string().empty('').default(null), // 내부 vr 영상을 위한 링크(youtube link)
+        vr_link_outer : Joi.string().empty('').default(null), // 외부 vr 영상을 위한 링크(youtube link)
+        vr_link_typeA : Joi.string().empty('').default(null), // type A vr 링크
+        vr_link_typeB : Joi.string().empty('').default(null), // type B vr 링크
 
-        // vr_image : Joi.string().required(), // 사진 슬라이드에 들어갈 이미지 로컬링크
+        // vr_image : Joi.string(), // 사진 슬라이드에 들어갈 이미지 로컬링크
         // 이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때)일 경우에는 어떻게 해야 함?
         // 위의 질문이 구현이 어렵다면 그냥 특정 개수로 태그를 달아서 하는 게 낫나?
 
-        // info_image : Joi.string().required(), // 안내자료에 들어갈 이미지 로컬링크
+        // info_image : Joi.string(), // 안내자료에 들어갈 이미지 로컬링크
 
         // 설명 부분
-        newsale_info_type : Joi.number().required(),            // 1. 타입
-        newsale_info_housenum : Joi.number().required(),        // 2. 총 세대수
-        newsale_info_parknum : Joi.number().required(),         // 3. 주차 대수
-        newsale_info_width : Joi.number().required(),           // 4. 평형대
-        newsale_info_price : Joi.number().required(),           // 5. 가격
-        newsale_info_perprice : Joi.number().required(),        // 6. 평당가격
-        newsale_info_roomnum : Joi.number().required(),         // 7. 방 개수
-        newsale_info_bathroomnum : Joi.number().required(),     // 7. 욕실
-        newsale_info_option : Joi.string().required(),  // 8. 옵션
-        newsale_info_floornum : Joi.number().required(),        // 9. 층수
-        newsale_info_etc : Joi.string().required(),    // 10. 기타설명
+        newsale_info_type : Joi.string().empty('').default(null),            // 1. 타입
+        newsale_info_housenum : Joi.number().empty('').default(null),        // 2. 총 세대수
+        newsale_info_parknum : Joi.number().empty('').default(null),         // 3. 주차 대수
+        newsale_info_width : Joi.number().empty('').default(null),           // 4. 평형대
+        newsale_info_price : Joi.number().empty('').default(null),           // 5. 가격
+        newsale_info_perprice : Joi.number().empty('').default(null),        // 6. 평당가격
+        newsale_info_roomnum : Joi.number().empty('').default(null),         // 7. 방 개수
+        newsale_info_bathroomnum : Joi.number().empty('').default(null),     // 7. 욕실
+        newsale_info_option : Joi.string().empty('').default(null),  // 8. 옵션
+        newsale_info_floornum : Joi.number().empty('').default(null),        // 9. 층수
+        newsale_info_etc : Joi.string().empty('').default(null),    // 10. 기타설명
         //
 
         kakaomap_info_latitude : Joi.number().required(),
         kakaomap_info_longtitude : Joi.number().required(),
         kakaomap_info_address : Joi.string().required(),
     }).validate(ctx.request.body)
+    // console.log(params.error);
     if(params.error) {
         ctx.throw(400, "잘못된 요청입니다.");
     }
@@ -269,6 +281,7 @@ exports.update = async (ctx) => {
     //     vr_image: [ ...JSON.parse(Imgs.vr_image), ...vr_image],
     //     info_image: [ ...JSON.parse(Imgs.info_image), ...info_image],
     // }, id);
+    // console.log(params.value);
     await newsale.update(id, {
         ...params.value,
         updateAt: new Date()
@@ -287,7 +300,7 @@ exports.delImg = async (ctx)=>{
     // TODO: id 가 존재하는 값인지 검증해야 함-->생각해보고 굳이 필요없겠다고 생각들면 안할것
     const { id } = ctx.params;
     const params = Joi.object({
-        field: Joi.string().valid("thumnail_image","preview_video_link","vr_image","info_image").required(),
+        field: Joi.string().valid("thumnail_image", "thumnail_image_vr", "preview_video_link","vr_image","info_image").required(),
         key: Joi.string().required()
     }).validate(ctx.query);
     if(params.error) {
@@ -323,7 +336,7 @@ exports.delImg = async (ctx)=>{
 exports.upImg = async (ctx)=>{
     const params = Joi.object({
       id: Joi.number().integer().required(),
-      field: Joi.string().regex(/\bthumnail_image\b|\bpreview_video_link\b|\bvr_image\b|\binfo_image\b/).required(),
+      field: Joi.string().valid("thumnail_image", "thumnail_image_vr", "preview_video_link","vr_image","info_image").required(),
       imgIdx: Joi.number().integer().required()
     }).validate(ctx.query)
 
@@ -342,7 +355,7 @@ exports.upImg = async (ctx)=>{
       ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
     }
 
-    if(field === 'thumnail_image'||field === 'preview_video_link'){
+    if(field === 'thumnail_image'||field === 'preview_video_link'||field === 'thumnail_image_vr'){
       if(imgExist[`${field}`] != '[]'){
         S3.delete(ctx.files[`${field}`][0].key);
         ctx.throw(400, "해당 필드는 데이터가 2개이상 들어갈 수 없습니다.(데이터가 이미 존재함).")

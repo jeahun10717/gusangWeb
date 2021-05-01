@@ -27,7 +27,7 @@ function getAccessToken(code){
              reject(false);
           })
           .catch( e=>{
-             console.log(e.response.data);
+             // console.log(e.response.data);
              reject(false);
           });
        }
@@ -50,7 +50,7 @@ exports.kakao = async ( code )=>{
    try{
       data = await getAccessToken(code);
    }catch(e){
-      console.log("error",e);
+      // console.log("error",e);
    }
 
    const kakaoData = (await axios.post(`https://kapi.kakao.com/v2/user/me`, {}, {
@@ -70,10 +70,10 @@ exports.naverData = async (access_token)=>{
           Authorization: `Bearer ${access_token}`
         }
       });
-  
+
       return result.data.response;
     }catch(e){
-       console.log(e.data);
+       // console.log(e.data);
       const err = new Error('잘못된 요청-네이버 로그인 실패');
       err.status = 400;
       throw err

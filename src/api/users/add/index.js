@@ -17,7 +17,17 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
         realty_owner_phone: Joi.string().regex(/^[0-9]{10,13}$/).required()
     }).validate(ctx.request.body);
 
-    if(params.error) ctx.throw(400, 'bed request');
+    // console.log(params.error[0]);
+    // console.log();
+    // console.log(params.error.details[0].message);
+
+    // console.log(throwErrMsg);
+    if(params.error) {
+      const errorMsg = params.error.details[0].message;
+      const regexp = new RegExp(/^\"[a-zA-Z\_]{0,}\"/, "g");
+      const throwErrMsg = regexp.exec(errorMsg);
+      ctx.throw(400, throwErrMsg[0])
+    };
 
     const { access_token, login_type, ...rest } = params.value;
 
@@ -27,7 +37,7 @@ add.post ('/', async (ctx,next) => {   //부동산 관련 가입 시 로그인 �
       const kakaoData = await oauth.kakaoData(access_token);
       const result = await user.isExistFromUserID(`kakao:${kakaoData.id}`)
       if(result) ctx.throw(400, "이미 존재하는 유저입니다.")
-      console.log(result);
+      // console.log(result);
       login_id = `kakao:${kakaoData.id}`;
     }
     else if(login_type === 1){  // naver login

@@ -9,10 +9,6 @@ const content = require('./content')
 
 const api = new Router();
 
-api.get('/', (ctx, next)=>{
-    ctx.body = 'this is api page'
-})
-
 api.use('/users', users.routes());
 api.use('/newsale', newsale.routes());
 api.use('/interior', interior.routes());

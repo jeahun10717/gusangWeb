@@ -6,7 +6,7 @@ const token = require('../token');
 exports.regist = async (query)=>{
     const userData = await user.isExist(query.login_type, query.login_id);
     // 가입이 된 유저인지 검증
-    console.log(userData, ' : /login/index.js');
+    // console.log(userData, ' : /login/index.js');
     if(userData){   //가입이 되어 있을 경우(userData 가 존재할 때)-->isExist 가 객체로 존재할 때 <1>
         // 토큰 생성 및 토큰 return
         // dead code

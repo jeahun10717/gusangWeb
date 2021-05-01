@@ -30,6 +30,7 @@ exports.pagenate = async (ctx) => {
     // TODO: query 에서 원하는 값이 안들어오면 400 띄우는 소스 필요
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
     const result = await interior.pagination( order, type, localCode, conType, page, contentNum);
+    console.log(result);
     const conNum = await interior.contentCnt(conType, localCode);
     // console.log(conNum, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
@@ -86,9 +87,10 @@ exports.search = async (ctx) => {
     const { searchName, page, conType } = params.value;
 
     data = searchName.split(' ');
-
+    if(data[1]===undefined) data[1]=''
+    if(data[2]===undefined) data[2]=''
     const result = await interior.pageForSearch(data[0],data[1],data[2],conType,page, contentNum);
-    const conNum = await interior.contentCntForSearch(conType);
+    const conNum = await interior.contentCntForSearch(data[0],data[1],data[2],conType);
 
     ctx.body = {
         status : 200,
@@ -101,20 +103,21 @@ exports.search = async (ctx) => {
 exports.create = async (ctx) => {
     const params = Joi.object({
         contents_name : Joi.string().required(), // 컨텐츠에 표시될 텍스트
-        contents_type : Joi.string().regex(/\bcommon\b|\blive\b|\bmarket\b/).required(), // 영상,360 vr, 주거, 상가
+        contents_type : Joi.string().regex(/\blive\b|\bmarket\b/).required(), // 영상,360 vr, 주거, 상가
         local_address : Joi.string().required(), // : 지역명에 대한 정보 저장, ex) 연제구, 부산진구 등등
                                    // 프론트에서 데이터 정해줘야 할 듯
         // thumnail_image : Joi.string().required(),
 
         // preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
-        youtube_link : Joi.string().required(), // 해당 컨텐츠의 유튭 영상
-        vr_link_old : Joi.string().required(), // 시공 전 vr 영상을 위한 링크
-        vr_link_new : Joi.string().required(), // 시공 후 vr 영상을 위한 링크
+        youtube_link : Joi.string(), // 해당 컨텐츠의 유튭 영상
+        youtube_link_text : Joi.string(),
+        vr_link_old : Joi.string(), // 시공 전 vr 영상을 위한 링크
+        vr_link_new : Joi.string(), // 시공 후 vr 영상을 위한 링크
 
         construct_time : Joi.string().required(), // 인테리어/상세보기 부분 공사기간
         construct_cost : Joi.string().required(), // 인테리어/상세보기 부분 공사비용
         construct_company : Joi.string().required(), // 인테리어/상세보기 부분 공사업체
-        construct_info : Joi.string().required(), // 인테리어/상세보기 부분 공사내역
+        construct_info : Joi.string(), // 인테리어/상세보기 부분 공사내역
 
         // image_link : Joi.string().required(), // 사진 슬라이드에 들어갈 이미지 로컬링크
         // 이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때일 경우에는 어떻게 해야 함?
@@ -125,8 +128,8 @@ exports.create = async (ctx) => {
         interior_info_width : Joi.number().required(),              // 2. 평수
         interior_info_period : Joi.string().required(),    // 3. 공사기간
         interior_info_price : Joi.number().required(),              // 4. 비용
-        interior_info_history : Joi.string().required(),   // 5. 시공내역
-        interior_info_etc : Joi.string().required(),       // 6. 기타설명
+        interior_info_history : Joi.string(),   // 5. 시공내역
+        interior_info_etc : Joi.string(),       // 6. 기타설명
         //
 
         // 카카오 맵을 위한 위도 경도 주소
@@ -137,10 +140,12 @@ exports.create = async (ctx) => {
     // console.log(params.error);
     if(params.error) {
       const thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+      const thumnail_image_vr = ctx.files['thumnail_image_vr'].map(i=>i.key);
       const preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
       const image_link = ctx.files['image_link'].map(i=>i.key);
       const allFile = [
         ...thumnail_image,
+        ...thumnail_image_vr,
         ...preview_video_link,
         ...image_link,
       ]
@@ -151,16 +156,19 @@ exports.create = async (ctx) => {
     }
 
     let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
+    let thumnail_image_vr = ctx.files['thumnail_image_vr'].map(i=>i.key);
     let preview_video_link = ctx.files['preview_video_link'].map(i=>i.key);
     let image_link = ctx.files['image_link'].map(i=>i.key);
 
     thumnail_image = JSON.stringify(thumnail_image)
+    thumnail_image_vr = JSON.stringify(thumnail_image_vr)
     preview_video_link = JSON.stringify(preview_video_link)
     image_link = JSON.stringify(image_link)
 
     await interior.insert({
         ...params.value,
         thumnail_image: thumnail_image,
+        thumnail_image_vr: thumnail_image_vr,
         preview_video_link: preview_video_link,
         image_link: image_link,
         views:0
@@ -170,20 +178,6 @@ exports.create = async (ctx) => {
         status: 200
     }
 
-}
-
-exports.delete = async(ctx) => {
-    const { id } = ctx.params;
-
-    //isExist 는 값이 DB 에 있으면 1, 없으면 0 출력
-    if(interior.isExist(id)){
-        await interior.delete(id)
-        ctx.body = {
-            status : 200
-        }
-    }else{
-        ctx.throw(400)
-    }
 }
 
 exports.update = async (ctx) => {
@@ -200,14 +194,15 @@ exports.update = async (ctx) => {
         // thumnail_image : Joi.string().required(),
 
         // preview_video_link : Joi.string().required(), // 미리보기 영상 로컬링크
-        youtube_link : Joi.string().required(), // 해당 컨텐츠의 유튭 영상
-        vr_link_old : Joi.string().required(), // 시공 전 vr 영상을 위한 링크
-        vr_link_new : Joi.string().required(), // 시공 후 vr 영상을 위한 링크
+        youtube_link : Joi.string().empty('').default(null), // 해당 컨텐츠의 유튭 영상
+        youtube_link_text : Joi.string().empty('').default(null),
+        vr_link_old : Joi.string().empty('').default(null), // 시공 전 vr 영상을 위한 링크
+        vr_link_new : Joi.string().empty('').default(null), // 시공 후 vr 영상을 위한 링크
 
         construct_time : Joi.string().required(), // 인테리어/상세보기 부분 공사기간
         construct_cost : Joi.string().required(), // 인테리어/상세보기 부분 공사비용
         construct_company : Joi.string().required(), // 인테리어/상세보기 부분 공사업체
-        construct_info : Joi.string().required(), // 인테리어/상세보기 부분 공사내역
+        construct_info : Joi.string().empty('').default(null), // 인테리어/상세보기 부분 공사내역
 
         // image_link : Joi.string().required(), // 사진 슬라이드에 들어갈 이미지 로컬링크
         // 이미지가 여러개 인데 만약에 동적(사진 개수가 정해지지 않았을 때일 경우에는 어떻게 해야 함?
@@ -218,8 +213,8 @@ exports.update = async (ctx) => {
         interior_info_width : Joi.number().required(),              // 2. 평수
         interior_info_period : Joi.string().required(),    // 3. 공사기간
         interior_info_price : Joi.number().required(),              // 4. 비용
-        interior_info_history : Joi.string().required(),   // 5. 시공내역
-        interior_info_etc : Joi.string().required(),       // 6. 기타설명
+        interior_info_history : Joi.string().empty('').default(null),   // 5. 시공내역
+        interior_info_etc : Joi.string().empty('').default(null),       // 6. 기타설명
         //
 
         // 카카오 맵을 위한 위도 경도 주소
@@ -251,7 +246,7 @@ exports.delImg = async (ctx)=>{
     // TODO: id 가 존재하는 값인지 검증해야 함-->생각해보고 굳이 필요없겠다고 생각들면 안할것
     const { id } = ctx.params;
     const params = Joi.object({
-        field: Joi.string().valid("thumnail_image","preview_video_link","image_link").required(),
+        field: Joi.string().valid("thumnail_image","thumnail_image_vr","preview_video_link","image_link").required(),
         key: Joi.string().required()
     }).validate(ctx.query);
     if(params.error) ctx.throw(400, '잘못된 요청');
@@ -287,7 +282,7 @@ exports.delImg = async (ctx)=>{
 exports.upImg = async (ctx)=>{
     const params = Joi.object({
         id: Joi.number().integer().required(),
-        field: Joi.string().valid('thumnail_image','preview_video_link','image_link').required(),
+        field: Joi.string().valid('thumnail_image',"thumnail_image_vr",'preview_video_link','image_link').required(),
         imgIdx: Joi.number().integer().required()
     }).validate(ctx.query);
 
@@ -306,7 +301,7 @@ exports.upImg = async (ctx)=>{
       ctx.throw(400, "해당하는 인덱스의 이미지가 존재하지 않습니다")
     }
 
-    if(field === 'thumnail_image'||field === 'preview_video_link'){
+    if(field === 'thumnail_image'||field === 'preview_video_link'||field === "thumnail_image_vr"){
       if(imgExist[`${field}`] != '[]'){
         S3.delete(ctx.files[`${field}`][0].key);
         ctx.throw(400, "해당 필드는 데이터가 2개이상 들어갈 수 없습니다.(데이터가 이미 존재함).")
@@ -350,11 +345,15 @@ exports.delete = async(ctx) => {
   const binData = await interior.getImgs(id);
 
   const thumnail_image = JSON.parse(binData.thumnail_image);
+  const thumnail_image_vr = JSON.parse(binData.thumnail_image_vr);
   const preview_video_link = JSON.parse(binData.preview_video_link);
   const image_link = JSON.parse(binData.image_link);
 
   for (var i = 0; i < thumnail_image.length; i++) {
     S3.delete(thumnail_image[i]);
+  }
+  for (var i = 0; i < thumnail_image_vr.length; i++) {
+    S3.delete(thumnail_image_vr[i]);
   }
   for (var i = 0; i < preview_video_link.length; i++) {
     S3.delete(preview_video_link[i]);

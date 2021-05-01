@@ -26,7 +26,7 @@ exports.token = async(ctx)=>{
     const bufUUID = Buffer.from(UUID, 'hex');
 
     const result = await user.isExistFromUUID(bufUUID);
-    console.log(result);
+    // console.log(result);
     if(!result) ctx.throw(401, "인증 오류 입니다.");
 
     ctx.body={
@@ -111,8 +111,14 @@ exports.update = async(ctx)=>{
         realty_owner_name: Joi.string().required(),
         realty_owner_phone: Joi.string().regex(/^[0-9]{10,13}$/).required()
     }).validate(ctx.request.body);
-    if(params.error) ctx.throw(400, 'bed request');
 
+    if(params.error) {
+      const errorMsg = params.error.details[0].message;
+      const regexp = new RegExp(/^\"[a-zA-Z\_]{0,}\"/, "g");
+      const throwErrMsg = regexp.exec(errorMsg);
+      ctx.throw(400, throwErrMsg[0])
+    };
+    
     const result = await user.update(user_id, params.value);
     if(result.affectedRows === 0) ctx.throw(400, "id 가 존재하지 않음");
 
@@ -224,7 +230,7 @@ exports.delete = async(ctx)=>{
   // const token = ctx.request.header.authorization;
   // console.log(token);
   // console.log(userInfo, admNum, "dddddddddddddddddddddddddddddddd");
-  console.log(userInfo.Auth, admNum);
+  // console.log(userInfo.Auth, admNum);
   if(userInfo.Auth === 3 && admNum <= 1) ctx.throw(400, "본 유저가 탈퇴시 최종관리자가 1명도 없으므로 탈퇴가 불가합니다.")
   // console.log(KAKAO_ADMIN_KEY);
   // const config = {

@@ -24,15 +24,17 @@ newsale
 .post('/create',
 upload.fields([
     {name: "thumnail_image", maxCount: 1},
+    {name: "thumnail_image_vr", maxCount: 1},
     {name: "preview_video_link", maxcount: 1},
-    {name: "vr_image", maxCount: 5},
-    {name: "info_image", maxCount: 5}
+    {name: "vr_image", maxCount: 30},
+    {name: "info_image", maxCount: 30}
 ]),
 newSaleCtrl.create)
 .post('/update/:id', newSaleCtrl.update)
 .post('/upImg',
 upload.fields([
     {name: "thumnail_image", maxCount: 1},
+    {name: "thumnail_image_vr", maxCount: 1},
     {name: "preview_video_link", maxcount: 1},
     {name: "vr_image", maxCount: 1},
     {name: "info_image", maxCount: 1}

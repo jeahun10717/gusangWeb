@@ -20,7 +20,7 @@ interior
     {name: "thumnail_image", maxcount: 1},
     {name: "thumnail_image_vr", maxCount: 1},
     {name: "preview_video_link", maxcount: 1},
-    {name: "image_link", maxcount: 2}
+    {name: "image_link", maxcount: 30}
 ]), interiorCtrl.create)
 .post('/update/:id', interiorCtrl.update)
 .post('/upImg',

@@ -104,12 +104,12 @@ exports.update = async(ctx)=>{
 
 
     const params = Joi.object({
-        phone: Joi.string().regex(/^[0-9]{10,13}$/).required(), // 회원전화번호
+        phone: Joi.string().regex(/^[0-9]{8,13}$/).required(), // 회원전화번호
         name: Joi.string().required(),  // 회원 이름
         realty_name: Joi.string().required(),
         realty_address: Joi.string().required(),
         realty_owner_name: Joi.string().required(),
-        realty_owner_phone: Joi.string().regex(/^[0-9]{10,13}$/).required()
+        realty_owner_phone: Joi.string().regex(/^[0-9]{8,13}$/).required()
     }).validate(ctx.request.body);
 
     if(params.error) {
@@ -118,7 +118,7 @@ exports.update = async(ctx)=>{
       const throwErrMsg = regexp.exec(errorMsg);
       ctx.throw(400, throwErrMsg[0])
     };
-    
+
     const result = await user.update(user_id, params.value);
     if(result.affectedRows === 0) ctx.throw(400, "id 가 존재하지 않음");
 
@@ -138,12 +138,12 @@ exports.userUpdate = async(ctx)=>{
   const reqBody = Joi.object({
     uuid: Joi.string().custom(v=>Buffer.from(v,'hex')).required(),
     auth: Joi.number().integer().valid(0,1,2,3).required(),
-    phone: Joi.string().regex(/^[0-9]{10,13}$/).required(), // 회원전화번호
+    phone: Joi.string().regex(/^[0-9]{8,13}$/).required(), // 회원전화번호
     name: Joi.string().required(),  // 회원 이름
     realty_name: Joi.string().required(),
     realty_address: Joi.string().required(),
     realty_owner_name: Joi.string().required(),
-    realty_owner_phone: Joi.string().regex(/^[0-9]{10,13}$/).required()
+    realty_owner_phone: Joi.string().regex(/^[0-9]{8,13}$/).required()
   }).validate(ctx.request.body);
 
   // if(query.error) ctx.throw(400, "잘못된 요청입니다");

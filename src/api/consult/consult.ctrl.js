@@ -13,9 +13,9 @@ exports.create = async (ctx)=>{
 
             consult_req_name : Joi.string().required(), // 상담 요청한 사람의 이름
             // consult_req_type : (30), 처음 받은 기획서에서 상담사항에 해당하는 부분임 위에서 가져오면 됨
-            consult_req_phone : Joi.string().regex(/^[0-9]{10,13}$/).required(), // 상담 요청한 사람의 전화번호
+            consult_req_phone : Joi.string().regex(/^[0-9]{8,13}$/).required(), // 상담 요청한 사람의 전화번호
             consult_realty_name: Joi.string(),
-            consult_realty_phoneNum : Joi.string().regex(/^[0-9]{10,13}$/)
+            consult_realty_phoneNum : Joi.string().regex(/^[0-9]{8,13}$/)
             // -----------------------------------------------------------------
         }).validate(ctx.request.body)
         // console.log(params.error);
@@ -40,11 +40,11 @@ exports.create = async (ctx)=>{
 
             consult_req_name : Joi.string().required(), // 상담 요청한 사람의 이름
             // consult_req_type : (30), 처음 받은 기획서에서 상담사항에 해당하는 부분임 위에서 가져오면 됨
-            consult_req_phone : Joi.string().regex(/^[0-9]{10,13}$/).required(), // 상담 요청한 사람의 전화번호
+            consult_req_phone : Joi.string().regex(/^[0-9]{8,13}$/).required(), // 상담 요청한 사람의 전화번호
             // -----------------------------------------------------------------
             consult_req_sector : Joi.string().required(), // 상담 요청한 업종
             consult_realty_name: Joi.string(),
-            consult_realty_phoneNum : Joi.string().regex(/^[0-9]{10,13}$/)
+            consult_realty_phoneNum : Joi.string().regex(/^[0-9]{8,13}$/)
         }).validate(ctx.request.body)
         if(params.error) {
           const errorMsg = params.error.details[0].message;
@@ -82,11 +82,11 @@ exports.createNewSale = async (ctx) => {
         consult_req_email : Joi.string().email().required(),
         consult_req_name : Joi.string().required(), // 상담 요청한 사람의 이름
         // consult_req_type : (30), 처음 받은 기획서에서 상담사항에 해당하는 부분임 위에서 가져오면 됨
-        consult_req_phone : Joi.string().regex(/^[0-9]{10,13}$/).required(), // 상담 요청한 사람의 전화번호
+        consult_req_phone : Joi.string().regex(/^[0-9]{8,13}$/).required(), // 상담 요청한 사람의 전화번호
         // -----------------------------------------------------------------
         consult_req_found : Joi.string().required(), // 상담 요청한 찾는 물건
-        consult_realty_name: Joi.string().required(),
-        consult_realty_phoneNum : Joi.string().regex(/^[0-9]{10,13}$/).required()
+        consult_realty_name: Joi.string(),
+        consult_realty_phoneNum : Joi.string().regex(/^[0-9]{8,13}$/)
     }).validate(ctx.request.body)
     if(params.error) {
       const errorMsg = params.error.details[0].message;

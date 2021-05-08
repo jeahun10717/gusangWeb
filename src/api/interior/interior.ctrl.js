@@ -30,7 +30,7 @@ exports.pagenate = async (ctx) => {
     // TODO: query 에서 원하는 값이 안들어오면 400 띄우는 소스 필요
     // TODO: 주거랑 상가 부분에서 지역별로 나눌 필요가 없는지 클라이언트한테 물어봐야 함
     const result = await interior.pagination( order, type, localCode, conType, page, contentNum);
-    console.log(result);
+    // console.log(result);
     const conNum = await interior.contentCnt(conType, localCode);
     // console.log(conNum, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
@@ -225,7 +225,7 @@ exports.update = async (ctx) => {
 
 
     if(params.error) {
-        ctx.throw(400);
+        ctx.throw(400, "잘못된 요청입니다.");
     }
 
     await interior.update(id, {

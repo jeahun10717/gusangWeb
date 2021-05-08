@@ -114,8 +114,8 @@ exports.create = async (ctx) => {
         franchise_address: Joi.string().required(), // 주소
         franchise_registnum: Joi.string(), // 사업자등록번호
         franchise_crn: Joi.string(),  // 법인등록번호
-        franchise_phone: Joi.string(), // 대표 번호
-        franchise_fax: Joi.string(),  // 대표 팩스 번호
+        franchise_phone: Joi.string().regex(/^[0-9]{8,13}$/), // 대표 번호
+        franchise_fax: Joi.string().regex(/^[0-9]{8,13}$/),  // 대표 팩스 번호
         franchise_detailsale: Joi.string(), // 브랜드 창업 비용
 
         brandcost_standard_width: Joi.number().integer(),
@@ -470,6 +470,7 @@ exports.delete = async(ctx) => {
     const franchise_logo = JSON.parse(binData.franchise_logo);
     const brand_menu = JSON.parse(binData.brand_menu);
     const brand_video = JSON.parse(binData.brand_video);
+    const brand_comp_imgs = JSON.parse(binData.brand_comp_imgs);
 
     for (var i = 0; i < franchise_logo.length; i++) {
       S3.delete(franchise_logo[i]);
@@ -479,6 +480,11 @@ exports.delete = async(ctx) => {
     }
     for (var i = 0; i < brand_video.length; i++) {
       S3.delete(brand_video[i]);
+    }
+    if(brand_comp_imgs){
+        for (var i = 0; i < brand_comp_imgs.length; i++) {
+          S3.delete(brand_comp_imgs[i]);
+        }
     }
 
     await franchise.delete(id);

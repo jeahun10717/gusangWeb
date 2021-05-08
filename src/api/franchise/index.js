@@ -19,7 +19,7 @@ franchise
 .post('/create',
 upload.fields([
     {name: "franchise_logo", maxcount: 1},
-    {name: "brand_menu", maxcount: 3},
+    {name: "brand_menu", maxcount: 30},
     {name: "brand_video", maxcount: 1}
 ]),
 franchiseCtrl.create)
@@ -33,12 +33,12 @@ upload.fields([
 franchiseCtrl.upImg)
 .post('/compUpImg',
 upload.fields([
-    {name: "brand_comp_imgs", maxcount: 5}
+    {name: "brand_comp_imgs", maxcount: 30}
 ]),
 franchiseCtrl.compUpImg)
 .post('/compImgUpdate',
 upload.fields([
-    {name: "brand_comp_imgs", maxcount: 5}
+    {name: "brand_comp_imgs", maxcount: 30}
 ]),
 franchiseCtrl.compImgUpdate)
 // .post('/update/:id/:type', franchiseCtrl.update)

@@ -18,7 +18,7 @@ exports.pagenate = async (ctx) => {
     // console.log(params.error);
 
     if(params.error){
-        ctx.throw(400)
+        ctx.throw(400, "잘못된 요청입니다")
     }
     // show/:type/:id
     // 위의 api router 에서 type 은 최신순, 조회순
@@ -152,7 +152,10 @@ exports.create = async (ctx) => {
       for (let i = 0; i < allFile.length; i++) {
         S3.delete(allFile[i]);
       }
-      ctx.throw(400, "잘못된 요청입니다.")
+      const errorMsg = params.error.details[0].message;
+      const regexp = new RegExp(/^\"[a-zA-Z\_]{0,}\"/, "g");
+      const throwErrMsg = regexp.exec(errorMsg);
+      ctx.throw(400, throwErrMsg[0])
     }
 
     let thumnail_image = ctx.files['thumnail_image'].map(i=>i.key);
@@ -225,7 +228,10 @@ exports.update = async (ctx) => {
 
 
     if(params.error) {
-        ctx.throw(400, "잘못된 요청입니다.");
+        const errorMsg = params.error.details[0].message;
+        const regexp = new RegExp(/^\"[a-zA-Z\_]{0,}\"/, "g");
+        const throwErrMsg = regexp.exec(errorMsg);
+        ctx.throw(400, throwErrMsg[0])
     }
 
     await interior.update(id, {

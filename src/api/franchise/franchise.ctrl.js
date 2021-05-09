@@ -158,7 +158,10 @@ exports.create = async (ctx) => {
       for (let i = 0; i < allFile.length; i++) {
         S3.delete(allFile[i]);
       }
-      ctx.throw(400, "잘못된 요청입니다.")
+      const errorMsg = params.error.details[0].message;
+      const regexp = new RegExp(/^\"[a-zA-Z\_]{0,}\"/, "g");
+      const throwErrMsg = regexp.exec(errorMsg);
+      ctx.throw(400, throwErrMsg[0])
     }
 
     // console.log(params.value[0].brand_menutext);
@@ -236,7 +239,12 @@ exports.update = async(ctx)=>{
   }).validate(ctx.request.body);
 
   // console.log(params.error);
-  if(params.error) ctx.throw(400, "잘못된 요청입니다.");
+  if(params.error) {
+      const errorMsg = params.error.details[0].message;
+      const regexp = new RegExp(/^\"[a-zA-Z\_]{0,}\"/, "g");
+      const throwErrMsg = regexp.exec(errorMsg);
+      ctx.throw(400, throwErrMsg[0])
+  }
   // console.log("ad1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
   await franchise.update(id, {
     ...params.value,

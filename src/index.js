@@ -146,11 +146,11 @@ const { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, NAVER_CLIENT_ID, NAVER_REDIRECT_URI
 //    const kakaoData = await oauth.kakao(code);
 //    ctx.body = kakaoData;
 // });
-app.use(// koa helmet 적용- 보안관련
-  helmet({
-    contentSecurityPolicy: false,
-  })
-);
+// app.use(// koa helmet 적용- 보안관련
+//   helmet({
+//     contentSecurityPolicy: false,
+//   })
+// );
 router.use('/api', api.routes());
 app.use(serve(__dirname + '/build'))
 app.use(cors());

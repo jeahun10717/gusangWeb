@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const multerS3 = require('multer-s3');
+// const multerS3 = require('multer-s3-rotate');
 const path = require('path');
 const randomString = require('random-string');
 const Joi = require('joi')
@@ -24,8 +25,6 @@ exports.getStorage = (bucket, folder)=>{
       cb(null, `${folder}/${randomString({length:16})+Date.now()+extention}`);
     },
     acl: 'public-read-write',
-    ContentEncoding: 'base64',
-    ContentDisposition: 'inline'
   });
 }
 
